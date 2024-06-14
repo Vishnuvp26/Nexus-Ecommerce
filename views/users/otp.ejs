@@ -1,0 +1,125 @@
+<%- include("../layout/header") %>
+<!-- Navbar -->
+<%- include("../layout/navbar") %>
+
+<div class="container pb-xl-5 pt-xl-1">
+    <div class="row justify-content-center center-div">
+        <div class="col-md-6 col-lg-6"> <!-- Increased column width -->
+            <div class="formContainer border py-5">
+                <div class="title pb-5 text-center">
+                    <h2 class="font-weight-medium">Enter OTP</h2>
+                </div>
+
+                <!-- OTP Entry -->
+                <form id="otpForm" method="POST" class="pt-2">
+                    <div class="form-group">
+                        <label for="otp" class="form-label text-danger">
+                            <% if(locals.message) { %>
+                                <%= message %>
+                            <% } %>
+                        </label>
+                        <span class="text-center d-block mb-4">Please enter the OTP sent to your email</span>
+                        <input type="text" class="input" name="otp" id="otp" placeholder="Enter OTP" required>
+                    </div><br>
+                    
+                    <!-- Timer -->
+                    <div class="mb-3" id="timerSection" style="display: none;">
+                        <span id="timer"></span> seconds remaining
+                    </div>
+
+                    <a href="/otp">
+                        <button type="button" class="btn btn-secondary mb-3 ms-2" id="resendButton" style="display: none;">Resend OTP</button>
+                    </a>
+
+                    <button id="submitOTPBtn" type="submit" class="btn btn-info rounded-pill w-100 mt-3">Submit OTP</button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p>Already have an account?&nbsp;<a href="/login">Log In</a></p>    
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../layout/footer.ejs") %>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Timer
+    const timerSection = document.getElementById('timerSection');
+    const timerSpan = document.getElementById('timer');
+    const resendButton = document.getElementById('resendButton');
+    const submitOTPBtn = document.getElementById('submitOTPBtn');
+
+    let timerDuration = 60;
+    let timerInterval;
+
+    function startTimer() {
+        timerDuration = 50; // Reset timer
+        timerSection.style.display = 'block';
+        resendButton.style.display = 'none';
+        submitOTPBtn.style.display = 'block';
+
+        timerInterval = setInterval(() => {
+            if (timerDuration <= 0) {
+                clearInterval(timerInterval);
+                resendButton.style.display = 'block';
+                timerSection.style.display = 'none';
+            } else {
+                timerSpan.textContent = timerDuration;
+                timerDuration--;
+            }
+        }, 1000);
+    }
+    startTimer();
+
+    document.getElementById('otpForm').onsubmit = function(event) {
+        event.preventDefault();
+
+        const otpInput = document.getElementById('otp');
+        const otp = otpInput.value;
+
+        if (otp.length >= 4 && /^[0-9]+$/.test(otp)) {
+            axios.post('/otp', { otp: otp })
+                .then(function(response) {
+                    if (response.data.success === true) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registration Successful',
+                            text: 'Your registration has been completed successfully.',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/login';
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid OTP',
+                            text: 'The OTP you entered is incorrect. Please try again.'
+                        });
+                    }
+                })
+                .catch(function(error) {
+                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Server Error',
+                        text: 'An error occurred while verifying your OTP. Please try again later.'
+                    });
+                });
+        } else {
+            otpInput.classList.add('is-invalid');
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Input',
+                text: 'Please enter a valid OTP.'
+            });
+        }
+    }
+</script>

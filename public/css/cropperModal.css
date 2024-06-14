@@ -1,0 +1,13 @@
+/* Increase modal size */
+.modal-lg {
+    max-width: 80%; /* Adjust the width as needed */
+}
+  
+  
+/* Center modal */
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 60px); /* Adjust if you have a fixed header */
+}

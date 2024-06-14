@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Nexus Admin</title>
+<!--===============================================================================================-->
+    <link rel="stylesheet" href="/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/css/cropperModal.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JavaScript -->
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="/assets/images/faces/3935309_user_admin_icon (1).png" />
+<!--===============================================================================================-->    
+  </head>
+  <body>
+    
+    <div class="container-scroller">
+      
+      <!---------- Navbar Starting ---------->
+      <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+          <a href="#" style="text-decoration: none; color: black;"><h3>NEXUS</h3></a>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+  
+
+          <!-- Admin Nav Dropdown section -->
+          <ul class="navbar-nav navbar-nav-right">
+            <li class="nav-item nav-profile dropdown">
+              <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                <div class="nav-profile-img">
+                </div>
+                <div class="nav-profile-text">
+                  <p class="mb-1 text-black">Admin</p>
+                </div>
+              </a>
+
+              <!-- Logout Button -->
+              <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
+                <div class="dropdown-divider"></div>
+                <a id="logoutButton" class="dropdown-item"">
+                  <i class="mdi mdi-logout mr-2 text-primary"></i>Logout 
+                </a>  
+              </div>
+            </li>
+            <!-- Admin Nav Dropdown section - -->
+          
+          
+            <!-- Full screen mode -->
+            <li class="nav-item d-none d-lg-block full-screen-link">
+              <a class="nav-link">
+                <i class="mdi mdi-fullscreen" id="fullscreen-button"></i>
+              </a>
+            </li>
+          </ul>
+            <!-- Toggler Button -->
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-menu"></span>
+          </button>
+        </div>
+      </nav>
+      <!---------- Navbar Ending ---------->
+
+
+      <!-- Navbar logout sweetAlert -->
+      <script>
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Are you sure you want to logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/logout";
+                }
+            });
+        });
+    </script>   

@@ -1,0 +1,215 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+<style>
+  .table th,
+  .table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .table th:nth-child(1),
+  .table td:nth-child(1) {
+    width: 10%;
+  }
+
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    width: 20%;
+  }
+
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    width: 30%;
+  }
+
+  .table th:nth-child(4),
+  .table td:nth-child(4) {
+    width: 20%;
+  }
+
+  .table th:nth-child(5),
+  .table td:nth-child(5) {
+    width: 15%;
+  }
+</style>
+
+<div class="main-panel">
+  <div class="content-wrapper">
+
+    <div class="page-header pt-5">
+      <h3 class="page-title d-flex align-items-center">
+        <span class="page-title-icon btn-gradient-primary text-white mr-2">
+          <i class="mdi mdi-account-multiple menu-icon"></i>
+        </span>
+        Users
+      </h3>
+      <nav aria-label="breadcrumb" class="d-flex align-items-center mt-3">
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<%= searchQuery %>"/>
+          <button class="btn btn-gradient-dark" type="submit">Search</button>
+        </form>
+      </nav>
+    </div>
+
+  
+
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Actions</th>  
+              </tr>
+            </thead>
+            <tbody>
+              <% if(userData.length > 0) { %>
+                <% userData.forEach((user, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= user.name %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.phone %></td>
+                    <td>
+                      <% if (user.is_blocked) { %>
+                        <button class="btn-sm btn-gradient-success" onclick="unblockUser('<%= user._id %>')" style="width: 100px;">Unblock</button>
+                      <% } else { %>
+                        <button class="btn-sm btn-gradient-danger" onclick="blockUser('<%= user._id %>')" style="width: 100px;">Block</button>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" class="text-center">No users found</td>
+                  <div class="mb-4">
+                    <a href="/admin/users" class="btn btn-inverse-dark">Go Back</a>
+                  </div>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+
+          <!-- Pagination Container -->
+          <div class="pagination-container mt-4">
+            <ul class="pagination justify-content-center">
+              <% if (currentPage > 1) { %>
+                <li class="page-item">
+                  <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Previous</a>
+                </li>
+              <% } %>
+              <% for(let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+                  <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+                </li>
+              <% } %>
+              <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                  <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+                </li>
+              <% } %>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../layout/adminSidebarFoot") %>
+<%- include("../layout/adminFooter") %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+
+  // Block User
+  function blockUser(userId) {
+    Swal.fire({
+      title: 'Are you sure you want to block this user?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, block',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.get(`/admin/blockUser/?id=${userId}`)
+          .then((response) => {
+            if (response.data.success) {
+              Swal.fire(
+                'Blocked!',
+                'User has been blocked.',
+                'success'
+              ).then(() => {
+                window.location.reload();
+              });
+            } else {
+              Swal.fire(
+                'Error!',
+                `Failed to block the user: ${response.data.error}`,
+                'error'
+              );
+            }
+          })
+          .catch((error) => {
+            console.error('Error blocking the user:', error);
+            Swal.fire(
+              'Error!',
+              'An error occurred while trying to block the user.',
+              'error'
+            );
+          });
+      }
+    });
+  }
+
+  // Unblock User
+  function unblockUser(userId) {
+    Swal.fire({
+      title: 'Are you sure you want to unblock this user?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, unblock',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.get(`/admin/unblockUser/?id=${userId}`)
+          .then((response) => {
+            if (response.data.success) {
+              Swal.fire(
+                'Unblocked!',
+                'User has been unblocked.',
+                'success'
+              ).then(() => {
+                window.location.reload();
+              });
+            } else {
+              Swal.fire(
+                'Error!',
+                `Failed to unblock the user: ${response.data.error}`,
+                'error'
+              );
+            }
+          })
+          .catch((error) => {
+            console.error('Error unblocking the user:', error);
+            Swal.fire(
+              'Error!',
+              'An error occurred while trying to unblock the user.',
+              'error'
+            );
+          });
+      }
+    });
+  }
+</script>

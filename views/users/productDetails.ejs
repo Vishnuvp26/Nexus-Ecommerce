@@ -51,15 +51,45 @@
 						<h4 class="mtext-105 cl2 js-name-detail p-b-14">
 							<%= product.productName %>
 						</h4>
-						<p class="stext-102 cl3 p-t-23">
-							<%= product.category %>
-						</p>
+					
+						<span class="mtext-100 cl2">
+							<%= product.productDetails %>
+						</span><br><br>
+
 						<span class="mtext-106 cl2">
 							₹ <%= product.price %>
 						</span>
-						<p class="stext-102 cl3 p-t-23">
-							<%= product.productDec %>
-						</p>
+
+						<div class="pt-5">
+							<ul>
+								<a class="mtext-104 cl2" style="color: #008B8B;">Highlights</a><br>	
+								<% 
+        						for(let i = 0; i < product.highlights.length; i++){ %>
+          							<li><%= product.highlights[i] %></li>
+        						<% } %>
+							</ul>
+						</div><br><br>
+
+						<div class="flex-w flex-r-m p-b-10">
+							<div class="size-204 flex-w flex-m respon6-next">
+								<div class="wrap-num-product flex-w m-r-20 m-tb-10">
+									<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+										<i class="fs-16 zmdi zmdi-minus"></i>
+									</div>
+
+									<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product" value="1">
+
+									<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+										<i class="fs-16 zmdi zmdi-plus"></i>
+									</div>
+								</div>
+
+								<button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail">
+									Add to cart
+								</button>
+							</div>
+						</div>
+
 					</div>
 				</div>
 			</div>			
@@ -73,13 +103,13 @@
 							<a class="nav-link active" data-toggle="tab" href="#description" role="tab">Description</a>
 						</li>
 
-						<li class="nav-item p-b-10">
+						<!-- <li class="nav-item p-b-10">
 							<a class="nav-link" data-toggle="tab" href="#information" role="tab">Additional information</a>
-						</li>
+						</li> -->
 
-						<li class="nav-item p-b-10">
+						<!-- <li class="nav-item p-b-10">
 							<a class="nav-link" data-toggle="tab" href="#reviews" role="tab">Reviews (1)</a>
-						</li>
+						</li> -->
 					</ul>
 
 					<!-- Tab panes -->
@@ -241,11 +271,7 @@
 
 		<div class="bg6 flex-c-m flex-w size-302 m-t-73 p-tb-15">
 			<span class="stext-107 cl6 p-lr-25">
-				SKU: JAK-01
-			</span>
-
-			<span class="stext-107 cl6 p-lr-25">
-				Categories: Jacket, Men
+				Category : <%= product.category.categoryName %>
 			</span>
 		</div>
 	</section>
@@ -287,8 +313,8 @@
 
 								<div class="block2-txt-child2 flex-r p-t-3">
 									<a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
-										<img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png" alt="ICON">
-										<img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON">
+										<!-- <img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png" alt="ICON">
+										<img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON"> -->
 									</a>
 								</div>
 							</div>

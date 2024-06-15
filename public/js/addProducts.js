@@ -144,6 +144,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let quantity = document.getElementById('quantity').value.trim();
     let price = document.getElementById('price').value.trim();
     let productDescription = document.getElementById('productDescription').value.trim();
+    let highlights = document.getElementById('highlights').value.trim(); // New field
+    let productDetails = document.getElementById('productDetails').value.trim(); // New field
     let images = document.querySelector(".file-upload-default");
     let category = document.getElementById('category').value;
 
@@ -159,6 +161,8 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('productDescriptionError').innerText = '';
     document.getElementById('imageError').innerText = '';
     document.getElementById('categoryError').innerText = '';
+    document.getElementById('highlightsError').innerText = ''; 
+    document.getElementById('productDetailsError').innerText = '';
 
     try {
       // Check if product name already exists
@@ -195,6 +199,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (productDescription.length === 0) {
       document.getElementById('productDescriptionError').innerText = 'Product Description is required';
+      isValid = false;
+    }
+
+    if (highlights.length === 0) { // New field
+      document.getElementById('highlightsError').innerText = 'Highlights are required';
+      isValid = false;
+    }
+
+    if (productDetails.length === 0) { // New field
+      document.getElementById('productDetailsError').innerText = 'Product Details are required';
       isValid = false;
     }
 

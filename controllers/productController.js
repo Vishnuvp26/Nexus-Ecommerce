@@ -51,12 +51,14 @@ const loadAddProducts = async (req, res, next) => {
 // Adding Products
 const addProducts = async (req, res) => {
     try {
-        const { productName, price, categoryName, productDescription, quantity } = req.body;
+        const { productName, price, categoryName, productDescription, quantity, highlights, productDetails } = req.body;
 
         const category = await Category.findOne({ categoryName: categoryName });
         if (!category) {
             return res.status(404).json({ success: false, message: 'Category not found' });
         }
+
+        const highlightsArray = highlights.split('\n').map(feature => feature.trim());
 
         const product = new Product({
             productName: productName,
@@ -64,15 +66,17 @@ const addProducts = async (req, res) => {
             category: category._id,
             productDec: productDescription,
             quantity: quantity,
+            highlights: highlightsArray,
+            productDetails: productDetails,
             addedDate: new Date()
         });
 
         for (const file of req.files) {
             product.image.push(file.filename);
         }
-
         await product.save();
         res.status(201).json({ success: true, message: 'Product added successfully' });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Failed to add product', error: error.message });

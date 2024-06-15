@@ -11,20 +11,16 @@
                 </div>
 
                 <!-- LOGIN FORM -->
-                <form id="loginForm" class="pt-2" method="post">
+                <form id="loginForm" class="pt-2">
                     <div class="form-group">
                         <input type="text" class="input" name="email" id="email" placeholder="Email" required>
                     </div>
                     <div style="height: 15px;"></div>
                     <div class="form-group">
                         <input type="password" class="input" name="password" id="password" placeholder="Password" required>
-                        <% if (locals.message) { %>
-                            <p style="color: red; text-align: center;"><%= message %></p>
-                        <% } %>
                     </div>
-                    <!-- Add a placeholder for error message -->
+                    <!-- Placeholder for error messages -->
                     <span id="errorMessage" style="color: red;"></span>
-                    <span id="blockedMessage" style="color: red;"></span>
                     <button id="submitBtn" type="submit" class="btn btn-info rounded-pill w-100 mt-3">Login</button>
                 </form>
                 <div class="social-icon mt-4 text-center">
@@ -39,5 +35,29 @@
         </div>
     </div>
 </div>
-    
+
 <%- include("../layout/footer.ejs") %>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('errorMessage');
+
+    try {
+        const response = await axios.post('/login', { email, password });
+        const data = response.data;
+
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            errorMessage.textContent = data.message;
+        }
+    } catch (error) {
+        errorMessage.textContent = 'An error occurred. Please try again.';
+    }
+});
+</script>

@@ -1,5 +1,6 @@
 const userModel = require('../models/userModel'); 
 
+// User table
 const loadUser = async (req, res, next) => {
     try {
         let search = "";
@@ -31,16 +32,23 @@ const loadUser = async (req, res, next) => {
     }
 };  
 
+// Block user
 const blockUser = async (req, res, next) => {
     try {
         const id = req.query.id;
         await userModel.updateOne({ _id: id }, { $set: { is_blocked: true } });
+
+        if (req.session.user_id && id === req.session.user_id) {
+            delete req.session.user_id;
+        }
+
         res.json({ success: true });
     } catch (error) {
         next(error);
     }
 };
 
+// Unblock user
 const unblockUser = async (req, res, next) => {
     try {
         const id = req.query.id;
@@ -49,8 +57,7 @@ const unblockUser = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
-
+};  
 
 module.exports = {
     loadUser,

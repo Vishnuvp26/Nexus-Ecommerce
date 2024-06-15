@@ -31,29 +31,8 @@ const isLogout = async (req, res, next) => {
     }
 };
 
-const authMiddleware = async (req, res, next) => {
-    try {
-        if (req.session && req.session.isLogin) {
-            const user = await userModel.findById(req.session.user_id);
-            if (user) {
-                res.locals.isAuthenticated = true;
-                res.locals.user = user;
-            } else {
-                res.locals.isAuthenticated = false;
-                res.locals.user = null;
-            }
-        } else {
-            res.locals.isAuthenticated = false;
-            res.locals.user = null;
-        }
-        next();
-    } catch (error) {
-        res.send(error.message);
-    }
-};
 
 module.exports = {
     isLogout,
     isLogin,
-    authMiddleware
 };

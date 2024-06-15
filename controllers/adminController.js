@@ -54,44 +54,10 @@ const loadDashboard = async (req, res) => {
     }
 };
 
-// View User
-const viewuser = async (req, res) => {
-    try {
-        res.render('users');
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// Block User
-const blockUser = async (req, res) => {
-    try {
-        const id = req.params.id;
-        await userModel.updateOne({ _id: id }, { $set: { is_blocked: true } });
-        res.status(200).json({ success: true, message: 'User has been successfully blocked.' });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-// Unblock User
-const unblockUser = async (req, res) => {
-    try {
-        const id = req.params.id;
-        await userModel.updateOne({ _id: id }, { $set: { is_blocked: false } });
-        res.status(200).json({ success: true, message: 'User has been successfully unblocked.' });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
-
 
 module.exports = {
     adminLogin,
     adminLogout,
     adminPostLogin,
     loadDashboard,
-    blockUser,
-    unblockUser,
-    viewuser,
-};  
+}; 

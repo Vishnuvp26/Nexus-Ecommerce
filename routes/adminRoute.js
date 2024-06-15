@@ -6,6 +6,7 @@ const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
 const adminUserController = require('../controllers/adminUserController');
 const adminAuth = require('../middleware/adminAuth');
+const setNoCacheHeaders = require('../middleware/nocache');
 const path = require("path");
 
 
@@ -28,7 +29,7 @@ adminRouter.set("view engine", "ejs");
 adminRouter.set("views", "./views/admin");
 
 // login logout
-adminRouter.get('/', adminController.adminLogin);
+adminRouter.get('/', adminAuth.isLogout, adminController.adminLogin);
 adminRouter.post('/', adminController.adminPostLogin);
 adminRouter.get("/dashboard", adminAuth.isLogin, adminController.loadDashboard);  
 adminRouter.get("/logout", adminAuth.isLogin, adminController.adminLogout);

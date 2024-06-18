@@ -3,6 +3,25 @@
 <!-- Navbar -->
 <%- include("../layout/navbar") %>
 
+<style>
+    .position-relative {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.form-control {
+    padding-right: 30px;
+}
+</style>
+
 <div class="container pb-xl-5 pt-xl-1">
     <div class="row justify-content-center center-div">
         <div class="col-md-6 col-lg-6">
@@ -27,16 +46,22 @@
                         <div class="invalid-feedback">Please provide a valid 10 digit mobile number.</div>
                     </div>
 
-                    <div class="form-group">
-                        <input type="password" class="input" name="password" id="password" placeholder="Password" required>
+                    <div class="form-group position-relative">
+                        <input type="password" class="input form-control" name="password" id="password" placeholder="Password" required>
+                        <span class="position-absolute password-toggle" onclick="togglePasswordVisibility('password')">
+                            <i id="password-toggle-icon" class="fa fa-eye"></i>
+                        </span>
                         <div class="invalid-feedback">Password must be at least 4 or more characters long.</div>
                     </div>
-
-                    <div class="form-group">
-                        <input type="password" class="input" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
+                    
+                    <div class="form-group position-relative">
+                        <input type="password" class="input form-control" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
+                        <span class="position-absolute password-toggle" onclick="togglePasswordVisibility('confirmPassword')">
+                            <i id="confirmPassword-toggle-icon" class="fa fa-eye"></i>
+                        </span>
                         <div class="invalid-feedback">Passwords do not match.</div>
                     </div>
-
+                    
                     <button id="submitBtn" type="submit" class="btn btn-info rounded-pill w-100 mt-3">Get OTP</button>
                 </form>
 
@@ -50,81 +75,4 @@
 </div>
 
 <%- include("../layout/footer.ejs") %>
-
-<script>
-    // Regex validation
-    document.getElementById('name').addEventListener('input', function () {
-        const nameRegex = /^[A-Za-z][A-Za-z\s]*$/;
-        if (!nameRegex.test(this.value)) {
-            this.setCustomValidity('Name should start with a letter and contain only letters and spaces.');
-        } else {
-            this.setCustomValidity('');
-        }
-    });
-
-    document.getElementById('phone').addEventListener('input', function () {
-        const phoneRegex = /^(?!0{10})\d{10}$/; // 10 digit number, not all zeros
-        if (!phoneRegex.test(this.value)) {
-            this.setCustomValidity('Please provide a valid 10 digit mobile number.');
-        } else {
-            this.setCustomValidity('');
-        }
-    });
-
-    document.getElementById('password').addEventListener('input', function () {
-        const passwordRegex = /^.{4,}$/; // At least 4 characters long
-        if (!passwordRegex.test(this.value)) {
-            this.setCustomValidity('Password must be at least 4 or more characters.');
-        } else {
-            this.setCustomValidity('');
-        }
-    });
-
-    // Password Match
-    document.getElementById('confirmPassword').addEventListener('input', function () {
-        var passwordInput = document.getElementById('password');
-        var confirmPasswordInput = document.getElementById('confirmPassword');
-
-        if (passwordInput.value !== confirmPasswordInput.value) {
-            confirmPasswordInput.setCustomValidity('Passwords do not match.');
-        } else {
-            confirmPasswordInput.setCustomValidity('');
-        }
-    });
-
-    // Checking email exist or not
-    document.getElementById('registerForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const data = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            phone: formData.get('phone'),
-            password: formData.get('password'),
-            confirmPassword: formData.get('confirmPassword')
-        };
-
-        fetch('/register', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data),
-        })
-        .then(response => response.json())
-        .then(data => {
-            const emailInput = document.getElementById('email');
-            if (data.success) {
-                window.location.href = '/otp';
-            } else {
-                emailInput.value = '';
-                emailInput.placeholder = data.message;
-                emailInput.classList.add('is-invalid');
-                
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    });
-
-</script>
+<script src="/js/userAssets/userRegister.js"></script>

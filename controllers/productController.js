@@ -105,22 +105,6 @@ const unlistProducts = async (req, res, next) => {
     }
 };
 
-// Load edit products menu
-const loadEditProducts = async (req, res) => {
-    try {
-      const id = req.query.id;
-      const category = await Category.find();
-      const product = await Product.findOne({ _id: id }).populate('category');
-      
-      if (product) {
-        res.render('editProducts', { product: product, category: category });
-      } else {
-        res.status(404).send('Product not found');
-      }
-    } catch (error) {
-      console.log(error)
-    }
-};
 
 const checkAlready = async (req, res) => {
     try {
@@ -137,6 +121,23 @@ const checkAlready = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+// Load edit products menu
+const loadEditProducts = async (req, res) => {
+    try {
+      const id = req.query.id;
+      const category = await Category.find();
+      const product = await Product.findOne({ _id: id }).populate('category');
+      
+      if (product) {
+        res.render('editProducts', { product: product, category: category });
+      } else {
+        res.status(404).send('Product not found');
+      }
+    } catch (error) {
+      console.log(error)
+    }
+};
 
 // Edit products
 const editProducts = async (req, res) => {

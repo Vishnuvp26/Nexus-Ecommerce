@@ -1,11 +1,13 @@
 const express = require("express");
-const flash = require('express-flash');
 const userRouter = express();
 const userController = require('../controllers/userController');
 const userAuth = require('../middleware/userAuth');
 const passport = require("passport")
 userRouter.use(passport.initialize());
 userRouter.use(passport.session())
+
+userRouter.set("view engine", "ejs");
+userRouter.set("views", "./views/users");
 
 //------Google Authentication Starting------//
 userRouter.get('/auth/google', passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -14,15 +16,12 @@ userRouter.get(
     "/auth/google/callback",
     passport.authenticate("google", {
         successRedirect: "/auth/google/googleSuccess",
-        failureRedirect: "/register",
+        failureRedirect: "/login",
     })
 );
 
 userRouter.get("/auth/google/googleSuccess", userController.googleSuccess);
 //------Google Authentication Ending------//
-
-userRouter.set("view engine", "ejs");
-userRouter.set("views", "./views/users");
 
 // Account Related
 userRouter.get('/', userController.userHome);

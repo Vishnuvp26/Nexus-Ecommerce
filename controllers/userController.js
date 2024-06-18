@@ -164,17 +164,26 @@ passport.deserializeUser((user, done) => {
 const googleSuccess = async (req, res) => {
     try {
         let userData = await userModel.findOne({ email: req.user.emails[0].value });
+        
         if (!userData) {
             userData = new userModel({
                 name: req.user.displayName,
                 email: req.user.emails[0].value
             });
             await userData.save();
-            req.session.user_id = userData._id;
-            res.redirect('/');
-        } else {
-            res.redirect('/');
         }
+        
+        req.session.user_id = userData._id;
+        
+        // Save the session
+        req.session.save((err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send('An error occurred');
+            }
+            res.redirect('/');
+        });
+
     } catch (error) {
         console.log(error);
         res.status(500).send('An error occurred');
@@ -193,62 +202,7 @@ const loginLoad = async (req, res) => {
     }
 };
 
-// Login POST old
-// const loginUser = async (req, res) => {
-//     try {
-//         const email = req.body.email;
-//         const password = req.body.password;
-
-//         const userData = await userModel.findOne({ email: email });
-//         if (userData && userData.password) {
-//             const passwordMatch = await bcrypt.compare(password, userData.password);
-//             if (passwordMatch) {
-//                 res.status(200).json({ message: 'Login successful' });
-//             } else {
-//                 res.status(401).json({ message: 'Email or password is incorrect' });
-//             }
-//         } else {
-//             res.status(401).json({ message: 'Email or password is incorrect' });
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-  
-
-
-// login with admin block
-// const loginUser = async (req, res) => {
-//     try {
-//         const email = req.body.email;
-//         const password = req.body.password;
-
-//         const userData = await userModel.findOne({ email: email });
-//         console.log(userData, 'dfasdfsdgfh');
-//         if (userData && userData.password) {
-//             if (userData.is_blocked === true) {
-//                 res.status(401).json({ message: 'You have been blocked by the admin' });
-//             } else {
-//                 const passwordMatch = await bcrypt.compare(password, userData.password);
-//                 if (passwordMatch) {
-
-//                     res.status(200).json({ message: 'Login successful'});
-//                 } else {
-//                     res.status(401).json({ message: 'Email or password is incorrect' });
-//                 }
-//             }
-//         } else {
-//             res.status(401).json({ message: 'Email or password is incorrect' });
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ message: 'Internal server error' });
-//     }
-// };
-
-
+// Login
 const loginUser = async (req, res) => {
     try {
         const email = req.body.email;
@@ -262,22 +216,22 @@ const loginUser = async (req, res) => {
             if (passwordMatch) {
                 if (userData.is_blocked == false) {
                     req.session.user_id = userData._id;
-                    res.redirect('/');
+                    res.json({ success: true, message: "Login successful" });
                 } else {
-                    res.render('login', { message: "You are blocked" }); 
+                    res.json({ success: false, message: "You are blocked from accessing this website" });
                 }
             } else {
-                res.render("login", { message: "Wrong email or Password" }); 
+                res.json({ success: false, message: "Wrong email or Password" });
             }
         } else {
-            res.render("login", { message: "No user found" }); 
+            res.json({ success: false, message: "No user found" });
         }
     } catch (error) {
-        res.send(error.message);
+        res.json({ success: false, message: error.message });
     }
 };
 
-// Home Page    
+// Home Page   
 const userHome = async (req, res) => {
     try {   
         const userData = await userModel.findOne({ _id: req.session.user_id });
@@ -299,15 +253,14 @@ const userLogout = async (req, res) => {
     }
 }
 
+// Single prouct page
 const productDetails = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const productId = req.query.productId;
         
-        // Fetch user data
         const userData = await userModel.findOne({ _id: userId });
         
-        // Fetch the specific product
         const product = await productModel.findOne({ _id: productId, status: "active" }).populate('category');
         
         if (product) {

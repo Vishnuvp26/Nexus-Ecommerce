@@ -41,13 +41,13 @@
 										</span>
 										<span class="stext-106 cl3">
 											<% if (product.quantity >= 10) { %>
-											<span style="color: green;">in stock</span>
+												<span style="color: green;">in stock</span>
 											<% } else if (product.quantity > 0) { %>
-												only <%= product.quantity %> left in stock
+												<span style="color: orange;">only <%= product.quantity %> left in stock</span>
 											<% } else { %>
 												<span style="color: red;">out of stock</span>
 											<% } %>
-										</span>
+										</span>										
 									</div>
 									
 									<!-- WISHLIST ICON -->
@@ -57,7 +57,7 @@
 										<img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON">
 										</a>
 									</div> -->
-									
+
 								</div>
 							</div>
 						</div>

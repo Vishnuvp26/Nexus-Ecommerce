@@ -16,9 +16,9 @@ app.use(session({
 }));
 
 // Middleware setup
+app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(nocache());
 
 const userRoute = require('./routes/userRoute');
 const adminRoute = require('./routes/adminRoute')

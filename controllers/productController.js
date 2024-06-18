@@ -141,27 +141,36 @@ const checkAlready = async (req, res) => {
 // Edit products
 const editProducts = async (req, res) => {
     try {
-        const { categoryName, productName, price, quantity, productDescription } = req.body;
+        const { categoryName, productName, price, quantity, productDescription, highlights, productDetails, deletedIndices } = req.body;
         const id = req.query.id;
         const category = await Category.findOne({ categoryName: categoryName });
-        const product = await Product.findByIdAndUpdate(
-            { _id: id },
-            {
-                $set: {
-                    productName: productName,
-                    price: price,
-                    category: category._id,
-                    productDec: productDescription,
-                    quantity: quantity,
-                },
-            }
-        );  
+
+        const highlightsArray = highlights.split('\n').map(feature => feature.trim());
+
+        const product = await Product.findById(id);
+        product.productName = productName;
+        product.price = price;
+        product.category = category._id;
+        product.productDec = productDescription;
+        product.quantity = quantity;
+        product.highlights = highlightsArray;
+        product.productDetails = productDetails;
+
+        if (deletedIndices) {
+            const indicesToDelete = JSON.parse(deletedIndices);
+            product.image = product.image.filter((img, index) => !indicesToDelete.includes(index.toString()));
+        }
+
         for (const file of req.files) {
             product.image.push(file.filename);
         }
+
         await product.save();
+
+        res.json({ success: true });
     } catch (error) {
         console.log(error);
+        res.json({ success: false, error: error.message });
     }
 };  
 

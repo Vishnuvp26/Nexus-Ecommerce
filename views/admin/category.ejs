@@ -66,22 +66,21 @@
               <% if (categoryData.length > 0) { %>
                 <% categoryData.forEach((category, index) => { %>
                   <tr>
-                    <td><%= index + 1 %></td>
-                    <!-- Serial number -->
+                    <td><%= (currentPage - 1) * 5 + index + 1 %></td>
                     <td><%= category.categoryName %></td>
                     <td><%= category.status %></td>
                     <td>
                       <button class="btn-sm btn-gradient-dark edit-btn" data-id="<%= category._id %>" data-name="<%= category.categoryName %>">Edit</button>
-                      <% if (category.status == "active") { %>
-                          <form class="status-form" action="/admin/unlistCategory?id=<%= category._id %>" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="<%= category._id %>">
-                            <button type="submit" class="btn-sm btn-gradient-danger status-btn" data-status="Inactive" style="width: 100px;">Inactive</button>
-                          </form>
+                      <% if (category.status === "active") { %>
+                        <form class="status-form" action="/admin/unlistCategory?id=<%= category._id %>" method="post" style="display:inline;">
+                          <input type="hidden" name="id" value="<%= category._id %>">
+                          <button type="submit" class="btn-sm btn-gradient-danger status-btn" data-status="Inactive" style="width: 100px;">Inactive</button>
+                        </form>
                       <% } else { %>
-                          <form class="status-form" action="/admin/listCategory?id=<%= category._id %>" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="<%= category._id %>">
-                            <button type="submit" class="btn-sm btn-gradient-success status-btn" data-status="Active" style="width: 100px;">Active</button>
-                          </form>
+                        <form class="status-form" action="/admin/listCategory?id=<%= category._id %>" method="post" style="display:inline;">
+                          <input type="hidden" name="id" value="<%= category._id %>">
+                          <button type="submit" class="btn-sm btn-gradient-success status-btn" data-status="Active" style="width: 100px;">Active</button>
+                        </form>
                       <% } %>
                     </td>
                   </tr>
@@ -93,27 +92,28 @@
               <% } %>
             </tbody>
           </table>
-
+          
           <!-- Pagination Container -->
           <div class="pagination-container mt-4">
             <ul class="pagination justify-content-center">
               <% if (currentPage > 1) { %>
                 <li class="page-item">
-                  <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Previous</a>
+                  <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>" style="background-color: #fff; border-color: #000; color: #000;">Previous</a>
                 </li>
               <% } %>
               <% for(let i = 1; i <= totalPages; i++) { %>
                 <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
-                  <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+                  <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>&search=<%= searchQuery %>" style="border-color: #000;"><%= i %></a>
                 </li>
               <% } %>
               <% if (currentPage < totalPages) { %>
                 <li class="page-item">
-                  <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
+                  <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>" style="background-color: #fff; border-color: #000; color: #000;">Next</a>
                 </li>
               <% } %>
             </ul>
           </div>
+          
 
         </div>
       </div>
@@ -144,6 +144,7 @@
             <label for="categoryName">Category Name</label>
             <input type="hidden" id="editCategoryId" name="id">
             <input type="text" class="form-control" id="editCategoryName" name="name" required>
+            <div id="nameValidationMsg" style="display: none; color: red; font-size: small;">Please enter a valid category name.</div>
           </div>
         </div>
         <div class="modal-footer">
@@ -181,8 +182,20 @@
       $('#addCategoryModal').modal('show');
     });
 
+    $('#editCategoryForm').submit(function(event) {
+      var categoryName = $('#editCategoryName').val();
+      var isValidName = /^[a-zA-Z0-9\s\-]{3,}$/.test(categoryName);
+      if (!isValidName) {
+        event.preventDefault();
+        $('#nameValidationMsg').show();
+      } else {
+        $('#nameValidationMsg').hide();
+      }
+    });
+
     $('.status-btn').click(function(event) {
       event.preventDefault();
+      
       var form = $(this).closest('form');
       var status = $(this).data('status');
       var categoryId = form.find('input[name="id"]').val();

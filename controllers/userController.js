@@ -274,6 +274,18 @@ const productDetails = async (req, res) => {
     }
 }
 
+const shop = async (req, res) => {
+    try {
+        const userData = await userModel.findOne({ _id: req.session.user_id });
+        const activeProducts = await productModel.find({ status: "active" }).populate('category');
+        const categories = await categoryModel.find({ status: "active" });
+
+        res.render('shop', { user: userData, products: activeProducts, categories: categories });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 module.exports = {
     userHome,
@@ -286,5 +298,6 @@ module.exports = {
     googleSuccess,
     insertUser,
     verifyOtp,
-    productDetails
+    productDetails,
+    shop
 };

@@ -35,5 +35,6 @@ userRouter.post('/otp', userController.verifyOtp);
 
 // Products
 userRouter.get('/productDetails', userController.productDetails);
+userRouter.get('/shop', userController.shop);
 
 module.exports = userRouter;

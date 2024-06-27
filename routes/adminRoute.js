@@ -1,30 +1,14 @@
 const express = require("express");
 const adminRouter = express();
-const multer = require("multer");
 const adminController = require('../controllers/adminController');
 const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
 const adminUserController = require('../controllers/adminUserController');
 const adminAuth = require('../middleware/adminAuth');
+const upload = require('../middleware/multer')
 const setNoCacheHeaders = require('../middleware/nocache');
-const path = require("path");
 
-
-// multer file upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../public/productimages"));
-  },
-    filename: (req, file, cb) => {
-      const name = Date.now() + "-" + file.originalname;
-      cb(null, name);
-    },
-});
-  
-const upload = multer({ storage: storage });
-//----------Multer end--------//
-
-
+// views
 adminRouter.set("view engine", "ejs");
 adminRouter.set("views", "./views/admin");
 
@@ -42,7 +26,7 @@ adminRouter.post('/editCategory', adminAuth.isLogin, categoryController.updateCa
 adminRouter.post('/listCategory', adminAuth.isLogin, categoryController.listCategory);
 adminRouter.post('/unlistCategory', adminAuth.isLogin, categoryController.unlistCategory);
 
-// users list
+// users
 adminRouter.get('/users', adminAuth.isLogin, adminUserController.loadUser);
 adminRouter.get('/blockUser', adminAuth.isLogin, adminUserController.blockUser);
 adminRouter.get('/unblockUser', adminAuth.isLogin, adminUserController.unblockUser);
@@ -56,6 +40,5 @@ adminRouter.post('/unlistProducts', adminAuth.isLogin, productController.unlistP
 adminRouter.get('/editProducts', adminAuth.isLogin, productController.loadEditProducts);
 adminRouter.get('/checkAlready', adminAuth.isLogin, productController.checkAlready);
 adminRouter.post('/editProducts', adminAuth.isLogin, upload.array('images'), productController.editProducts);
-
 
 module.exports = adminRouter;

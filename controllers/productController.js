@@ -109,7 +109,7 @@ const unlistProducts = async (req, res, next) => {
 const checkAlready = async (req, res) => {
     try {
         const productName = req.query.productName;
-        const product = await Product.findOne({ productName: productName });
+        const product = await Product.findOne({ productName: { $regex: ".*" + productName + ".*", $options: "i" } });
 
         if (product) {
             res.json({ exists: true });

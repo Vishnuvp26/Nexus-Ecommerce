@@ -9,7 +9,7 @@ document.getElementById('name').addEventListener('input', function () {
 });
 
 document.getElementById('phone').addEventListener('input', function () {
-    const phoneRegex = /^(?!0{10})\d{10}$/; // 10 digit number, not all zeros
+    const phoneRegex = /^[1-9]\d{9}$/;
     if (!phoneRegex.test(this.value)) {
         this.setCustomValidity('Please provide a valid 10 digit mobile number.');
     } else {

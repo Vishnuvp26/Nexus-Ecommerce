@@ -31,7 +31,7 @@ input::placeholder {
 }
 
 #submitBtn {
-  background-color: #717fe0; 
+  background-color: #008B8B; 
   color: white;
   transition: background-color 0.3s ease;
   border-radius: 20px;
@@ -50,7 +50,7 @@ input::placeholder {
 }
 
 #signupButton {
-  background-color: #717fe0; 
+  background-color: #008B8B; 
   color: white;
   transition: background-color 0.3s ease;
 }
@@ -60,11 +60,11 @@ input::placeholder {
 }
 
 #signupButton:hover {
-  background-color: #000000bb; 
+  background-color: #ffffffbb; 
 }
 
 #submitOTPBtn {
-  background-color: #717fe0; 
+  background-color: #008B8B; 
   color: white;
   transition: background-color 0.3s ease;
 }
@@ -125,7 +125,7 @@ button svg {
   padding: 12px 16px 12px 42px;
   border: none;
   border-radius: 3px;
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, .25);
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.10), 0 1px 1px rgba(0, 0, 0, .25);
   color: #2c2c2c;
   font-size: 14px;
   font-weight: 500;
@@ -138,15 +138,37 @@ button svg {
   &:hover {
     box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, .25);
   }
-    
+      
   &:active {
     background-color: #eeeeee;
   }
     
-  &:disabled {
-    filter: grayscale(100%);
-    background-color: #ebebeb;
-    box-shadow: 0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25);
-    cursor: not-allowed;
+}
+
+/* Password toggle button in form */
+.position-relative {
+  position: relative;
+}
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;    
+  z-index: 2;
+}
+.form-control {
+  padding-right: 30px;
+}
+
+/* form bottom padding */
+.formContainer {
+  padding: 20px;
+  padding-bottom: 50px;
+}
+
+@media (max-width: 767px) {
+  .formContainer {
+      margin-bottom: 50px;
   }
 }

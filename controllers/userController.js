@@ -173,9 +173,13 @@ const googleSuccess = async (req, res) => {
             await userData.save();
         }
         
+        if (userData.is_blocked) {
+            return res.status(403).send('You are blocked from accessing this website');
+        }
+        
         req.session.user_id = userData._id;
         
-        // Save the session
+        // Save user session
         req.session.save((err) => {
             if (err) {
                 console.log(err);
@@ -247,11 +251,11 @@ const userHome = async (req, res) => {
 const userLogout = async (req, res) => {
     try {
         delete req.session.user_id;
-        res.redirect('/')
+        res.redirect('/');
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 // Single prouct page
 const productDetails = async (req, res) => {
@@ -260,11 +264,16 @@ const productDetails = async (req, res) => {
         const productId = req.query.productId;
         
         const userData = await userModel.findOne({ _id: userId });
-        
         const product = await productModel.findOne({ _id: productId, status: "active" }).populate('category');
         
         if (product) {
-            res.render('productDetails', { user: userData, product });
+            const relatedProducts = await productModel.find({
+                category: product.category._id,
+                _id: { $ne: productId },
+                status: "active"
+            }).limit(4);
+
+            res.render('productDetails', { user: userData, product, relatedProducts });
         } else {
             res.status(404).send('Product not found');
         }
@@ -272,8 +281,9 @@ const productDetails = async (req, res) => {
         console.log(error);
         res.status(500).send('Internal Server Error');
     }
-}
+};
 
+// Shop
 const shop = async (req, res) => {
     try {
         const userData = await userModel.findOne({ _id: req.session.user_id });
@@ -284,8 +294,7 @@ const shop = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
-
+};
 
 module.exports = {
     userHome,

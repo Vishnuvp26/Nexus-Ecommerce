@@ -1,31 +1,14 @@
 <%- include("../layout/header") %>
+
 <!-- Navbar -->
 <%- include("../layout/navbar") %>
 
-<style>
-    .position-relative {
-    position: relative;
-}
-
-.password-toggle {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    z-index: 2;
-}
-
-.form-control {
-    padding-right: 30px; /* Ensure space for the toggle icon */
-}
-</style>
 
 <div class="container pb-xl-5 pt-xl-1">
     <div class="row justify-content-center center-div">
-        <div class="col-md-6 col-lg-6"> <!-- Increased column width -->
+        <div class="col-md-6 col-lg-6">
             <div class="formContainer border border-dark py-4">
-                <div class="title pb-5 text-center">
+                <div class="title pb-3 text-center">
                     <h2 class="font-weight-medium">Log in</h2><br><br>
                 </div>
 
@@ -33,7 +16,7 @@
                 <form id="loginForm" class="pt-2">
 
                     <div class="form-group">
-                        <input type="text" class="input" name="email" id="email" placeholder="Email" required>
+                        <input type="text" class="input form-control" name="email" id="email" placeholder="Email" required>
                     </div>
                     <div style="height: 15px;"></div>
 

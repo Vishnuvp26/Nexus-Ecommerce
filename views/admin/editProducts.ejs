@@ -282,7 +282,6 @@
                     document.getElementById('imageInput').value = '';
                 };
 
-                // Add Cropper.js initialization for the image
                 imageElement.addEventListener('click', function() {
                     const cropperModal = new bootstrap.Modal(document.getElementById('cropModal'));
                     const cropperImage = document.getElementById('cropperImage');
@@ -291,17 +290,17 @@
                     cropperModal.show();
 
                     const cropper = new Cropper(cropperImage, {
-                        aspectRatio: 1, // Aspect ratio for square cropping (adjust as needed)
-                        viewMode: 1,    // Restricts the crop box to always fit within the container
+                        aspectRatio: 1,
+                        viewMode: 1,    
                         autoCropArea: 1,
                     });
 
                     // Handle crop button click
                     document.getElementById('cropButton').addEventListener('click', function() {
                         const canvas = cropper.getCroppedCanvas({
-                            width: 600, // Specify final dimensions
+                            width: 600,
                             height: 600,
-                            fillColor: '#fff', // Background color (optional)
+                            fillColor: '#fff',
                         });
 
                         // Replace the original image with the cropped image

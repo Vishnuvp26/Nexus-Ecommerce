@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Adm Login</title>
+    <title>Admin Login</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
@@ -24,10 +24,8 @@
                             </div>
                         </div>
 
-
                         <!-- Admin Login Form -->
-                        <form id="signupForm" method="POST" action="/admin" class="needs-validation" novalidate>
-
+                        <form id="loginForm" class="needs-validation" novalidate>
                             <div class="form-group mb-3">
                                 <label for="email" class="label">Email</label>
                                 <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
@@ -36,8 +34,7 @@
 
                             <div class="form-group mb-3">
                                 <label for="password" class="label">Password</label>
-                                <input type="password" name="password" class="form-control" id="password" placeholder="Password" minlength="8" required>
-                                <!-- <div class="invalid-feedback">Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one special character, and one digit.</div> -->
+                                <input type="password" name="password" class="form-control" id="password" placeholder="Password" required>
                                 <div class="invalid-feedback">Please enter a valid password.</div>
                             </div>
 
@@ -45,12 +42,7 @@
                                 <button type="submit" class="form-control btn btn-primary rounded submit px-3">Sign In</button>
                             </div>
 
-                            <label for="otp" class="form-label text-danger">
-                                <% if(locals.message){ %>
-                                    <%= message %>
-                                <% } %>
-                            </label>
-
+                            <label id="message" class="form-label text-danger"></label>
                         </form>
                         <!-- Admin Login Form End-->
 
@@ -61,50 +53,41 @@
     </div>
 </section>
 
-<!--===============================================================================================-->
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="lib/easing/easing.min.js"></script>
-<script src="lib/waypoints/waypoints.min.js"></script>
-<script src="lib/lightbox/js/lightbox.min.js"></script>
-<script src="lib/owlcarousel/owl.carousel.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- warning closer -->
 <script>
-  function clearField(fieldName) {
-      document.getElementById(fieldName).value = '';
-  }
-</script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        var form = event.target;
+        if (form.checkValidity() === false) {
+            form.classList.add('was-validated');
+            return;
+        }
 
-<!-- Validation -->
-<script>
-    (function () {
-        'use strict';
-        var forms = document.querySelectorAll('.needs-validation');
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
 
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-
-                    form.classList.add('was-validated');
-                }, false);
+        try {
+            var response = await fetch('/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
             });
-    })();
 
-    document.getElementById('email').addEventListener('input', function () {
-        var emailInput = document.getElementById('email');
-        var emailValue = emailInput.value.trim();
+            var result = await response.json();
+            var messageLabel = document.getElementById('message');
 
-        if (emailValue.endsWith('.com')) {
-            emailInput.setCustomValidity('');
-        } else {
-            emailInput.setCustomValidity('Email address must end with ".com"');
+            if (response.status === 200) {
+                messageLabel.textContent = '';
+                window.location.href = '/admin/dashboard';
+            } else {
+                messageLabel.textContent = result.message;
+            }
+        } catch (error) {
+            document.getElementById('message').textContent = 'Internal server error';
         }
     });
 </script>

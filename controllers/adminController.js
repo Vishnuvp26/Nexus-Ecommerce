@@ -19,21 +19,22 @@ const adminPostLogin = async (req, res) => {
 
         const admin = await adminModel.findOne({ email });
         if (!admin) {
-            return res.redirect('/admin');
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
 
         const isMatch = await bcrypt.compare(password, admin.password);
         if (!isMatch) {
-            return res.redirect('/admin');
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
         
         req.session.admin_id = admin._id;
-        res.redirect('/admin/dashboard');
-        
+        return res.status(200).json({ message: 'Login successful' });
+
     } catch (error) {
-        res.redirect('/admin');
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 // Admin Logout
 const adminLogout = async (req, res) => {

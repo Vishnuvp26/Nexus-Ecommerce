@@ -172,14 +172,14 @@ const googleSuccess = async (req, res) => {
             });
             await userData.save();
         }
-        
+
         if (userData.is_blocked) {
-            return res.status(403).send('You are blocked from accessing this website');
+            // return res.status(403).send('You are blocked from accessing this website');
+            return res.redirect(`/login?error=blocked`);
         }
         
         req.session.user_id = userData._id;
         
-        // Save user session
         req.session.save((err) => {
             if (err) {
                 console.log(err);

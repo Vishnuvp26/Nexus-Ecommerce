@@ -207,6 +207,11 @@
             isValid = false;
         }
 
+        if (images.files.length < 3) {
+            document.getElementById('imageError').innerText = 'Select at least three images';
+            isValid = false;
+        }
+
         if (productDescription.length === 0) {
             document.getElementById('productDescriptionError').innerText = 'Product Description is required';
             isValid = false;

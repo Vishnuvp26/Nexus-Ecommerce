@@ -1,6 +1,7 @@
 const express = require("express");
 const userRouter = express();
 const userController = require('../controllers/userController');
+const profileController = require('../controllers/profileController');
 const userAuth = require('../middleware/userAuth');
 const passport = require("passport")
 userRouter.use(passport.initialize());
@@ -23,7 +24,7 @@ userRouter.get(
 userRouter.get("/auth/google/googleSuccess", userController.googleSuccess);
 //------Google Authentication Ending------//
 
-// Account Related
+// Login & Register
 userRouter.get('/', userController.userHome);
 userRouter.get('/login', userAuth.isLogout, userController.loginLoad);
 userRouter.post('/login', userController.loginUser);
@@ -36,5 +37,13 @@ userRouter.post('/otp', userController.verifyOtp);
 // Products
 userRouter.get('/productDetails', userController.productDetails);
 userRouter.get('/shop', userController.shop);
+
+// Profile
+userRouter.get('/profile', userAuth.isLogin, profileController.profile);
+userRouter.get('/address', userAuth.isLogin, profileController.loadAddress);
+userRouter.post('/addAddress', userAuth.isLogin, profileController.addAddress);
+userRouter.get('/loadEditAddress', userAuth.isLogin, profileController.loadEditAddress);
+userRouter.post('/editAddress', userAuth.isLogin, profileController.editAddress);
+userRouter.post('/deleteAddress', userAuth.isLogin, profileController.deleteAddress);
 
 module.exports = userRouter;

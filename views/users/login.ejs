@@ -3,6 +3,7 @@
 <!-- Navbar -->
 <%- include("../layout/navbar") %>
 
+
 <div class="container pb-xl-5 pt-xl-1">
     <div class="row justify-content-center center-div">
         <div class="col-md-6 col-lg-6">
@@ -17,24 +18,28 @@
                         <input type="text" class="input form-control" name="email" id="email" placeholder="Email" required>
                     </div>
                     <div style="height: 15px;"></div>
+
                     <div class="form-group position-relative">
                         <input type="password" class="input form-control" name="password" id="password" placeholder="Password" required>
                         <span class="position-absolute password-toggle" onclick="togglePasswordVisibility('password')">
                             <i id="password-toggle-icon" class="fa fa-eye"></i>
                         </span>
-                    </div> 
-                    <!-- Placeholder for error messages -->
+                    </div>
+
                     <span id="errorMessage" style="color: red;"></span>
                     <button id="submitBtn" type="submit" class="btn btn-info rounded-pill w-100 mt-3">Login</button>
                 </form>
+
+                <p class="text-center pt-4 fw-bold orloginwith">OR</p>
                 <div class="social-icon mt-4 text-center">
                     <button type="button" class="login-with-google-btn" onclick="window.location.href='/auth/google'">
                         Continue with Google
                     </button>
                 </div>                
-                <div class="text-center mt-4">
+                <div class="text-center pt-4">
                     <p>Don’t you have an account?&nbsp;<a href="/register">Sign Up</a></p>    
                 </div>
+
             </div>  
         </div>
     </div>
@@ -64,29 +69,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         errorMessage.textContent = 'An error occurred. Please try again.';
     }
 });
-
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    if (error) {
-        let errorMessage = '';
-        if (error === 'blocked') {
-            errorMessage = 'You are blocked from accessing this website';
-        }
-        if (errorMessage) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = errorMessage;
-
-            // Remove the query parameter from the URL
-            const newUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    }
-}
 </script>
 
 <script>
-function togglePasswordVisibility(inputId) {
+    function togglePasswordVisibility(inputId) {
     const passwordInput = document.getElementById(inputId);
     const passwordToggleIcon = document.getElementById(inputId + '-toggle-icon');
 

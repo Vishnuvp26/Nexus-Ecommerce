@@ -26,10 +26,10 @@
                         <% if (user) { %>
                             <li>
                                 <ul class="sub-menu">
-                                    <li><a href="#"><%=user.name%></a></li>
+                                    <!-- <li><a href="/profile">Go to profile</a></li> -->
                                     <li><a href="/logout">Logout</a></li>
                                 </ul>
-                                <a href="#">Account</a>
+                                <a href="/profile">Account</a>
                             </li>
                         <% } else { %>
                             <li>
@@ -62,8 +62,11 @@
                     </a>
 
                     <% if (user) { %>
-                    <a href="#" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11">
-                        <li class="zmdi zmdi-account"></li>
+                    <a href="/profile" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11">
+                        <li class="zmdi zmdi-account" style="display: flex; align-items: center;">
+                            <span style="font-size: 15px; margin-left: 10px; font-family:Poppins-Regular; font-weight: 500;">
+                            <%= user.name %></span>
+                        </li>                                                
                     </a>
                     <% } %>
 
@@ -113,9 +116,15 @@
                 <a href="/shop">Shop</a>
             </li>
 
-            <li>
-                <a href="/login">Account</a>
-            </li>
+            <% if (user) { %>
+                <li>
+                    <a href="/profile">Account</a>
+                </li>
+            <% } else { %>
+                <li>
+                    <a href="/login">Login</a>
+                </li>
+            <% } %>
 
             <li>
                 <a href="about.html">About</a>

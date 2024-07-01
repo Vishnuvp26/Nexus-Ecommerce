@@ -1,5 +1,4 @@
 const categoryModel = require('../models/categoryModel');
-const userModel = require('../models/userModel');
 const productModel = require('../models/productModel');
 
 // Load Category Page

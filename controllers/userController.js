@@ -168,7 +168,8 @@ const googleSuccess = async (req, res) => {
         if (!userData) {
             userData = new userModel({
                 name: req.user.displayName,
-                email: req.user.emails[0].value
+                email: req.user.emails[0].value,
+                isGoogleAuth: true
             });
             await userData.save();
         }
@@ -296,6 +297,7 @@ const shop = async (req, res) => {
     }
 };
 
+
 module.exports = {
     userHome,
     loginLoad,
@@ -308,5 +310,5 @@ module.exports = {
     insertUser,
     verifyOtp,
     productDetails,
-    shop
+    shop,
 };

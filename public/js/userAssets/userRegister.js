@@ -18,9 +18,9 @@ document.getElementById('phone').addEventListener('input', function () {
 });
 
 document.getElementById('password').addEventListener('input', function () {
-    const passwordRegex = /^.{4,}$/; // At least 4 characters long
+    const passwordRegex = /^[^\W_][\w\W]{4,}$/;
     if (!passwordRegex.test(this.value)) {
-        this.setCustomValidity('Password must be at least 4 or more characters.');
+        this.setCustomValidity('Password must be 5 characters long and cannot start with a symbol or space.');
     } else {
         this.setCustomValidity('');
     }

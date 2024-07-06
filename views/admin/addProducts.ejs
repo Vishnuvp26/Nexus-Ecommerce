@@ -107,8 +107,9 @@
 </div>
 <%- include("../layout/adminSidebarFoot") %>
 
+<!-- Modal HTML -->
 <div id="cropModal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-fullscreen" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Crop Image</h5>
@@ -128,6 +129,15 @@
     </div>
   </div>
 </div>
+
+<!--===============================================================================================-->
+<link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/cropperjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 
 <!--===============================================================================================-->
 <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet">

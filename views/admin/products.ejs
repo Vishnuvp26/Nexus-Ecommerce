@@ -2,13 +2,29 @@
 <%- include("../layout/adminSidebarHead") %>
 
 <style>
-    .swal2-title {
-  font-weight: normal !important;
-  font-size: 18px !important;
+/* Custom CSS for SweetAlert2 */
+.swal2-popup {
+    font-size: 14px; /* Adjust font size */
+    max-width: 320px; /* Adjust width as needed */
+    padding: 1.16rem; /* Adjust padding as needed */
+    max-height: 300px !important;
 }
+
+.swal2-title {
+    font-size: 15px !important; /* Adjust title font size */
+}
+
 .swal2-content {
-  font-weight: normal !important; 
-  font-size: 16px !important; 
+    font-size: 12px !important; /* Adjust content font size */
+}
+
+.swal2-confirm,
+.swal2-cancel {
+    padding: 8px 16px; /* Adjust padding for button size */
+    font-size: 14px; /* Adjust button font size */
+}
+.swal2-icon.swal2-warning {
+    font-size: 10px; /* Reduce warning icon size */
 }
 </style>
 
@@ -44,7 +60,7 @@
                   <thead class="text-center">
                       <tr>
                           <th>Product Name</th> 
-                          <!-- <th>Image</th> -->
+                          <th>Image</th>
                           <th>Category</th>
                           <th>Quantity</th>
                           <th>Price</th>
@@ -65,9 +81,9 @@
                           ">
                               <%= products[i].productName %>
                           </td>
-                          <!-- <td>
+                          <td>
                             <img src="/productimages/<%= products[i].image[0] %>" style="width: 100px; height: auto; border-radius: 0" />
-                        </td>                         -->
+                        </td>                        
                           <td><%= products[i].category.categoryName %></td>
                           <td><%= products[i].quantity %></td>
                           <td><%= products[i].price %></td>

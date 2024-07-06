@@ -18,8 +18,9 @@
                                 <%= message %>
                             <% } %>
                         </label>
-                        <span class="text-center d-block mb-4">Please enter the OTP sent to your email</span>
+                        <span class="text-center d-block mb-4">Please enter the OTP sent to your mail <%= email %></span>
                         <input type="text" class="input" name="otp" id="otp" placeholder="Enter OTP" required>
+                        <small id="otpError" class="text-danger"></small> <!-- Error message element -->
                     </div><br>
                     
                     <!-- Timer -->
@@ -46,7 +47,6 @@
 <%- include("../layout/footer.ejs") %>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     // Timer
@@ -54,6 +54,8 @@
     const timerSpan = document.getElementById('timer');
     const resendButton = document.getElementById('resendButton');
     const submitOTPBtn = document.getElementById('submitOTPBtn');
+    const otpError = document.getElementById('otpError');
+    const otpInput = document.getElementById('otp');
 
     let timerDuration = 60;
     let timerInterval;
@@ -80,13 +82,13 @@
     document.getElementById('otpForm').onsubmit = function(event) {
         event.preventDefault();
 
-        const otpInput = document.getElementById('otp');
         const otp = otpInput.value;
 
         if (otp.length >= 4 && /^[0-9]+$/.test(otp)) {
             axios.post('/otp', { otp: otp })
                 .then(function(response) {
                     if (response.data.success === true) {
+                        otpError.textContent = '';
                         Swal.fire({
                             icon: 'success',
                             title: 'Registration Successful',
@@ -98,28 +100,15 @@
                             }
                         });
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Invalid OTP',
-                            text: 'The OTP you entered is incorrect. Please try again.'
-                        });
+                        otpError.textContent = 'The OTP you entered is incorrect. Please try again.';
                     }
                 })
                 .catch(function(error) {
                     console.error(error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Server Error',
-                        text: 'An error occurred while verifying your OTP. Please try again later.'
-                    });
+                    otpError.textContent = 'An error occurred while verifying your OTP. Please try again later.';
                 });
         } else {
-            otpInput.classList.add('is-invalid');
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Input',
-                text: 'Please enter a valid OTP.'
-            });
+            otpError.textContent = 'Please enter a valid OTP.';
         }
     }
 </script>

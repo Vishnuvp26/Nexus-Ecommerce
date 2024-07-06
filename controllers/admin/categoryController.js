@@ -1,5 +1,5 @@
-const categoryModel = require('../models/categoryModel');
-const productModel = require('../models/productModel');
+const categoryModel = require('../../models/categoryModel');
+const productModel = require('../../models/productModel');
 
 // Load Category Page
 const loadCategory = async (req, res) => {
@@ -41,28 +41,6 @@ const addCategory = async (req, res) => {
     }
 };
  
-// Add New Category POST
-// const addNewCategory = async (req, res) => {
-//     try {
-//         const { name: categoryName } = req.body;
-
-//         const existingCategory = await categoryModel.findOne({ categoryName: { $regex: new RegExp('^' + categoryName + '$', 'i') } });
-
-//         if (existingCategory) {
-//             const categoryData = await categoryModel.find();
-//             return res.render('category', { categoryData, message: 'Category name already exists' });
-//         }
-
-//         const category = new categoryModel({ categoryName });
-
-//         await category.save();
-//         res.redirect('/admin/category');
-
-//     } catch (error) {
-//         console.error(error);
-//     }
-// };
-
 // Adding category
 const addNewCategory = async (req, res) => {
     try {
@@ -85,7 +63,6 @@ const addNewCategory = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
-
 
 // Edit Category
 const updateCategory = async (req, res) => {

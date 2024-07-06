@@ -1,7 +1,7 @@
 require('dotenv').config();
-const userModel = require('../models/userModel');
-const productModel = require('../models/productModel');
-const categoryModel = require('../models/categoryModel');
+const userModel = require('../../models/userModel');
+const productModel = require('../../models/productModel');
+const categoryModel = require('../../models/categoryModel');
 const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const nodemailer = require("nodemailer");
@@ -107,7 +107,7 @@ const handleOTP = async (req, res, next) => {
         req.session.otp = otp;
 
         sendOTP(recipientEmail, otp);
-        res.render('otp', { user: userData, products: activeProducts });
+        res.render('otp', { user: userData, products: activeProducts, email: recipientEmail });
         
     } catch (error) {
         console.log(error);
@@ -226,7 +226,7 @@ const loginUser = async (req, res) => {
                     res.json({ success: false, message: "You are blocked from accessing this website" });
                 }
             } else {
-                res.json({ success: false, message: "Wrong email or Password" });
+                res.json({ success: false, message: "Wrong email or password" });
             }
         } else {
             res.json({ success: false, message: "No user found" });
@@ -242,7 +242,7 @@ const userHome = async (req, res) => {
         const userData = await userModel.findOne({ _id: req.session.user_id });
         const activeProducts = await productModel.find({ status: "active" }).populate('category');
 
-        res.render('index', { user: userData, products: activeProducts });
+        res.render('home', { user: userData, products: activeProducts });
     } catch (error) {
         res.status(500).send(error);
     }

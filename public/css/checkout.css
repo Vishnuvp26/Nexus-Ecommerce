@@ -1,0 +1,143 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.card-header h4 {
+    margin: 0;
+}
+
+.accordion .card-header {
+    padding: 0;
+    background-color: rgba(0, 0, 0, .03);
+    height: 90px;
+}
+
+.accordion .btn-link {
+    color: #fff;
+    text-decoration: none;
+    width: 100%;
+    text-align: left;
+    padding: 15px;
+    font-size: 16px;
+}
+
+.accordion .btn-primary {
+    margin: 10px 0;
+}
+
+.accordion .card-body {
+    background-color: rgba(0, 0, 0, .03);
+}
+
+.quantity-controls .btn {
+    border-radius: 0;
+}
+
+.quantity-controls .form-control {
+    text-align: center;
+    width: 60px;
+}
+
+.quantity-controls .input-group-prepend .btn,
+.quantity-controls .input-group-append .btn {
+    width: 30px;
+}
+
+.cart-total p {
+    margin: 0;
+}
+
+.cart-total .text-primary {
+    font-weight: bold;
+}
+
+.btn-block {
+    margin-top: 10px;
+}
+
+.btn-danger.btn-sm {
+    margin-top: 10px;
+}
+
+#viewaddress {
+    color: black;
+}
+
+#viewaddress:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#addaddressbtn{
+    margin: 19px;
+}
+
+#addAddressForm {
+    margin: 0 auto;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+#addAddressForm input[type="text"],
+#addAddressForm button {
+    
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 12px;
+    font-family:'Poppins-Regular';
+}
+
+.btn-primary {
+    background-color: #008B8B;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #373737; 
+    color: #fff;
+}
+#addaddressbtn:hover{
+    background-color: #373737; 
+    color: #fff;
+}
+
+#addaddressbtn {
+    background-color:  #008B8B;
+    border-color:  #008B8B;
+}
+
+#addaddressbtn:focus,
+#addaddressbtn:active {
+    background-color: #006d6d;
+    border-color: #006d6d;
+    box-shadow: none;
+    outline: none;
+}
+
+.form-control {
+    border-radius: 10px;
+    height: 35px;
+}
+
+.input {
+    border-radius: 25px;
+    width: 100%;
+    border: 1px solid #c0c0c0;
+    outline: 0 !important;
+    box-sizing: border-box;
+    padding: 12px 15px;
+}
+
+@media (max-width: 768px) {
+    .media img {
+        width: 80px;
+    }
+    .media-body h5 {
+        font-size: 16px;
+    }
+    .media-body p {
+        font-size: 14px;
+    }
+}

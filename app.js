@@ -38,6 +38,14 @@ app.use('/', userRoute);
 // Admin route
 app.use('/admin', adminRoute);
 
+// app.use((err, req, res, next) => {
+//   res.status(500).render('error');
+// });
+
+app.get('*', (req, res) => {
+  res.status(404).render('error');
+});
+
 app.listen(PORT, () => {  
   console.log(`Server is running at http://localhost:${PORT}`);
 });

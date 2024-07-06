@@ -1,0 +1,252 @@
+<%- include("../layout/header") %>
+<!-- Navbar -->
+<%- include("../layout/navbar") %>
+<!-- css -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/checkout.css">
+
+<!-- breadcrumb -->
+<div class="container p-t-75">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/checkout" class="stext-109 cl8 hov-cl1 trans-04">
+            Cart
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Checkout
+        </span>
+    </div>
+</div>
+
+<!-- Address -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="stext-301">Order Summary</h4>
+                </div>
+                <div class="card-body">
+                    <% let totalPrice = 0; %>
+                    <% cart.items.forEach(function(item, index) { %>
+                        <div class="media mb-3">
+                            <!-- Image div -->
+                            <div class="mr-3" style="max-width: 100px;">
+                                <img src="/productimages/<%= item.productId.image[0] %>" class="img-fluid" alt="<%= item.productId.productName %>">
+                            </div>
+                            <!-- Text content -->
+                            <div class="media-body">
+                                <h5 class="mt-0"><%= item.productId.productName %></h5>
+                                <p>₹ <%= item.productId.price %> x <%= item.quantity %></p>
+                            </div>
+                        </div>
+                        <% totalPrice += item.productId.price * item.quantity; %>
+                        <hr>
+                    <% }) %>
+                </div>                
+            </div>
+            <div class="accordion" id="accordionExample">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center" id="headingTwo">
+                        <h2 class="mb-0">
+                            <button id="viewaddress" class="btn btn-link text-left collapsed view-address-btn" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                View Addresses <i class="fa fa-chevron-down ml-2"></i>
+                            </button>
+                        </h2>
+                        <button id="addaddressbtn" class="btn btn-primary btn-sm" onclick="showAddAddressForm()">Add Address</button>
+                    </div>
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                        <div class="card-body">
+                        <% addresses.forEach(function(address, index) { %>    
+                            <!-- Existing Addresses -->
+                            <div class="existing-addresses">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="address" id="address1" value="address1" data-description="456 Avenue, Another City, Another State, 654321">
+                                        <%= address.name %><br>
+                                        <%= address.house %>(H)
+                                        <%= address.city %>, <%= address.state %> <%= address.pincode %> <br>
+                                        Phone number: <%= address.phone %>
+                                </div>                        
+                                <!-- Add more addresses as needed -->
+                            </div>
+                            <hr>
+                        <% }) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Address Form (Initially Hidden) -->
+            <div id="addAddressForm" style="display: none;">
+                <form id="actualAddAddressForm">
+                    <div class="form-group pt-5">
+                        <label for="name">Name</label>  
+                        <input type="text" class="form-control" id="name" name="name" required>
+                        <small id="nameError" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
+                        <small id="phoneError" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <input type="text" class="form-control" id="district" name="district" required>
+                        <small id="districtError" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" required>
+                        <small id="cityError" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="house">House</label>
+                        <input type="text" class="form-control" id="house" name="house" required>
+                        <small id="houseError" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" class="form-control" id="state" name="state" required>
+                        <small id="stateError" class="text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" class="form-control" id="pincode" name="pincode" required>
+                        <small id="pincodeError" class="text-danger"></small>
+                    </div>
+                    <div class="addAddressformBtns pb-5 mt-2">
+                        <button type="submit" class="btn btn-primary">Save Address</button>
+                        <button type="button" class="btn btn-secondary ml-2" onclick="cancelForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="stext-301">Cart Total</h4>
+                </div>
+                <div class="card-body">
+                    <p>Price(<%= cart.items.length %> Items): <span class="float-right">₹ <%= totalPrice.toFixed(2) %></span></p>
+                    <p>Discount: <span class="float-right">₹ 0.00</span></p>
+                    <p>Total: <span class="float-right text-primary">₹ <%= totalPrice.toFixed(2) %></span></p>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                Cash on delivery
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="wallet">
+                            <label class="form-check-label" for="wallet">
+                                Wallet
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
+                            <label class="form-check-label" for="razorpay">
+                                RazorPay
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-block">PROCEED TO CONTINUE</button>
+                    <button class="btn btn-outline-secondary btn-block">CONTINUE SHOPPING</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../layout/footer.ejs") %>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Add new address -->
+<script>
+document.getElementById('actualAddAddressForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const formEntries = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch('/checkout/add-new-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formEntries)
+        });
+
+        const result = await response.json();
+        console.log('Response:', response);
+        console.log('Result:', result);
+
+        if (response.status === 200) {
+            Swal.fire({
+                text: 'Address added successfully',
+                width: '300px',
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: result.error || 'Something went wrong',
+                width: '300px',
+                showConfirmButton: false,
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Something went wrong',
+            width: '300px',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+});
+
+</script>
+
+
+<!-- Total price count -->
+<script>
+    $(document).ready(function() {
+        $('#collapseTwo').on('show.bs.collapse', function() {
+            $('#viewaddress i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        });
+
+        $('#collapseTwo').on('hide.bs.collapse', function() {
+            $('#viewaddress i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        });
+    });
+
+    function showAddAddressForm() {
+        $('#addAddressForm').toggle();
+    }
+
+    function cancelForm() {
+        $('#addAddressForm').hide();
+    }
+</script>

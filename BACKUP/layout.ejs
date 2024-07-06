@@ -1,0 +1,54 @@
+<%- include("../layout/header") %>
+<!-- Navbar -->
+<%- include("../layout/navbar") %>
+<!-- css -->
+<link rel="stylesheet" href="/css/editProfile.css">
+
+<!-- breadcrumb -->
+<div class="container p-t-75">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/profile" class="stext-109 cl8 hov-cl1 trans-04">
+            Profile
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Edit Profile
+        </span>
+    </div>
+</div>
+
+<div class="container mt-lg-4">
+    <div id="editAddressForm">
+        <form id="actualEditAddressForm">
+            <input type="hidden" name="addressId">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+                <small id="nameError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+                <small id="phoneError" class="text-danger"></small>
+            </div>
+            <div class="form-group">
+                <label for="district">Email</label>
+                <input type="text" class="form-control" id="district" name="district" disabled>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <button type="button" class="btn btn-secondary ml-2" onclick="cancelEdit()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<%- include("../layout/footer.ejs") %>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-3U2fGJF0v7Jl6Bau8bIuS4ZOCVrRc3bS5iiXigKkVBV7J+ABT/nx6Dk1f8CJjewL" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+YS/6D8hKLs6hVvpk2xX1vXS+OrnEWJ2RwX" crossorigin="anonymous"></script>

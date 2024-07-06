@@ -1,0 +1,203 @@
+<%- include("../layout/header") %>
+<%- include("../layout/navbar") %>
+<link rel="stylesheet" href="/css/cart.css">
+
+<!-- Breadcrumb -->
+<div class="container p-t-70">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">Shopping Cart</span>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <h4 class="mt-5">SHOPPING CART</h4>
+    <div class="row mt-4">
+        <div class="col-12 col-md-8">
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr id="catrtablerow">
+                            <th>PRODUCT</th>
+                            <th>PRICE</th>
+                            <th>QUANTITY</th>
+                            <th>TOTAL</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartItems">
+                        <% if (cart && cart.items.length > 0) { %>
+                            <% cart.items.forEach((item, i) => { %>
+                                <tr data-id="<%= item.productId._id %>">
+                                    <td class="align-middle">
+                                        <!-- Product Image -->
+                                        <img src="/productimages/<%= item.productId.image[0] %>" alt="<%= item.productId.productName %>" class="img-fluid" style="max-width: 100px;">
+                                        <!-- Product Name -->
+                                        <span class="ml-3"><%= item.productId.productName %></span>
+                                    </td>
+                                    <td class="align-middle">₹ <%= item.productId.price %></td>
+                                    <td class="align-middle">
+                                        <div class="input-group quantity">
+                                            <div class="input-group-prepend">
+                                                <!-- Decrease Quantity Button -->
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decrement('<%= item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">-</button>
+                                            </div>
+                                            <!-- Quantity Input -->
+                                            <input type="text" class="form-control text-center quantity-input" id="qty<%= i %>" value="<%= item.quantity %>" data-max="<%= Math.min(5, item.productId.quantity) %>">
+                                            <div class="input-group-append">
+                                                <!-- Increase Quantity Button -->
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increment('<%= item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">+</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle total-price" id="subtotal<%= i %>">₹ <%= item.productId.price * item.quantity %></td>
+                                    <td class="align-middle">
+                                        <!-- Delete Button -->
+                                        <button class="btn btn-sm btn-dark btn-transparent btn-delete" data-id="<%= item.productId._id %>">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="text-center">Your cart is empty</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <a href="/shop" class="text-dark" id="continueShoppingText">
+                <i id="continueShopping" class="fa fa-arrow-left pt-5"></i>&nbsp;Continue shopping
+            </a>   
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" id="cartTotals">CART TOTALS</h4>
+                    <hr>
+                    <p class="card-text">Total Amount</p>
+                    <h4 id="totalamount" class="mt-2">₹ <%= calculateCartTotal(cart) %></h4>
+                    <button id="proceedToCheckout" class="btn btn-dark btn-block mt-4">Proceed to checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../layout/footer.ejs") %>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+const updateCartTotal = () => {
+    let total = 0;
+    $('.total-price').each(function() {
+        total += parseFloat($(this).text().replace('₹ ', ''));
+    });
+    $('#totalamount').text('₹ ' + total.toFixed(2));
+}
+    
+// Decrease quantity
+const decrement = (price, stock, i, pId) => {
+    let quantity = Number(document.getElementById(`qty${i}`).value);
+    if (quantity > 1) {
+        axios.post('/cart/decrement', { index: i })
+            .then((response) => {
+                if (response.data.success) {
+                    quantity--;
+                    let subtotal = Number(quantity) * Number(price);
+                    document.getElementById(`subtotal${i}`).textContent = `₹ ${subtotal.toFixed(2)}`;
+                    document.getElementById(`qty${i}`).value = quantity;
+                    updateCartTotal();
+                } else {
+                    Swal.fire(response.data.message);
+                }
+            })
+            .catch((error) => {
+                Swal.fire("Error", "Oops!! Something went wrong", "error");
+            });
+    } else {
+        Swal.fire("", "Quantity cannot be less than 1");
+    }
+}
+    
+// Increase quantity
+const increment = (price, stock, i, pId) => {
+    let quantity = Number(document.getElementById(`qty${i}`).value);
+    if (quantity < 5 && quantity < stock) {
+        axios.post('/cart/increment', { index: i })
+            .then((response) => {
+                if (response.data.success) {
+                    quantity++;
+                    let subtotal = Number(quantity) * Number(price);
+                    document.getElementById(`subtotal${i}`).textContent = `₹ ${subtotal.toFixed(2)}`;
+                    document.getElementById(`qty${i}`).value = quantity;
+                    updateCartTotal();
+                } else {
+                    Swal.fire(response.data.message);
+                }
+            })
+            .catch((error) => {
+                Swal.fire("Error", "Oops!! Something went wrong", "error");
+            });
+    } else if (quantity >= 5) {
+        Swal.fire("Sorry", "You can't buy more than 5 quantity");
+    } else if (quantity >= stock) {
+        Swal.fire("You reached maximum quantity available");
+    }
+}
+    
+// Delete button
+const removeItem = (productId) => {
+    axios.post('/cart/remove', { productId })
+        .then((response) => {
+            if (response.data.success) {
+                document.querySelector(`tr[data-id="${productId}"]`).remove();
+                updateCartTotal();
+                Swal.fire("", "Item removed from cart").then(() => {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 10);
+                });
+            } else {
+                Swal.fire("Warning", response.data.message, "warning");
+            }
+        })
+        .catch((error) => {
+            Swal.fire("Error", "Oops!! Something went wrong", "error");
+        });
+}
+    
+// Delete button event listener
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', function() {
+        const productId = this.getAttribute('data-id');
+        removeItem(productId);
+    });
+});
+    
+// Stock check function
+const checkStockBeforeCheckout = () => {
+    axios.post('/cart/stock-check')
+        .then((response) => {
+            if (response.data.success) {
+                window.location.href = '/checkout';
+            } else {
+                Swal.fire("Warning", response.data.message, "warning");
+            }
+        })
+        .catch((error) => {
+            Swal.fire("Error", "Oops!! Something went wrong", "error");
+        });
+}
+    
+document.getElementById('proceedToCheckout').addEventListener('click', checkStockBeforeCheckout);
+
+updateCartTotal();
+</script>

@@ -1,6 +1,6 @@
-const adminModel = require('../models/adminModel');
+const adminModel = require('../../models/adminModel');
 const bcrypt = require("bcrypt"); 
-const userModel = require('../models/userModel');
+const userModel = require('../../models/userModel');
 
 // Admin Login Page GET
 const adminLogin = async (req, res) => {

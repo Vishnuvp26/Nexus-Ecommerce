@@ -27,16 +27,28 @@
   .table td:nth-child(4) {
     width: 30%;
   }
+  .swal2-popup {
+    font-size: 14px;
+    max-width: 320px;
+    padding: 1.16rem;
+    max-height: 300px !important;
+  }
 
   .swal2-title {
-    font-weight: normal !important; /* Reduce boldness */
-    font-size: 18px !important; /* Change font size */
-
+    font-size: 15px !important; 
   }
+
   .swal2-content {
-    font-weight: normal !important; /* Reduce boldness */
-    font-size: 16px !important; /* Change font size */
-    
+    font-size: 12px !important;
+  }
+
+  .swal2-confirm,
+  .swal2-cancel {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  .swal2-icon.swal2-warning {
+    font-size: 10px;
   }
 </style>
 
@@ -212,7 +224,7 @@
       var categoryId = form.find('input[name="id"]').val();
       Swal.fire({
         title: 'Are you sure?',
-        text: `You want to mark this category as ${status}?`,
+        text: `Make this category as ${status}?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes, do it!',

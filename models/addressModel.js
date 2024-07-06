@@ -8,28 +8,28 @@ const addressSchema = new mongoose.Schema({
     },
     address: [
         {
-        name: {
-            type: String
-        },
-        phone: {
-            type: String
-        },  
-        district: {
-            type: String
-        },
-        city: {
-            type: String
-        },
-        house: {
-            type: String
-        },
-        state: {
-            type: String
-        },
-        pincode: {
-            type: String
-        },
-    }]
+            name: {
+                type: String
+            },
+            phone: {
+                type: String
+            },
+            district: {
+                type: String
+            },
+            city: {
+                type: String
+            },
+            house: {
+                type: String
+            },
+            state: {
+                type: String
+            },
+            pincode: {
+                type: String
+            },
+        }]
 });
 
 module.exports = mongoose.model('Address', addressSchema);

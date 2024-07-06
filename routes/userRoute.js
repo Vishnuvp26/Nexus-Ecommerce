@@ -1,18 +1,20 @@
 const express = require("express");
 const userRouter = express();
-const userController = require('../controllers/userController');
-const profileController = require('../controllers/profileController');
+const userController = require('../controllers/user/userController');
+const profileController = require('../controllers/user/profileController');
+const cartController = require('../controllers/user/cartController');
+const orderController = require('../controllers/user/orderController');
 const userAuth = require('../middleware/userAuth');
-const passport = require("passport")
+const passport = require("passport");
+const { captureRejectionSymbol } = require("nodemailer/lib/xoauth2");
 userRouter.use(passport.initialize());
 userRouter.use(passport.session())
 
 userRouter.set("view engine", "ejs");
 userRouter.set("views", "./views/users");
 
-//------Google Authentication Starting------//
+// Google auth
 userRouter.get('/auth/google', passport.authenticate("google", { scope: ["profile", "email"] }));
-
 userRouter.get(
     "/auth/google/callback",
     passport.authenticate("google", {
@@ -20,17 +22,17 @@ userRouter.get(
         failureRedirect: "/login",
     })
 );
-
 userRouter.get("/auth/google/googleSuccess", userController.googleSuccess);
-//------Google Authentication Ending------//
 
-// Login & Register
+// Login
 userRouter.get('/', userController.userHome);
 userRouter.get('/login', userAuth.isLogout, userController.loginLoad);
 userRouter.post('/login', userController.loginUser);
+userRouter.get('/logout', userAuth.isLogin, userController.userLogout);
+
+// Register
 userRouter.get('/register', userController.registerLoad);
 userRouter.post('/register', userController.insertUser);
-userRouter.get('/logout', userAuth.isLogin, userController.userLogout);
 userRouter.get('/otp', userAuth.isLogout, userController.handleOTP);
 userRouter.post('/otp', userController.verifyOtp);
 
@@ -38,12 +40,37 @@ userRouter.post('/otp', userController.verifyOtp);
 userRouter.get('/productDetails', userController.productDetails);
 userRouter.get('/shop', userController.shop);
 
+// Cart
+userRouter.get('/load-cart', userAuth.isLogin, cartController.loadCart);
+userRouter.post('/add-to-cart', userAuth.isLogin, cartController.addToCart);
+userRouter.post('/cart/decrement', userAuth.isLogin, cartController.decrementCart);
+userRouter.post('/cart/increment', userAuth.isLogin, cartController.incrementCart);
+userRouter.post('/cart/remove', userAuth.isLogin, cartController.removeFromCart);
+userRouter.post('/cart/stock-check', userAuth.isLogin, cartController.stockCheck);
+
+// Checkout
+userRouter.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
+userRouter.post('/checkout/add-new-address', userAuth.isLogin, cartController.addNewAddress);
+userRouter.post('/checkout/place-order', userAuth.isLogin, orderController.createOrder);
+userRouter.get('/place-order/order-success', userAuth.isLogin, orderController.createOrder);
+
 // Profile
 userRouter.get('/profile', userAuth.isLogin, profileController.profile);
+userRouter.post('/editProfile', userAuth.isLogin, profileController.editProfile);
+
+// Address
 userRouter.get('/address', userAuth.isLogin, profileController.loadAddress);
 userRouter.post('/addAddress', userAuth.isLogin, profileController.addAddress);
 userRouter.get('/loadEditAddress', userAuth.isLogin, profileController.loadEditAddress);
 userRouter.post('/editAddress', userAuth.isLogin, profileController.editAddress);
 userRouter.post('/deleteAddress', userAuth.isLogin, profileController.deleteAddress);
+
+// Password
+userRouter.get('/edit-password', userAuth.isLogin, profileController.loadEditPassword);
+userRouter.post('/change-password', userAuth.isLogin, profileController.changePassword);
+userRouter.get('/forgot-password', userAuth.isLogout, profileController.loadForgetPassword);
+userRouter.post('/send-password-link', userAuth.isLogout, profileController.sendPasswordLink);
+userRouter.get('/reset-password', profileController.renderResetPasswordForm);
+userRouter.post('/reset-password', profileController.handleResetPassword);
 
 module.exports = userRouter;

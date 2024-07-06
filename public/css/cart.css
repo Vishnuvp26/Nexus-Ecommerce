@@ -1,0 +1,119 @@
+.btn-dark.btn-transparent {
+    color: #343a40; 
+    background-color: transparent; 
+    border-color: transparent; 
+}
+
+.btn-dark.btn-transparent:hover {
+    color: #fff;
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+.card {
+    width: 90%;
+    max-width: 400px;
+    margin: auto;
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+#catrtablerow {
+    background-color: #008b8b0a;
+    width: 20px;
+}
+
+.table th,
+.table td {
+    padding: 0.80rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+}
+
+.table th {
+    text-align: left;
+}
+
+.table td:not(:first-child) {
+    text-align: center;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+.table_head {
+    background-color: #858585;
+    color: #495057;
+}
+
+.table_row {
+    background-color: #fff;
+}
+
+.column-1 {
+    width: 90%;
+}
+
+.column-3,
+.column-4,
+.column-5,
+.column-6 {
+    width: 15%;
+}
+
+#continueShopping{
+    font-size: 12px;
+}
+
+#continueShoppingText{
+    font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .table th,
+    .table td {
+        padding: 0.5rem;
+    }
+    .column-1,
+    .column-3,
+    .column-4,
+    .column-5,
+    .column-6 {
+        width: auto;
+    }
+}
+
+.quantity .btn-outline-secondary {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.75rem;
+}
+
+#countvalue {
+    width: 20px;
+}
+
+#totalamount{
+    font-size: medium;
+    font-weight: 600;
+}
+
+#cartTotals {
+    font-weight: bold;
+    font-size: medium;
+    letter-spacing: 0.05em;
+    color: #212529;
+}
+
+.btn-dark:hover {
+    background-color:#008b8b; /* Dark background color on hover */
+}

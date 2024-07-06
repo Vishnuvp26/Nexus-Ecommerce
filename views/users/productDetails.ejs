@@ -70,22 +70,18 @@
 
 						<div class="flex-w flex-r-m p-b-10">
 							<div class="size-204 flex-w flex-m respon6-next">
-								<div class="wrap-num-product flex-w m-r-20 m-tb-10">
-									<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-										<i class="fs-16 zmdi zmdi-minus"></i>
-									</div>
-
-									<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product" value="1">
-
-									<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-										<i class="fs-16 zmdi zmdi-plus"></i>
-									</div>
-								</div>
-
-								<button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail">
-									Add to cart
+								
+								<button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail"
+									<% if (user) { %>
+										onclick="addToCart('<%= product._id %>')"
+									<% } else { %>
+										onclick="window.location.href='/login'"
+									<% } %>
+									>
+									<i class="zmdi zmdi-shopping-cart"></i>&nbsp; Add to cart
 								</button>
-							</div>
+							
+							</div>;
 						</div>
 
 					</div>
@@ -280,7 +276,7 @@
 		<div class="container">
 			<div class="p-b-45">
 				<h3 class="ltext-106 cl5 txt-center">
-					Related Products
+					Products You Might Like
 				</h3>
 			</div>
 	
@@ -349,3 +345,52 @@
 	});
 
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- <script>
+    function addToCart(productId) {
+        axios.post('/add-to-cart', { productId: productId })
+            .then(function (response) {
+                console.log(response.data);
+                alert('Product added to cart successfully!');
+            })
+            .catch(function (error) {
+                console.error('Error adding to cart:', error);
+                alert('Failed to add product to cart');
+            });
+    }
+</script> -->
+
+
+<script>
+    function addToCart(productId) {
+        axios.post('/add-to-cart', { productId: productId })
+            .then(function (response) {
+                console.log(response.data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product added to cart successfully!',
+					customClass: {
+                        icon: 'swal2-icon-custom',
+                        content: 'swal2-content-custom',
+                    }
+                });
+            })
+            .catch(function (error) {
+                console.error('Error adding to cart:', error);
+                Swal.fire({
+                    text: 'Product already exists in cart',
+                });
+            });
+    }
+</script>
+<style>
+    .swal2-icon-custom {
+        font-size: 8px !important;
+    }
+    .swal2-content-custom {
+        font-size: 5px !important;
+		font-family:'Poppins-Regular';
+    }
+</style>

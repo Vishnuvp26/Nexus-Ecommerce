@@ -2,7 +2,7 @@
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
 
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family:'Poppins-Regular';
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -120,10 +120,6 @@ button svg {
   padding: 12px 15px;
 }
 
-.orloginwith {
-  font-weight: 500;
-}
-
 .login-with-google-btn {
   transition: background-color .3s, box-shadow .3s;
   padding: 12px 16px 12px 42px;
@@ -165,10 +161,29 @@ button svg {
   padding-right: 30px;
 }
 
+#forgotPasswordbtn {
+  color: inherit;
+  font-size: 13px;
+  text-decoration: none;
+  position: relative;
+}
+#forgotPasswordbtn:hover{
+  color: rgb(0, 110, 184);
+}
+
 /* form bottom padding */
 .formContainer {
   padding: 20px;
   padding-bottom: 50px;
+}
+
+#nothaveaccount{
+  font-size: 14px;
+}
+
+#orContinue{
+  font-size: 15px;
+  font-weight: 500;
 }
 
 @media (max-width: 767px) {

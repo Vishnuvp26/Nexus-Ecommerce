@@ -1,4 +1,4 @@
-const userModel = require('../models/userModel'); 
+const userModel = require('../../models/userModel'); 
 
 // User table
 const loadUser = async (req, res, next) => {

@@ -42,6 +42,7 @@ userRouter.get('/shop', userController.shop);
 
 // Cart
 userRouter.get('/load-cart', userAuth.isLogin, cartController.loadCart);
+userRouter.get('/checkout/stock-check', userAuth.isLogin, cartController.stockCheck);
 userRouter.post('/add-to-cart', userAuth.isLogin, cartController.addToCart);
 userRouter.post('/cart/decrement', userAuth.isLogin, cartController.decrementCart);
 userRouter.post('/cart/increment', userAuth.isLogin, cartController.incrementCart);

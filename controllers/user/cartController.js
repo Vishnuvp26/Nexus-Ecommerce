@@ -133,12 +133,10 @@ const removeFromCart = async (req, res, next) => {
     }
 };
 
-const stockCheck = async (req,res) => {
+const stockCheck = async (req, res) => {
     try {
-        // Find the cart for the logged-in user
         const cart = await cartModel.findOne({ userId: req.session.user_id }).populate('items.productId');
 
-        // Perform the stock check
         let isAvailable = true;
         let message = "";
 
@@ -148,8 +146,6 @@ const stockCheck = async (req,res) => {
                 message = "Some items in your cart are currently unavailable";
                 break;
             } else if (item.quantity > item.productId.quantity) {
-                item.quantity = item.productId.quantity;
-                await cartModel.save();
                 isAvailable = false;
                 message = "Some item's quantity in your cart is greater than the stock available";
                 break;
@@ -163,8 +159,10 @@ const stockCheck = async (req,res) => {
         }
     } catch (error) {
         console.error(error);
+        return res.status(500).json({ success: false, message: "Server error" });
     }
 };
+
 
 // Load checkout
 const loadCheckout = async (req, res) => {

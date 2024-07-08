@@ -95,109 +95,119 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
-const updateCartTotal = () => {
-    let total = 0;
-    $('.total-price').each(function() {
-        total += parseFloat($(this).text().replace('₹ ', ''));
-    });
-    $('#totalamount').text('₹ ' + total.toFixed(2));
-}
-    
-// Decrease quantity
-const decrement = (price, stock, i, pId) => {
-    let quantity = Number(document.getElementById(`qty${i}`).value);
-    if (quantity > 1) {
-        axios.post('/cart/decrement', { index: i })
-            .then((response) => {
-                if (response.data.success) {
-                    quantity--;
-                    let subtotal = Number(quantity) * Number(price);
-                    document.getElementById(`subtotal${i}`).textContent = `₹ ${subtotal.toFixed(2)}`;
-                    document.getElementById(`qty${i}`).value = quantity;
-                    updateCartTotal();
-                } else {
-                    Swal.fire(response.data.message);
-                }
-            })
-            .catch((error) => {
-                Swal.fire("Error", "Oops!! Something went wrong", "error");
-            });
-    } else {
-        Swal.fire("", "Quantity cannot be less than 1");
+    const updateCartTotal = () => {
+        let total = 0;
+        $('.total-price').each(function() {
+            total += parseFloat($(this).text().replace('₹ ', ''));
+        });
+        $('#totalamount').text('₹ ' + total.toFixed(2));
     }
-}
     
-// Increase quantity
-const increment = (price, stock, i, pId) => {
-    let quantity = Number(document.getElementById(`qty${i}`).value);
-    if (quantity < 5 && quantity < stock) {
-        axios.post('/cart/increment', { index: i })
-            .then((response) => {
-                if (response.data.success) {
-                    quantity++;
-                    let subtotal = Number(quantity) * Number(price);
-                    document.getElementById(`subtotal${i}`).textContent = `₹ ${subtotal.toFixed(2)}`;
-                    document.getElementById(`qty${i}`).value = quantity;
-                    updateCartTotal();
-                } else {
-                    Swal.fire(response.data.message);
-                }
-            })
-            .catch((error) => {
-                Swal.fire("Error", "Oops!! Something went wrong", "error");
-            });
-    } else if (quantity >= 5) {
-        Swal.fire("Sorry", "You can't buy more than 5 quantity");
-    } else if (quantity >= stock) {
-        Swal.fire("You reached maximum quantity available");
-    }
-}
-    
-// Delete button
-const removeItem = (productId) => {
-    axios.post('/cart/remove', { productId })
-        .then((response) => {
-            if (response.data.success) {
-                document.querySelector(`tr[data-id="${productId}"]`).remove();
-                updateCartTotal();
-                Swal.fire("", "Item removed from cart").then(() => {
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 10);
+    // Decrease quantity
+    const decrement = (price, stock, i, pId) => {
+        let quantity = Number(document.getElementById(`qty${i}`).value);
+        if (quantity > 1) {
+            axios.post('/cart/decrement', { index: i })
+                .then((response) => {
+                    if (response.data.success) {
+                        quantity--;
+                        let subtotal = Number(quantity) * Number(price);
+                        document.getElementById(`subtotal${i}`).textContent = `₹ ${subtotal.toFixed(2)}`;
+                        document.getElementById(`qty${i}`).value = quantity;
+                        updateCartTotal();
+                    } else {
+                        Swal.fire(response.data.message);
+                    }
+                })
+                .catch((error) => {
+                    Swal.fire("Error", "Oops!! Something went wrong", "error");
                 });
-            } else {
-                Swal.fire("Warning", response.data.message, "warning");
-            }
-        })
-        .catch((error) => {
-            Swal.fire("Error", "Oops!! Something went wrong", "error");
-        });
-}
+        } else {
+            Swal.fire("", "Quantity cannot be less than 1");
+        }
+    }
     
-// Delete button event listener
-document.querySelectorAll('.btn-delete').forEach(button => {
-    button.addEventListener('click', function() {
-        const productId = this.getAttribute('data-id');
-        removeItem(productId);
+    // Increase quantity
+    const increment = (price, stock, i, pId) => {
+        let quantity = Number(document.getElementById(`qty${i}`).value);
+        if (quantity < 5 && quantity < stock) {
+            axios.post('/cart/increment', { index: i })
+                .then((response) => {
+                    if (response.data.success) {
+                        quantity++;
+                        let subtotal = Number(quantity) * Number(price);
+                        document.getElementById(`subtotal${i}`).textContent = `₹ ${subtotal.toFixed(2)}`;
+                        document.getElementById(`qty${i}`).value = quantity;
+                        updateCartTotal();
+                    } else {
+                        Swal.fire(response.data.message);
+                    }
+                })
+                .catch((error) => {
+                    Swal.fire("Error", "Oops!! Something went wrong", "error");
+                });
+        } else if (quantity >= 5) {
+            Swal.fire("Sorry", "You can't buy more than 5 quantity");
+        } else if (quantity >= stock) {
+            Swal.fire("You reached maximum quantity available");
+        }
+    }
+    
+    // Delete button
+    const removeItem = (productId) => {
+        axios.post('/cart/remove', { productId })
+            .then((response) => {
+                if (response.data.success) {
+                    document.querySelector(`tr[data-id="${productId}"]`).remove();
+                    updateCartTotal();
+                    Swal.fire("", "Item removed from cart").then(() => {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 10);
+                    });
+                } else {
+                    Swal.fire("Warning", response.data.message, "warning");
+                }
+            })
+            .catch((error) => {
+                Swal.fire("Error", "Oops!! Something went wrong", "error");
+            });
+    }
+    
+    // Delete button event listener
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-id');
+            removeItem(productId);
+        });
     });
-});
     
-// Stock check function
-const checkStockBeforeCheckout = () => {
-    axios.post('/cart/stock-check')
-        .then((response) => {
-            if (response.data.success) {
-                window.location.href = '/checkout';
-            } else {
-                Swal.fire("Warning", response.data.message, "warning");
-            }
-        })
-        .catch((error) => {
-            Swal.fire("Error", "Oops!! Something went wrong", "error");
-        });
-}
+    // Check stock before proceeding to checkout
+    const checkStockBeforeCheckout = () => {
+        console.log('Proceed to Checkout button clicked');
+        axios.get('/checkout/stock-check')
+            .then(response => {
+                if (response.data.success) {
+                    window.location.href = '/checkout';
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stock Issue',
+                        text: response.data.message,
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Oops! Something went wrong.',
+                });
+            });
+    };
     
-document.getElementById('proceedToCheckout').addEventListener('click', checkStockBeforeCheckout);
-
-updateCartTotal();
+    document.getElementById('proceedToCheckout').addEventListener('click', checkStockBeforeCheckout);
+    
+    updateCartTotal();
 </script>
+    

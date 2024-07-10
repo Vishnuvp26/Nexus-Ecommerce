@@ -1,30 +1,35 @@
 const express = require('express');
 const session = require('express-session');
 const { v4: uuidv4 } = require("uuid");
-const app = express();
 const nocache = require("nocache");
+const mongoose = require('mongoose');
+const path = require('path');
+require('dotenv').config();
 
+const app = express();
 
 // MongoDB Connection
-const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1:27017/COZA_Store");
+const mongoDB_URI = process.env.MONGODB_URI;
+mongoose.connect(mongoDB_URI)
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.log('MongoDB connection error:', err));
 
+// Session setup
 app.use(session({
-  secret:uuidv4(),
+  secret: uuidv4(),
   resave: false,
   saveUninitialized: false
 }));
 
-// Middleware setup
+// Middleware
 app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const userRoute = require('./routes/userRoute');
-const adminRoute = require('./routes/adminRoute')
+const adminRoute = require('./routes/adminRoute');
 
-const PORT = process.env.PORT || 3000;
-const path = require('path');
+const PORT = process.env.PORT
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -35,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // User Route
 app.use('/', userRoute);
 
-// Admin route
+// Admin Route
 app.use('/admin', adminRoute);
 
 // app.use((err, req, res, next) => {
@@ -43,7 +48,7 @@ app.use('/admin', adminRoute);
 // });
 
 app.get('*', (req, res) => {
-  res.status(404).render('error');
+  res.status(404).render('404');
 });
 
 app.listen(PORT, () => {  

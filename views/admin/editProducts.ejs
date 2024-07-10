@@ -70,11 +70,15 @@
                             <select class="form-control" id="category" name="categoryName">
                                 <% let activeCategories = category.filter(cat => cat.status === 'active'); %>
                                 <% for(let i = 0; i < activeCategories.length; i++) { %>
-                                  <option value="<%= activeCategories[i].categoryName %>" <% if (product.category.toString() === activeCategories[i]._id.toString()) { %> selected <% } %>><%= activeCategories[i].categoryName %></option>
+                                    <option value="<%= activeCategories[i].categoryName %>" 
+                                            <% if (product.category._id.toString() === activeCategories[i]._id.toString()) { %> 
+                                                selected 
+                                            <% } %>>
+                                        <%= activeCategories[i].categoryName %>
+                                    </option>
                                 <% } %>
-                            </select>                              
-                        </div>
-                        
+                            </select>
+                        </div>                        
                         <!-- Images -->
                         <div class="form-group">
                             <label>Images</label>

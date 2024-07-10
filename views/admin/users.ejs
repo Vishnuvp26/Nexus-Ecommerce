@@ -1,50 +1,6 @@
 <%- include("../layout/adminHeader") %>
 <%- include("../layout/adminSidebarHead") %>
-
-<style>
-  .table th,
-  .table td {
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  .table th:nth-child(1),
-  .table td:nth-child(1) {
-    width: 10%;
-  }
-
-  .table th:nth-child(2),
-  .table td:nth-child(2) {
-    width: 20%;
-  }
-
-  .table th:nth-child(3),
-  .table td:nth-child(3) {
-    width: 30%;
-  }
-
-  .table th:nth-child(4),
-  .table td:nth-child(4) {
-    width: 20%;
-  }
-  
-  .table th:nth-child(5),
-  .table td:nth-child(5) {
-    width: 15%;
-  }
-
-
-  .swal2-title {
-    font-weight: normal !important; 
-    font-size: 18px !important;
-
-  }
-  .swal2-content {
-    font-weight: normal !important; 
-    font-size: 16px !important;
-    
-  }
-</style>
+<link rel="stylesheet" href="/css/adminUsers.css">
 
 <div class="main-panel">
   <div class="content-wrapper">
@@ -97,11 +53,13 @@
                 <% }) %>
               <% } else { %>
                 <tr>
-                  <td colspan="5" class="text-center">No users found</td>
-                  <div class="mb-4">
-                    <a href="/admin/users" class="btn btn-inverse-dark">Go Back</a>
-                  </div>
-                </tr>
+                  <td colspan="7" class="text-center">
+                       No such users found
+                      <div class="mt-4">
+                          <a href="/admin/users" class="btn-sm btn-inverse-dark" style="text-decoration: none;">Go Back</a>
+                      </div>
+                  </td>
+              </tr>
               <% } %>
             </tbody>
           </table>

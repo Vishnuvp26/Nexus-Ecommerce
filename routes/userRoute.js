@@ -52,8 +52,12 @@ userRouter.post('/cart/stock-check', userAuth.isLogin, cartController.stockCheck
 // Checkout
 userRouter.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
 userRouter.post('/checkout/add-new-address', userAuth.isLogin, cartController.addNewAddress);
+
+// Orders
 userRouter.post('/checkout/place-order', userAuth.isLogin, orderController.createOrder);
-userRouter.get('/place-order/order-success', userAuth.isLogin, orderController.createOrder);
+userRouter.get('/order-success', userAuth.isLogin, orderController.orderSuccess);
+userRouter.get('/view-orders', userAuth.isLogin, orderController.viewOrders);
+userRouter.get('/order-details', userAuth.isLogin, orderController.orderDetails);
 
 // Profile
 userRouter.get('/profile', userAuth.isLogin, profileController.profile);

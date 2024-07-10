@@ -1,6 +1,7 @@
 const userModel = require('../../models/userModel');
 const addressModel = require('../../models/addressModel');
 const cartModel = require('../../models/cartModel');
+const productModel = require('../../models/productModel');
 
 // Calculate total
 function calculateCartTotal(cart) {
@@ -18,13 +19,25 @@ function calculateCartTotal(cart) {
 const loadCart = async (req, res) => {
     try {
         const userData = await userModel.findOne({ _id: req.session.user_id });
-        const cartData = await cartModel.findOne({ userId: req.session.user_id }).populate("items.productId");
+        const cartData = await cartModel.findOne({ userId: req.session.user_id })
+            .populate({
+                path: 'items.productId',
+                populate: {
+                    path: 'category',
+                    model: 'Category'
+                }
+            });
 
         let cartCount = 0;
         if (cartData) {
             cartCount = cartData.items.length;
         }
-        res.render('cart', { user: userData, cartCount: cartCount, cart: cartData, calculateCartTotal: calculateCartTotal });
+        res.render('cart', { 
+            user: userData, 
+            cartCount: cartCount, 
+            cart: cartData, 
+            calculateCartTotal: calculateCartTotal 
+        });
     } catch (error) {
         console.log(error);
     }
@@ -133,6 +146,7 @@ const removeFromCart = async (req, res, next) => {
     }
 };
 
+// Stock Check
 const stockCheck = async (req, res) => {
     try {
         const cart = await cartModel.findOne({ userId: req.session.user_id }).populate('items.productId');
@@ -169,9 +183,20 @@ const loadCheckout = async (req, res) => {
     try {
         const userData = await userModel.findOne({ _id: req.session.user_id });
         const addressData = await addressModel.findOne({ userId: req.session.user_id });
-        const cartData = await cartModel.findOne({ userId: req.session.user_id }).populate("items.productId");
+        const cartData = await cartModel.findOne({ userId: req.session.user_id })
+            .populate({
+                path: 'items.productId',
+                populate: {
+                    path: 'category',
+                    model: 'Category'
+                }
+            });
 
-        res.render('checkout', { user: userData, cart: cartData, addresses: addressData ? addressData.address : [] });
+        res.render('checkout', { 
+            user: userData,  
+            cart: cartData, 
+            addresses: addressData ? addressData.address : [] 
+        });
     } catch (error) {
         console.log(error);
     }

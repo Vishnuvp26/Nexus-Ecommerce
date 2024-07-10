@@ -7,7 +7,7 @@
             <nav class="limiter-menu-desktop container">
                 
                 <!-- Logo desktop -->		
-                <a href="/" class="logo" style="color: darkcyan; font-family: Arial, sans-serif; font-weight: bold; font-size: 10px;">
+                <a href="/" class="logo" style="color: darkcyan; font-family: Arial, sans-serif; font-weight: bold; font-size: 10px; text-decoration: none;">
                     <h2>NEXUS</h2>
                 </a>										
 
@@ -25,10 +25,6 @@
 
                         <% if (user) { %>
                             <li>
-                                <ul class="sub-menu">
-                                    <!-- <li><a href="/profile">Go to profile</a></li> -->
-                                    <li><a href="/logout">Logout</a></li>
-                                </ul>
                                 <a href="/profile">Account</a>
                             </li>
                         <% } else { %>
@@ -62,14 +58,22 @@
                     </a>
 
                     <% if (user) { %>
-                    <a href="/profile" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11" style="text-decoration: none;">
-                        <li class="zmdi zmdi-account" style="display: flex; align-items: center;">
-                            <span style="font-size: 15px; margin-left: 10px; font-family:Poppins-Regular; font-weight: 500;">
-                            <%= user.name %></span>
-                        </li>                                                
-                    </a>
-                    <% } %>
-
+                        <div class="dropdown user-dropdown">
+                            <a href="/profile" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 dropdown-toggle" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none; display: flex; align-items: center;">
+                                <li class="zmdi zmdi-account" style="display: flex; align-items: center;">
+                                    <span style="font-size: 15px; margin-left: 10px; font-family: Poppins-Regular; font-weight: 500;">
+                                        <%= user.name %>
+                                    </span>
+                                    <span class="caret"></span>
+                                </li>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="/profile">Profile</a>
+                                <a class="dropdown-item" href="/view-orders">Orders</a>
+                                <a class="dropdown-item" href="/logout">Logout</a>
+                            </div>
+                        </div>
+                    <% } %>                                                
                 </div>
             </nav>
         </div>	

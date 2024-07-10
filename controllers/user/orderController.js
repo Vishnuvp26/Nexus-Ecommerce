@@ -4,7 +4,9 @@ const addressModel = require('../../models/addressModel');
 const cartModel = require('../../models/cartModel');
 const orderModel = require('../../models/orderModel');
 const productModel = require('../../models/productModel');
+const categoryModel = require('../../models/categoryModel');
 
+// create order
 const createOrder = async (req, res) => {
     try {
         const userId = req.session.user_id;
@@ -60,7 +62,7 @@ const createOrder = async (req, res) => {
             orderData.items.push({
                 productId: item.productId._id,
                 productName: item.productId.productName,
-                categoryName: item.productId.category.name,
+                categoryName: item.productId.category.categoryName,
                 image: item.productId.image[0],
                 quantity: item.quantity,
                 price: item.productId.price,
@@ -69,7 +71,7 @@ const createOrder = async (req, res) => {
 
             await productModel.findByIdAndUpdate(
                 item.productId._id,
-                { $inc: { quantity: -item.quantity } }
+                { $inc: { quantity: -item.quantity } }  
             );
         }
 
@@ -82,19 +84,54 @@ const createOrder = async (req, res) => {
             orderData.paymentStatus = "Paid";
         }
 
-        await orderData.save();
-        req.session.orderData = orderData;
-        res.json({ success: true, message: "Order placed successfully"});
+        const savedOrder = await orderData.save();
+
+        await cartModel.findOneAndUpdate({ userId }, { $set: { items: [] } });
+
+        req.session.orderId = savedOrder._id;
+        res.json({ success: true, message: "Order placed successfully" });
 
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        console.error('Error creating order:', error);
     }
 };
 
+// Order success
 const orderSuccess = async (req, res) => {
     try {
-        res.render('orderSuccess');
+        const userData = await userModel.findOne({ _id: req.session.user_id });
+        res.render('orderPlaced', { user: userData });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// View orders
+const viewOrders = async (req, res) => {
+    try {
+        const userData = await userModel.findOne({ _id: req.session.user_id });
+        const orderData = await orderModel.find({ userId: req.session.user_id }).sort({ date: -1 });
+    
+        res.render('viewOrders', { user: userData, order: orderData });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Order Details
+const orderDetails = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        const orderId = req.query.orderId;
+
+        if (!userId || !orderId) {
+            return redirect('/')
+        }
+
+        const userData = await userModel.findOne({ _id: userId });
+        const orderData = await orderModel.findOne({ _id: orderId });
+
+        res.render('orderDetails', { user: userData, order: orderData });
     } catch (error) {
         console.log(error);
     }
@@ -103,5 +140,7 @@ const orderSuccess = async (req, res) => {
 
 module.exports = {
     createOrder,
-    orderSuccess
+    orderSuccess,
+    viewOrders,
+    orderDetails,
 };

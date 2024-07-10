@@ -4,6 +4,7 @@ const adminController = require('../controllers/admin/adminController');
 const categoryController = require('../controllers/admin/categoryController');
 const productController = require('../controllers/admin/productController');
 const adminUserController = require('../controllers/admin/adminUserController');
+const orderController = require('../controllers/user/orderController');
 const adminAuth = require('../middleware/adminAuth');
 const upload = require('../middleware/multer')
 const setNoCacheHeaders = require('../middleware/nocache');
@@ -40,5 +41,10 @@ adminRouter.post('/unlistProducts', adminAuth.isLogin, productController.unlistP
 adminRouter.get('/editProducts', adminAuth.isLogin, productController.loadEditProducts);
 adminRouter.get('/checkAlready', adminAuth.isLogin, productController.checkAlready);
 adminRouter.post('/editProducts', adminAuth.isLogin, upload.array('images'), productController.editProducts);
+
+// Orders
+adminRouter.get('/orderList', adminAuth.isLogin, adminController.loadOrdersList);
+adminRouter.get('/orderDetails', adminAuth.isLogin, adminController.adminOrderDetails);
+adminRouter.post('/updateOrderStatus', adminAuth.isLogin, adminController.updateOrderStatus);
 
 module.exports = adminRouter;

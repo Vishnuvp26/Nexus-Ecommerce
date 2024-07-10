@@ -44,6 +44,7 @@
                             <div class="media-body">
                                 <h5 class="mt-0"><%= item.productId.productName %></h5>
                                 <p>₹ <%= item.productId.price %> x <%= item.quantity %></p>
+                                <p>Brand: <%= item.productId.category.categoryName %></p>
                             </div>
                         </div>
                         <% totalPrice += item.productId.price * item.quantity; %>
@@ -67,7 +68,7 @@
                             <!-- Existing Addresses -->
                             <div class="existing-addresses">
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="radio" name="address" id="address1" value="address1" data-description="456 Avenue, Another City, Another State, 654321">
+                                    <input class="form-check-input" type="radio" name="address" id="address<%= index %>" value="<%= address._id %>" data-description="<%= address.house %>(H) <%= address.city %>, <%= address.state %> <%= address.pincode %>">
                                         <%= address.name %><br>
                                         <%= address.house %>(H)
                                         <%= address.city %>, <%= address.state %> <%= address.pincode %> <br>
@@ -75,7 +76,6 @@
                                 </div>                        
                                 <!-- Add more addresses as needed -->
                             </div>
-                            <hr>
                         <% }) %>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                     <h4 class="stext-301">Cart Total</h4>
                 </div>
                 <div class="card-body">
-                    <p>Price(<%= cart.items.length %> Items): <span class="float-right">₹ <%= totalPrice.toFixed(2) %></span></p>
+                    <p>Price: <span class="float-right">₹ <%= totalPrice.toFixed(2) %></span></p>
                     <p>Discount: <span class="float-right">₹ 0.00</span></p>
                     <p>Total: <span class="float-right text-primary">₹ <%= totalPrice.toFixed(2) %></span></p>
                     <div class="form-group">
@@ -158,7 +158,7 @@
                             </label>
                         </div>
                     </div>
-                    <button id="placeOrderBtn" class="btn btn-primary btn-block">PLACE ORDER</button>
+                    <button id="placeOrderBtn" class="btn btn-primary btn-block" data-totalprice="<%= totalPrice.toFixed(2) %>">PLACE ORDER</button>
                     <button class="btn btn-outline-secondary btn-block">CONTINUE SHOPPING</button>
                 </div>
             </div>
@@ -166,23 +166,20 @@
     </div>
 </div>
 
-<%- include("../layout/footer.ejs") %>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Include JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="/js/address.js"></script>
-
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
     document.getElementById('placeOrderBtn').addEventListener('click', async function() {
         const selectedAddress = document.querySelector('input[name="address"]:checked');
         const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const totalPrice = this.getAttribute('data-totalprice');
 
         if (!selectedAddress) {
             Swal.fire({
-                icon: 'error',
                 title: 'Oops...',
                 text: 'Please select an address!'
             });
@@ -191,27 +188,26 @@
 
         if (selectedPaymentMethod !== 'cod') {
             Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
+                title: 'Sorry...',
                 text: 'Currently, only Cash on Delivery is available!'
             });
             return;
         }
 
         try {
-            const response = await axios.post('/checkout/create-order', {
-                address: selectedAddress.value,
-                paymentMethod: selectedPaymentMethod
+            const response = await axios.post('/checkout/place-order', {
+                selectedAddress: selectedAddress.value,
+                paymentMethod: selectedPaymentMethod,
+                totalprice: totalPrice
             });
 
             if (response.data.success) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Order placed successfully!',
+                    title: 'Processing your order...!',
                     showConfirmButton: false,
                     timer: 2000
                 }).then(() => {
-                    window.location.href = '/order-confirmation';
+                    window.location.href = '/order-success';
                 });
             } else {
                 Swal.fire({
@@ -221,11 +217,75 @@
                 });
             }
         } catch (error) {
+            console.error('Error:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: error.response.data.message || 'Something went wrong!'
+                text: error.response?.data?.message || 'Something went wrong!'
             });
         }
     });
+
+    document.getElementById('actualAddAddressForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        const formEntries = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('/checkout/add-new-address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formEntries)
+            });
+
+            const result = await response.json();
+            console.log('Response:', response);
+            console.log('Result:', result);
+
+            if (response.status === 200) {
+                Swal.fire({
+                    text: 'Address added successfully',
+                    width: '300px',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+
+                setTimeout(() => {
+                location.reload();
+                }, 1000);
+
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: result.error || 'Something went wrong',
+                    width: '300px',
+                    showConfirmButton: false,
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Something went wrong',
+                width: '300px',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    });
+
+    function showAddAddressForm() {
+        document.getElementById('addAddressForm').style.display = 'block';
+    }
+
+    function cancelForm() {
+        document.getElementById('addAddressForm').style.display = 'none';
+    }
 </script>
+
+<%- include("../layout/footer") %>

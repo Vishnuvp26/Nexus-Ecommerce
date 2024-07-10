@@ -69,6 +69,10 @@
           </li>
         </ul>
       </nav>
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<%= searchQuery %>"/>
+        <button class="btn btn-gradient-dark" type="submit">Search</button>
+    </form>
     </div>
 
     <div class="col-lg-12 grid-margin stretch-card">
@@ -109,9 +113,13 @@
                   </tr>
                 <% }) %>
               <% } else { %>
-                <tr>
-                  <td colspan="4" class="text-center">No such category found</td>
-                </tr>
+    
+                  <td colspan="4" class="text-center">No such category found
+                    <div class="mt-4">
+                      <a href="/admin/category" class="btn-sm btn-inverse-dark" style="text-decoration: none;">Go Back</a>
+                  </div>
+                  </td>
+        
               <% } %>
             </tbody>
           </table>

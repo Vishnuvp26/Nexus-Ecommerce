@@ -1,0 +1,36 @@
+.status-delivered {
+    color: green;
+}
+.status-ordered {
+    color: orange;
+}
+.status-shipped {
+    color: blue;
+}
+.status-cancelled {
+    color: red;
+}
+.small-title {
+    font-size: 12px;
+}
+.small-text {
+    font-size: 8px;
+}
+.small-button {
+    font-size: 8px;
+    padding: 5px 10px;
+}
+.swal2-popup {
+    width: 300px !important;
+    font-size: 12px !important; 
+}
+.swal2-title {
+    font-size: 14px !important; 
+}
+.swal2-content {
+    font-size: 14px !important; 
+}
+.swal2-actions .swal2-styled {
+    padding: 5px 10px !important; 
+    font-size: 14px !important; 
+}

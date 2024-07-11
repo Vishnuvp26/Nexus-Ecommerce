@@ -8,6 +8,7 @@ const categoryModel = require('../../models/categoryModel');
 
 // create order
 const createOrder = async (req, res) => {
+
     try {
         const userId = req.session.user_id;
         if (!userId) {
@@ -137,10 +138,45 @@ const orderDetails = async (req, res) => {
     }
 };
 
+// Cancel order
+const cancelOrder = async (req, res) => {
+    try {
+        const { orderId, productId } = req.body;
+
+        const orderData = await orderModel.findOne({ _id: orderId });
+
+        let allItemsCancelled = true;
+        for (let item of orderData.items) {
+            if (item.productId == productId) {
+                item.itemStatus = "Cancelled";
+
+                await productModel.findByIdAndUpdate(
+                    item.productId,
+                    { $inc: { quantity: item.quantity } }
+                );
+            }
+            if (item.itemStatus !== "Cancelled") {
+                allItemsCancelled = false;
+            }
+        }
+
+        orderData.status = allItemsCancelled ? "Cancelled" : "Pending";
+        await orderData.save();
+
+        res.json({ success: true, message: "Order item cancelled successfully." });
+    } catch (error) {
+        console.log('Error cancelling order:', error);
+        res.json({ success: false, message: "Error cancelling order." });
+    }
+};
+
+
+
 
 module.exports = {
     createOrder,
     orderSuccess,
     viewOrders,
     orderDetails,
+    cancelOrder
 };

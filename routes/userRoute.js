@@ -58,6 +58,7 @@ userRouter.post('/checkout/place-order', userAuth.isLogin, orderController.creat
 userRouter.get('/order-success', userAuth.isLogin, orderController.orderSuccess);
 userRouter.get('/view-orders', userAuth.isLogin, orderController.viewOrders);
 userRouter.get('/order-details', userAuth.isLogin, orderController.orderDetails);
+userRouter.post('/cancel-order', userAuth.isLogin, orderController.cancelOrder);
 
 // Profile
 userRouter.get('/profile', userAuth.isLogin, profileController.profile);

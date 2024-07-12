@@ -1,0 +1,119 @@
+<%- include("../layout/header") %>
+<%- include("../layout/navbar") %>
+<link rel="stylesheet" href="/css/wishlist.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+
+<!-- Breadcrumb -->
+<div class="container p-t-70">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">Wishlist</span>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <h4 class="mt-5">WISHLIST</h4>
+    <% if (wishlist && wishlist.items.length > 0) { %>
+        <% wishlist.items.forEach(item => { %>
+            <div class="row wishlist-item mt-4">
+                <div class="col-12 col-md-2">
+                    <img class="img-fluid" src="/productimages/<%= item.productId.image[0] %>" alt="Product Image" style="max-width: 100px;">
+                </div>
+                <div class="col-12 col-md-5">
+                    <p class="product-name"><%= item.productId.productName %></p>
+                    <h5 class="product-price">₹ <%= item.productId.price %></h5>
+                </div>
+                <div class="col-12 col-md-2 text-md-center">
+                    <% if (item.productId.quantity > 0) { %>
+                        <p class="stock-status text-success">In stock</p>
+                    <% } else { %>
+                        <p class="stock-status text-danger">Out of stock</p>
+                    <% } %>
+                </div>
+                <div class="col-12 col-md-3 text-md-right">
+                    <div class="action-buttons d-flex justify-content-around justify-content-md-end">
+                        <% if (item.productId.quantity > 0) { %>
+                            <p class="add-to-cart" onclick="addToCart('<%= item.productId._id %>')">
+                                <span class="bi bi-cart"></span> Add to Cart
+                            </p>
+                        <% } else { %>
+                            <p class="add-to-cart text-muted" style="cursor: not-allowed;">
+                                <span class="bi bi-cart"></span> Add to Cart
+                            </p>
+                        <% } %>
+                        <p class="remove-from-wishlist" onclick="removeFromWishlist('<%= item.productId._id %>')">
+                            <span class="bi bi-trash"></span> Remove
+                        </p>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <div class="row mt-4 text-center">
+            <div class="col-12">
+                <h5 class="text-dark">Your wishlist is empty!</h5>
+                <p class="mt-3" style="font-size: 13px;">Explore the shop and find something you like</p>
+                <div>
+                    <img src="/images/icons/emptywishlist.png" alt="Wishlist empty" style="max-width: 250px;" class="mt-4">
+                </div>
+                <a href="/shop" class="text-info">Add Now</a>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include("../layout/footer.ejs") %>
+
+<script>
+// Remove from wishlist
+const removeFromWishlist = async (productId) => {
+    try {
+        const response = await axios.delete(`/wishlist/remove?productId=${productId}`);
+        if (response.data.success) {
+            Swal.fire({
+                text: 'Product removed from wishlist!',
+            }).then(()=>{
+                window.location.reload();
+            })
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Info',
+                text: response.data.message,
+            });
+        }
+    } catch (error) {
+        console.error('Error removing product from wishlist:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to remove product from wishlist.',
+        });
+    }
+};
+
+// Add to cart
+function addToCart(productId) {
+    axios.post('/add-to-cart', { productId: productId })
+        .then(function (response) {
+            console.log(response.data);
+            Swal.fire({
+                icon: 'success',
+                title: 'Product added to cart successfully!',
+                customClass: {
+                    icon: 'swal2-icon-custom',
+                    content: 'swal2-content-custom',
+                }
+            });
+        })
+        .catch(function (error) {
+            console.error('Error adding to cart:', error);
+            Swal.fire({
+                text: 'Product already exists in cart',
+            });
+        });
+}
+</script>

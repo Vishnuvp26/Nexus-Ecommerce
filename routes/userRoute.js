@@ -4,6 +4,7 @@ const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController');
 const cartController = require('../controllers/user/cartController');
 const orderController = require('../controllers/user/orderController');
+const wishlistController = require('../controllers/user/wishlistController');
 const userAuth = require('../middleware/userAuth');
 const passport = require("passport");
 const { captureRejectionSymbol } = require("nodemailer/lib/xoauth2");
@@ -39,6 +40,11 @@ userRouter.post('/otp', userController.verifyOtp);
 // Products
 userRouter.get('/productDetails', userController.productDetails);
 userRouter.get('/shop', userController.shop);
+
+// Wishlist
+userRouter.get('/wishlist', userAuth.isLogin, wishlistController.wishlist);
+userRouter.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);
+userRouter.delete('/wishlist/remove', userAuth.isLogin, wishlistController.removeFromWishlist);
 
 // Cart
 userRouter.get('/load-cart', userAuth.isLogin, cartController.loadCart);

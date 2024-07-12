@@ -20,11 +20,12 @@
         <% wishlist.items.forEach(item => { %>
             <div class="row wishlist-item mt-4">
                 <div class="col-12 col-md-2">
-                    <img class="img-fluid" src="/productimages/<%= item.productId.image[0] %>" alt="Product Image" style="max-width: 100px;">
+                    <img class="img-fluid" src="/productimages/<%= item.productId.image[0] %>" alt="Product Image" style="max-width: 110px;">
                 </div>
                 <div class="col-12 col-md-5">
-                    <p class="product-name"><%= item.productId.productName %></p>
-                    <h5 class="product-price">₹ <%= item.productId.price %></h5>
+                    <h5 class="product-name" style="font-size: 16px;"><%= item.productId.productName %></h5>
+                    <p class="mt-2"><%= item.productId.productDetails %></p>
+                    <h6 class="product-price mt-2 text-dark font-weight-bold">₹ <%= item.productId.price %></h6>
                 </div>
                 <div class="col-12 col-md-2 text-md-center">
                     <% if (item.productId.quantity > 0) { %>

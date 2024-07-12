@@ -113,7 +113,3 @@
     letter-spacing: 0.05em;
     color: #212529;
 }
-
-.btn-dark:hover {
-    background-color:#008b8b; /* Dark background color on hover */
-}

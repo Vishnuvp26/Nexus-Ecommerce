@@ -155,11 +155,17 @@ const stockCheck = async (req, res) => {
         let message = "";
 
         for (let item of cart.items) {
-            if (item.productId.quantity === 0) {
+            const product = item.productId;
+
+            if (product.status === 'inactive') {
+                isAvailable = false;
+                message = "The product is no longer exist";
+                break;
+            } else if (product.quantity === 0) {
                 isAvailable = false;
                 message = "Some items in your cart are currently unavailable";
                 break;
-            } else if (item.quantity > item.productId.quantity) {
+            } else if (item.quantity > product.quantity) {
                 isAvailable = false;
                 message = "Some item's quantity in your cart is greater than the stock available";
                 break;
@@ -176,6 +182,7 @@ const stockCheck = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
+
 
 
 // Load checkout

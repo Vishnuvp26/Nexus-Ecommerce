@@ -136,7 +136,7 @@
                 <div class="card-body">
                     <p>Price: <span class="float-right">₹ <%= totalPrice.toFixed(2) %></span></p>
                     <p>Discount: <span class="float-right">₹ 0.00</span></p>
-                    <p>Total: <span class="float-right text-primary">₹ <%= totalPrice.toFixed(2) %></span></p>
+                    <p>Total: <span class="float-right"><b>₹ <%= totalPrice.toFixed(2) %></b></span></p>
                     <div class="form-group">
                         <label>Payment Method</label>
                         <div class="form-check">
@@ -172,6 +172,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     document.getElementById('placeOrderBtn').addEventListener('click', async function() {
         const selectedAddress = document.querySelector('input[name="address"]:checked');
@@ -186,10 +187,10 @@
             return;
         }
 
-        if (selectedPaymentMethod !== 'cod') {
+        if (selectedPaymentMethod !== 'cod' && selectedPaymentMethod !== 'razorpay') {
             Swal.fire({
                 title: 'Sorry...',
-                text: 'Currently, only Cash on Delivery is available!'
+                text: 'Currently, only Cash on Delivery and Razorpay are available!'
             });
             return;
         }
@@ -202,13 +203,42 @@
             });
 
             if (response.data.success) {
-                Swal.fire({
-                    title: 'Processing your order...!',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => {
-                    window.location.href = '/order-success';
-                });
+                if (selectedPaymentMethod === 'razorpay') {
+                    var options = {
+                        key: response.data.key,
+                        amount: response.data.amount,
+                        currency: "INR",
+                        name: 'NEXUS',
+                        description: "Payment for order",
+                        image: "/images/icons/NEXfavicon.png",
+                        order_id: response.data.razorpayOrderId,
+                        handler: function(response) {
+                            window.location.href = '/order-success';
+                        },
+                        prefill: {
+                            name: response.data.name,
+                            email: response.data.email,
+                            contact: response.data.phone
+                        },
+                        notes: {
+                            address: selectedAddress.dataset.description
+                        },
+                        theme: {
+                            color: "#F37254"
+                        }
+                    };
+
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    Swal.fire({
+                        title: 'Processing your order...!',
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        window.location.href = '/order-success';
+                    });
+                }
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -226,57 +256,106 @@
         }
     });
 
-    document.getElementById('actualAddAddressForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
+    document.addEventListener("DOMContentLoaded", function() {
+        const validationPatterns = {
+            name: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+            phone: /^[1-9]\d{9}$/,
+            district: /^[A-Za-z]{3,}$/,
+            city: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+            house: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+            state: /^[A-Za-z]{3,}$/,
+            pincode: /^\d{6}$/
+        };
 
-        const formData = new FormData(this);
-        const formEntries = Object.fromEntries(formData.entries());
+        const errorMessages = {
+            name: 'Name should start with a letter and contain only letters and spaces.',
+            phone: 'Please provide a valid 10 digit mobile number.',
+            district: 'Please provide a valid district name.',
+            city: 'Please provide a valid city name.',
+            house: 'Please provide a valid house name or number.',
+            state: 'Please provide a valid state name.',
+            pincode: 'Please provide a valid 6 digit pincode.'
+        };
 
-        try {
-            const response = await fetch('/checkout/add-new-address', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formEntries)
+        const fields = Object.keys(validationPatterns);
+
+        fields.forEach(field => {
+            const input = document.getElementById(field);
+            input.addEventListener('input', function () {
+                const errorElement = document.getElementById(`${field}Error`);
+                if (!validationPatterns[field].test(this.value)) {
+                    errorElement.innerText = errorMessages[field];
+                } else {
+                    errorElement.innerText = '';
+                }
+            });
+        });
+
+        document.getElementById('actualAddAddressForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            let isValid = true;
+
+            fields.forEach(field => {
+                const input = document.getElementById(field);
+                const errorElement = document.getElementById(`${field}Error`);
+                if (!validationPatterns[field].test(input.value.trim())) {
+                    errorElement.innerText = errorMessages[field];
+                    isValid = false;
+                } else {
+                    errorElement.innerText = '';
+                }
             });
 
-            const result = await response.json();
-            console.log('Response:', response);
-            console.log('Result:', result);
+            if (!isValid) return;
 
-            if (response.status === 200) {
-                Swal.fire({
-                    text: 'Address added successfully',
-                    width: '300px',
-                    showConfirmButton: false,
-                    timer: 1000
+            const formData = new FormData(this);
+            const formEntries = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/checkout/add-new-address', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formEntries)
                 });
 
-                setTimeout(() => {
-                location.reload();
-                }, 1000);
+                const result = await response.json();
+                console.log('Response:', response);
+                console.log('Result:', result);
 
-            } else {
+                if (response.status === 200) {
+                    Swal.fire({
+                        text: 'Address added successfully',
+                        width: '300px',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: result.error || 'Something went wrong',
+                        width: '300px',
+                        showConfirmButton: false,
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: result.error || 'Something went wrong',
+                    text: 'Something went wrong',
                     width: '300px',
                     showConfirmButton: false,
+                    timer: 1500
                 });
             }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Something went wrong',
-                width: '300px',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        }
+        });
     });
 
     function showAddAddressForm() {

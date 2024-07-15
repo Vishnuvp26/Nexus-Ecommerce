@@ -300,6 +300,8 @@ const handleResetPassword = async (req, res) => {
 
 
 
+
+
 module.exports = {
     profile,
     loadAddress,
@@ -313,5 +315,5 @@ module.exports = {
     loadForgetPassword,
     sendPasswordLink,
     renderResetPasswordForm,
-    handleResetPassword
+    handleResetPassword,
 };

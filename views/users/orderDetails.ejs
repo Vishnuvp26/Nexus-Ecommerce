@@ -74,12 +74,17 @@
                                         <td><%= item.quantity %></td>
                                         <td>&#8377;<%= item.price.toFixed(2) %></td>
                                         <td>&#8377;<%= (item.quantity * item.price).toFixed(2) %></td>
-                                        <td class="text-success"><%= item.itemStatus %></td>
+                                        <td class="<%= item.itemStatus === 'Cancelled' ? 'text-danger' : item.itemStatus === 'Delivered' ? 'text-success' : '' %>"><%= item.itemStatus %></td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-cancel" onclick="confirmCancelOrder('<%= item.productId %>', '<%= order._id %>')">
-                                                <i></i> Cancel
-                                            </button>                                                                                       
-                                        </form>
+                                            <% if (item.itemStatus !== 'Cancelled' && item.itemStatus !== 'Delivered') { %>
+                                                <button type="button" class="btn btn-sm btn-cancel" onclick="confirmCancelOrder('<%= item.productId %>', '<%= order._id %>')">
+                                                    <i class="fa fa-times"></i> Cancel
+                                                </button>
+                                            <% } else if (item.itemStatus === 'Delivered') { %>
+                                                <button type="button" class="btn btn-sm btn-return" onclick="confirmReturnOrder('<%= item.productId %>', '<%= order._id %>')">
+                                                    <i class="fa fa-undo"></i> Return
+                                                </button>
+                                            <% } %>
                                         </td>
                                     </tr>
                                 <% }); %>

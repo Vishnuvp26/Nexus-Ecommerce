@@ -5,6 +5,7 @@ const profileController = require('../controllers/user/profileController');
 const cartController = require('../controllers/user/cartController');
 const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistController');
+const walletController = require('../controllers/user/walletController');
 const userAuth = require('../middleware/userAuth');
 const passport = require("passport");
 const { captureRejectionSymbol } = require("nodemailer/lib/xoauth2");
@@ -84,5 +85,8 @@ userRouter.get('/forgot-password', userAuth.isLogout, profileController.loadForg
 userRouter.post('/send-password-link', userAuth.isLogout, profileController.sendPasswordLink);
 userRouter.get('/reset-password', profileController.renderResetPasswordForm);
 userRouter.post('/reset-password', profileController.handleResetPassword);
+
+// Wallet
+userRouter.get('/wallet', userAuth.isLogin, walletController.loadWallet);
 
 module.exports = userRouter;

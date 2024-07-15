@@ -71,20 +71,17 @@ const registerLoad = async (req, res) => {
 };
 
 // Register method POST
-const insertUser = async (req, res, next) => {
+const insertUser = async (req, res) => {
     try {
-        const hashedPassword = await hashPassword(req.body.password);
+        const { name, phone, email, password } = req.body;
+        const hashedPassword = await hashPassword(password);
         const existingUser = await userModel.findOne({ email: req.body.email });
+
         if (existingUser) {
             return res.json({ success: false, message: 'Email already exists' });
         }
 
-        req.session.newUser = {
-            name: req.body.name,
-            phone: req.body.phone,
-            email: req.body.email,
-            password: hashedPassword
-        }
+        req.session.newUser = { name, phone, email, password: hashedPassword };
         if (req.session.newUser) {
             return res.json({ success: true });
         }
@@ -92,10 +89,10 @@ const insertUser = async (req, res, next) => {
         console.log(error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
-}
+};
 
 // OTP page
-const handleOTP = async (req, res, next) => {
+const handleOTP = async (req, res) => {
     try {
         const userData = await userModel.findOne({ _id: req.session.user_id });
         const activeProducts = await productModel.find({ status: "active" }).populate('category');
@@ -118,7 +115,7 @@ const handleOTP = async (req, res, next) => {
 const verifyOtp = async (req, res) => {
     try {
         if (req.body.otp == req.session.otp) {
-
+ 
             const user = new userModel({
                 name: req.session.newUser.name,
                 phone: req.session.newUser.phone,

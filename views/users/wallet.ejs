@@ -1,0 +1,81 @@
+<%- include("../layout/header") %>
+<!-- Navbar -->
+<%- include("../layout/navbar") %>
+<link rel="stylesheet" href="/css/wallet.css">
+
+<!-- breadcrumb -->
+<div class="container p-t-75">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <a href="/profile" class="stext-109 cl8 hov-cl1 trans-04">
+            Profile
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Wallet
+        </span>
+    </div>
+</div>
+
+<!-- Wallet Design -->
+<div class="container mt-5">
+    <h4 class="ml-4">Wallet</h4>
+    <div class="card mt-4 wallet-card" id="walletcontainer">
+        <div class="card-header text-center">
+            <h5 class="walletText">NEXUS WALLET</h5>
+        </div>
+        <div class="card-body text-center">
+            <h4 class="walletText">Available Balance: <b>₹ <span id="balance"><%= balance %></span></b></h4>
+        </div>
+    </div>
+</div>
+
+<!-- Show Transactions Text Link -->
+<div class="text-center mt-4">
+    <a href="#" id="showTransactionsLink" class="show-transactions-link">Show Transactions</a>
+</div>
+
+<!-- Transaction Table -->
+<div class="container mt-5" id="transactionTableContainer" style="display: none;">
+    <div class="table-responsive">
+        <table class="table table-hover transaction-table">
+            <thead>
+                <tr>
+                    <th scope="col">DATE</th>
+                    <th scope="col">AMOUNT</th>
+                    <th scope="col">TYPE</th>
+                    <th scope="col">BALANCE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% history.forEach(transaction => { %>
+                    <tr>
+                        <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                        <td>₹<%= transaction.amount %></td>
+                        <td class="<%= transaction.transactionType === 'debit' ? 'text-danger' : 'text-success' %>">
+                            <%= transaction.transactionType %>
+                        </td>
+                        <td>₹<%= transaction.newBalance %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include("../layout/footer.ejs") %>
+
+<script>
+    document.getElementById('showTransactionsLink').addEventListener('click', function(event) {
+        event.preventDefault();
+        var tableContainer = document.getElementById('transactionTableContainer');
+        if (tableContainer.style.display === 'none') {
+            tableContainer.style.display = 'block';
+        } else {
+            tableContainer.style.display = 'none';
+        }
+    });
+</script>

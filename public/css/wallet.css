@@ -1,0 +1,76 @@
+/* Wallet card styling */
+.wallet-card {
+    width: 500px;
+    height: 300px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.wallet-card .card-header h5 {
+    margin: 0;
+    padding: 9px 0;
+    font-size: 1.25rem;
+
+}
+
+.wallet-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.wallet-card .card-body h4 {
+    margin: 0;
+}
+
+#showTransactionsLink{
+    text-decoration: none;
+    color:#008B8B;
+}
+
+#showTransactionsLink:hover{
+    color:#006060;
+}
+
+.table-responsive {
+    margin-top: 10px;
+    max-width: 630px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.transaction-table {    
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .wallet-card {
+        width: 300px;
+        height: 250px;
+    }
+
+    .wallet-card .card-header h5 {
+        font-size: 1rem;
+    }
+
+    .wallet-card .card-body h4 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .wallet-card {
+        width: 250px;
+        height: 200px;
+    }
+
+    .wallet-card .card-header h5 {
+        font-size: 0.875rem;
+    }
+
+    .wallet-card .card-body h4 {
+        font-size: 1rem;
+    }
+}

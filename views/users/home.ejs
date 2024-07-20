@@ -27,9 +27,6 @@
 									<a href="/productDetails?productId=<%= product._id %>">
 										<img src="/productimages/<%= product.image[0] %>" alt="IMG-PRODUCT">
 									</a>
-									<!-- <a href="/productDetails?productId=<%= product._id %>" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-show-modal1">
-										Quick View
-									</a> -->
 								</div>
 								<div class="block2-txt flex-w flex-t p-t-14">
 									<div class="block2-txt-child1 flex-col-l">
@@ -37,7 +34,12 @@
 											<%= product.productName %>
 										</a>
 										<span class="stext-105 cl3">
-											₹ <%= product.price %>
+											<% if (product.offerPrice) { %>
+												<span style="text-decoration: line-through;">₹ <%= product.price %></span>
+												₹ <%= product.offerPrice %>
+											<% } else { %>
+												₹ <%= product.price %>
+											<% } %>
 										</span>
 										<span class="stext-106 cl3">
 											<% if (product.quantity >= 10) { %>
@@ -49,15 +51,6 @@
 											<% } %>
 										</span><br>								
 									</div>
-									
-									<!-- WISHLIST ICON -->
-									<!-- <div class="block2-txt-child2 flex-r p-t-3">
-										<a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
-										<img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png" alt="ICON">
-										<img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON">
-										</a>
-									</div> -->
-
 								</div>
 							</div>
 						</div>
@@ -65,6 +58,7 @@
 					<% } %>
 				<% }) %>
 			</div>
+			
 			
 			<!-- Shop -->
 			<div class="flex-c-m flex-w w-full p-t-45">

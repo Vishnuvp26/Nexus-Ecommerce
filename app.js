@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const nocache = require("nocache");
 const mongoose = require('mongoose');
 const path = require('path');
+const morgan = require('morgan');
 require('dotenv').config();
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(session({
 app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// app.use(morgan('dev'));
 
 const userRoute = require('./routes/userRoute');
 const adminRoute = require('./routes/adminRoute');

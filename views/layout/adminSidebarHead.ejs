@@ -11,6 +11,21 @@
               </a>
             </li>
 
+            <!-- <li class="nav-item nav-profile">
+              <a href="#" class="nav-link">
+                <div class="nav-profile-image">
+                  <img src="/images/icons/vp2.jpg" alt="profile">
+                  <span class="login-status online"></span>
+                  
+                </div>
+                <div class="nav-profile-text d-flex flex-column">
+                  <span class="font-weight-bold mb-2">Vishnu</span>
+                  <span class="text-secondary text-small">Admin</span>
+                </div>
+                <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
+              </a>
+            </li> -->
+
             <!-- DASHBOARD -->
             <li class="nav-item">
               <a class="nav-link" href="/admin">
@@ -53,20 +68,42 @@
 
             <!-- COUPONS -->
             <li class="nav-item">
-              <a class="nav-link" href="#">
+              <a class="nav-link" href="/admin/coupons">
                 <span class="menu-title">Coupons</span>
                 <i class="mdi mdi-ticket-percent menu-icon"></i>
               </a>
             </li>
 
-            <!-- BANNER -->
+            <!-- OFFER -->
             <li class="nav-item">
+              <a class="nav-link" data-toggle="collapse" href="#general-pages" aria-expanded="false" aria-controls="general-pages">
+                <span class="menu-title">Offers</span>
+                <!-- <i class="menu-arrow"></i> -->
+                <i class="mdi mdi-sale menu-icon"></i>
+              </a>
+              <div class="collapse" id="general-pages">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item"> <a class="nav-link" href="/admin/productOffers"> Product Offer </a></li>
+                  <li class="nav-item"> <a class="nav-link" href="/admin/categoryOffers"> Category Offer </a></li>
+                </ul>
+              </div>
+            </li>
+
+            <!-- BANNER -->
+            <!-- <li class="nav-item">
               <a class="nav-link" href="#">
                 <span class="menu-title">Banner</span>
                 <i class="mdi mdi-image-area menu-icon"></i>
               </a>
-            </li>
+            </li> -->
 
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/salesReport">
+                  <span class="menu-title">Sales Report</span>
+                  <i class="mdi menu-icon mdi mdi-chart-line"></i>
+              </a>
+            </li>                   
+            
             <!-- LOGOUT -->
             <li class="nav-item">
               <a id="logoutButtons" class="nav-link" href="#">

@@ -3,8 +3,16 @@
 <link rel="stylesheet" href="/css/wishlist.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
 
+<style>
+    @media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+}
+</style>
+
 <!-- Breadcrumb -->
-<div class="container p-t-70">
+<div class="container p-t-70" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
             Home
@@ -25,7 +33,11 @@
                 <div class="col-12 col-md-5">
                     <h5 class="product-name" style="font-size: 16px;"><%= item.productId.productName %></h5>
                     <p class="mt-2"><%= item.productId.productDetails %></p>
-                    <h6 class="product-price mt-2 text-dark font-weight-bold">₹ <%= item.productId.price %></h6>
+                    <h6 class="product-price mt-2 text-dark font-weight-bold">₹ <% if (item.productId.offerPrice) { %>
+                        <%= item.productId.offerPrice %>
+                    <% } else { %>
+                        <%= item.productId.price %>
+                    <% } %></h6>
                 </div>
                 <div class="col-12 col-md-2 text-md-center">
                     <% if (item.productId.quantity > 0) { %>

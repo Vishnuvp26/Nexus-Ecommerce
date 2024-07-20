@@ -74,3 +74,60 @@ p {
 .btn-return:hover {
     background-color: #e0a800;
 }
+
+.modal-custom {
+    font-size: 0.875rem;
+}
+
+.modal-custom .modal-header,
+.modal-custom .modal-body,
+.modal-custom .modal-footer {
+    padding: 1rem;
+}
+
+.modal-custom .modal-title {
+    font-size: 1.25rem;
+}
+
+.modal-custom .form-control {
+    font-size: 0.875rem;
+}
+
+.modal-custom .btn {
+    font-size: 0.80rem;
+}
+
+.btnSubmitReq{
+    color: #ffffff;
+    background-color:#008B8B;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-footer {
+    justify-content: center;
+}
+
+.modal-footer .btn {
+    margin: 0 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .modal-custom .modal-dialog {
+        max-width: 90%;
+    }
+
+    .modal-custom .modal-header,
+    .modal-custom .modal-body,
+    .modal-custom .modal-footer {
+        padding: 0.75rem; 
+    }
+
+    .modal-custom .modal-title {
+        font-size: 1.1rem;
+    }
+}

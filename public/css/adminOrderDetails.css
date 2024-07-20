@@ -10,16 +10,25 @@
 .status-cancelled {
     color: red;
 }
+.status-return-pending{
+    color: chocolate;
+}
+.status-returned {
+    color: salmon;
+}
+
 .small-title {
     font-size: 12px;
 }
 .small-text {
     font-size: 8px;
 }
+
 .small-button {
     font-size: 8px;
     padding: 5px 10px;
 }
+
 .swal2-popup {
     width: 300px !important;
     font-size: 12px !important; 

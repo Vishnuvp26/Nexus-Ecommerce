@@ -29,7 +29,6 @@ const createOrder = async (req, res) => {
             }
         });
 
-        // Check if address and cart data exist
         const addressId = new mongoose.Types.ObjectId(req.body.selectedAddress);
         const addressArray = await addressModel.aggregate([
             { $unwind: "$address" },
@@ -40,10 +39,8 @@ const createOrder = async (req, res) => {
             return res.redirect("/checkout");
         }
 
-        // Extract address details
         const address = addressArray[0].address;
 
-        // Create order data
         const orderData = new orderModel({
             orderId: Math.floor(100000 + Math.random() * 900000).toString(),
             userId,
@@ -63,7 +60,6 @@ const createOrder = async (req, res) => {
             date: Date.now(),
         });
 
-        // Populate order items
         for (const item of cartData.items) {
             let finalPrice = item.productId.price;
             if (item.productId.offerPrice) {
@@ -79,44 +75,35 @@ const createOrder = async (req, res) => {
                 finalPrice: finalPrice,
             });
 
-            // Decrease product quantity
             await productModel.findByIdAndUpdate(
                 item.productId._id,
                 { $inc: { quantity: -item.quantity } }
             );
         }
 
-        // Handle payment method specifics
         if (orderData.paymentMethod === "cod") {
-            // Check COD limit
             if (req.body.totalprice > 3000) {
                 return res.json({ success: false, message: "Cannot place order with COD for amount above 3000" });
             }
             orderData.paymentStatus = "Pending";
-        } else if (orderData.paymentMethod === "razorpay") {
-            // Create Razorpay order
-            const razorpayOrder = await razorpayInstance.orders.create({
-                amount: req.body.totalprice * 100, // Amount in smallest currency unit (paise for INR)
-                currency: "INR",
-                receipt: orderData.orderId, // Unique order ID
-            });
 
+        } else if (orderData.paymentMethod === "razorpay") {
+            const razorpayOrder = await razorpayInstance.orders.create({
+                amount: req.body.totalprice * 100,
+                currency: "INR",
+                receipt: orderData.orderId,
+            });
             orderData.paymentStatus = "Pending";
-            orderData.razorpayOrderId = razorpayOrder.id; // Save Razorpay order ID
+            orderData.razorpayOrderId = razorpayOrder.id;
         } else {
-            orderData.paymentStatus = "Paid"; // Handle other payment methods
+            orderData.paymentStatus = "Paid";
         }
 
-        // Save order
         const savedOrder = await orderData.save();
 
-        // Clear cart items after successful order creation
         await cartModel.findOneAndUpdate({ userId }, { $set: { items: [] } });
-
-        // Save order ID to session
         req.session.orderId = savedOrder._id;
 
-        // Redirect or respond based on payment method
         if (orderData.paymentMethod === "razorpay") {
             return res.json({
                 success: true,
@@ -124,7 +111,7 @@ const createOrder = async (req, res) => {
                 orderId: savedOrder._id,
                 razorpayOrderId: orderData.razorpayOrderId,
                 key: process.env.KEY_ID,
-                amount: req.body.totalprice * 100, // Amount in smallest currency unit
+                amount: req.body.totalprice * 100,
                 name: req.body.name,
                 email: req.body.email,
                 phone: req.body.phone,
@@ -186,12 +173,12 @@ const cancelOrder = async (req, res) => {
         const orderData = await orderModel.findOne({ _id: orderId });
 
         let allItemsCancelled = true;
-        let refund = false;
+        let refundAmount = 0;
 
         for (let item of orderData.items) {
             if (item.productId == productId) {
                 item.itemStatus = "Cancelled";
-                refund = true;
+                refundAmount = item.price * item.quantity;
 
                 await productModel.findByIdAndUpdate(
                     item.productId,
@@ -206,26 +193,26 @@ const cancelOrder = async (req, res) => {
         orderData.status = allItemsCancelled ? "Completed" : "Pending";
         await orderData.save();
 
-        if (refund && orderData.paymentMethod === "razorpay") {
+        if (refundAmount > 0 && orderData.paymentMethod === "razorpay") {
             let wallet = await walletModel.findOne({ userId: orderData.userId });
 
             if (!wallet) {
                 wallet = new walletModel({
                     userId: orderData.userId,
-                    balance: orderData.totalPrice,
+                    balance: refundAmount,
                     history: [{
-                        amount: orderData.totalPrice,
+                        amount: refundAmount,
                         transactionType: "Credit",
-                        newBalance: orderData.totalPrice,
+                        newBalance: refundAmount,
                     }]
                 });
             } else {
                 wallet.history.push({
-                    amount: orderData.totalPrice,
+                    amount: refundAmount,
                     transactionType: "Credit",
-                    newBalance: wallet.balance + orderData.totalPrice,
+                    newBalance: wallet.balance + refundAmount,
                 });
-                wallet.balance += orderData.totalPrice;
+                wallet.balance += refundAmount;
             }
 
             await wallet.save();
@@ -238,11 +225,39 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+// Return request
+const returnProduct = async (req, res) => {
+    try {
+        const { productId, orderId, reason } = req.body;
+        const orderData = await orderModel.findOne({ _id: orderId });
+
+        let itemFound = false;
+        for (let item of orderData.items) {
+            if (item.productId.toString() === productId && item.itemStatus === "Delivered") {
+                item.itemStatus = "Return Pending";
+                item.reason = reason;
+                itemFound = true;
+                await item.save();
+            }
+        }
+
+        orderData.status = "Return Requested";
+        await orderData.save();
+
+        res.json({ success: true, message: "Return request submitted successfully" });
+    } catch (error) {
+        console.error('Error processing return request:', error);
+    }
+};
+
+
 
 module.exports = {
     createOrder,
     orderSuccess,
     viewOrders,
     orderDetails,
-    cancelOrder
+    cancelOrder,
+    returnProduct
+
 };

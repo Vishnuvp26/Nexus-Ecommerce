@@ -6,6 +6,7 @@ const cartController = require('../controllers/user/cartController');
 const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistController');
 const walletController = require('../controllers/user/walletController');
+const couponController = require('../controllers/admin/couponController');
 const userAuth = require('../middleware/userAuth');
 const passport = require("passport");
 const { captureRejectionSymbol } = require("nodemailer/lib/xoauth2");
@@ -41,6 +42,7 @@ userRouter.post('/otp', userController.verifyOtp);
 // Products
 userRouter.get('/productDetails', userController.productDetails);
 userRouter.get('/shop', userController.shop);
+// userRouter.get('/shop/sortFilterSearch', userController.sortFilterSearch);
 
 // Wishlist
 userRouter.get('/wishlist', userAuth.isLogin, wishlistController.wishlist);
@@ -60,12 +62,16 @@ userRouter.post('/cart/stock-check', userAuth.isLogin, cartController.stockCheck
 userRouter.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
 userRouter.post('/checkout/add-new-address', userAuth.isLogin, cartController.addNewAddress);
 
+// Coupon
+userRouter.get('/check-coupon', userAuth.isLogin, couponController.checkCoupon);
+
 // Orders
 userRouter.post('/checkout/place-order', userAuth.isLogin, orderController.createOrder);
 userRouter.get('/order-success', userAuth.isLogin, orderController.orderSuccess);
 userRouter.get('/view-orders', userAuth.isLogin, orderController.viewOrders);
 userRouter.get('/order-details', userAuth.isLogin, orderController.orderDetails);
 userRouter.post('/cancel-order', userAuth.isLogin, orderController.cancelOrder);
+userRouter.post('/return-product', userAuth.isLogin, orderController.returnProduct);
 
 // Profile
 userRouter.get('/profile', userAuth.isLogin, profileController.profile);

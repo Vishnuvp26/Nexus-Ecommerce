@@ -48,7 +48,7 @@
                                         </p>
                                         <p class="card-text">
                                             <span class="fw-bold">Address Details: </span><br>
-                                            <span id="addressDetails"><%= order.address.house %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %></span>
+                                            <span id="addressDetails"><%= order.address.house %>, <%= order.address.city %>, <%= order.address.district %>, <%= order.address.state %>, <%= order.address.pincode %></span>
                                         </p>
                                     </div>
                                 </div>
@@ -65,26 +65,38 @@
                                                                     <img src="/productimages/<%= item.image %>" alt="<%= item.productName %>" class="img-fluid">
                                                                 </a>
                                                                 <h5 class="mt-2"><%= item.productName %></h5>
-                                                                <p>Category: <%= item.categoryName %></p>
+                                                                <p>Category: <span style="color: teal;"><%= item.categoryName %></span></p>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <p>Quantity: <%= item.quantity %></p>
-                                                                <p>Price: &#8377;<%= item.price.toFixed(2) %></p>
-                                                                <p>Total: &#8377;<%= item.finalPrice.toFixed(2) %></p>
+                                                                <p>Quantity : <%= item.quantity %></p>  
+                                                                <p>Price : &#8377;<%= item.price.toFixed(2) %></p>
+                                                                <p>Total : &#8377;<%= item.finalPrice.toFixed(2) %></p>
                                                                 <p id="status-item-<%= item._id %>">
                                                                     <span>Status : </span><span class="status-<%= item.itemStatus.toLowerCase() %>"><%= item.itemStatus %></span>
                                                                 </p>
+                                                                <% if (item.reason) { %>
+                                                                    <p>Reason : <%= item.reason %></p>
+                                                                <% } %>
                                                                 <p>Change Status :
-                                                                    <select class="form-control mb-3" onchange="confirmUpdateOrderStatus('<%= order._id %>', '<%= item._id %>', this.value)">
-                                                                        <option value="Ordered" disabled <%= item.itemStatus === 'Ordered' ? 'selected' : '' %>>Ordered</option>
-                                                                        <option value="Shipped" <%= item.itemStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                                        <option value="Delivered" <%= item.itemStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                                        <option value="Canceled" disabled <%= item.itemStatus === 'Canceled' ? 'selected' : '' %>>Canceled</option>
-                                                                    </select>                                                                                                                                                                                                          
+                                                                    <select class="form-control mb-3"
+                                                                            onchange="handleStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.itemStatus %>')"
+                                                                            <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>
+                                                                        <% if (item.itemStatus === 'Return Pending') { %>
+                                                                            <option value="" disabled selected>Select Action</option>
+                                                                            <option value="Approve" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Approve</option>
+                                                                            <option value="Decline" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Decline</option>
+                                                                        <% } else { %>
+                                                                            <option value="Ordered" disabled <%= item.itemStatus === 'Ordered' ? 'selected' : '' %>>Ordered</option>
+                                                                            <option value="Shipped" <%= item.itemStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                                            <option value="Delivered" <%= item.itemStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                                            <option value="Canceled" disabled <%= item.itemStatus === 'Canceled' ? 'selected' : '' %>>Canceled</option>
+                                                                            <option value="Returned" disabled <%= item.itemStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                                        <% } %>
+                                                                    </select>
                                                                 </p>
-                                                            </div>
+                                                            </div>                                                            
                                                         </div>
-                                                    </div>
+                                                    </div> 
                                                 </div>
                                             </div>
                                         <% }); %>
@@ -98,6 +110,7 @@
                 </div>
             </div>
         </section>
+        
     </div>
 </div>
 
@@ -106,6 +119,14 @@
 <link rel="stylesheet" href="/css/adminOrderDetails.css">
 
 <script>
+    function handleStatusChange(orderId, itemId, status, itemStatus) {
+        if (itemStatus === 'Return Pending') {
+            confirmUpdateReturnStatus(orderId, itemId, status);
+        } else {
+            confirmUpdateOrderStatus(orderId, itemId, status);
+        }
+    }
+
     function confirmUpdateOrderStatus(orderId, itemId, status) {
         Swal.fire({
             title: 'Are you sure?',
@@ -134,7 +155,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Status Updated',
-                    text: `The status has been updated to ${status}`,
+                    text: `The status has been updated`,
                     timer: 1500,
                     showConfirmButton: false,
                 }).then(() => {
@@ -147,6 +168,57 @@
                     icon: 'error',
                     title: 'Error',
                     text: 'There was an error updating the status.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    customClass: {
+                        title: 'small-title',
+                        text: 'small-text'
+                    }
+                });
+            });
+    }
+
+    function confirmUpdateReturnStatus(orderId, itemId, status) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Do you want to change the return status to ${status}?`,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, change it!',
+            cancelButtonText: 'No, cancel!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateReturnStatus(orderId, itemId, status);
+            }
+        });
+    }
+
+    function updateReturnStatus(orderId, itemId, status) {
+        axios.post('/admin/returnApproval', { orderId, itemId, status })
+            .then(response => {
+                const { status, paymentStatus } = response.data;
+                const statusElement = document.getElementById(`status-item-${itemId}`);
+                if (statusElement) {
+                    const statusText = status ? status.toLowerCase() : '';
+                    statusElement.innerHTML = `<span>Status : </span><span class="status-${statusText}">${statusText}</span>`;
+                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Return Status Updated',
+                    text: `The return status has been updated`,
+                    timer: 1500,
+                    showConfirmButton: false,
+                }).then(() => {
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                console.error('Error updating return status:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'There was an error updating the return status.',
                     timer: 1500,
                     showConfirmButton: false,
                     customClass: {

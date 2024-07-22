@@ -1,182 +1,290 @@
 <%- include("../layout/header") %>
-	<!-- Navbar -->
-	<%- include("../layout/navbar") %>
+<!-- Navbar -->
+<%- include("../layout/navbar") %>
+<link rel="stylesheet" href="/css/shop.css">
 
+<!-- breadcrumb -->
+<div class="container p-t-75" id="breadcrumb-container">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+        <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
+            Home
+            <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
+        </a>
+        <span class="stext-109 cl4">
+            Shop
+        </span>
+    </div>
+</div>
 
-	<!-- Product -->
-	<div class="bg0 m-t-23 p-b-140 p-t-75">
-		<div class="container">
-			<div class="flex-w flex-sb-m p-b-52">
+<!-- Product -->
+<div class="bg0 m-t-23 p-b-140 p-t-10">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+            <h4 class="ml-2 mt-2">Shop</h4>
+            <div class="d-flex flex-column flex-md-row align-items-center">
+                <div class="input-group mb-2 mb-md-0" style="width: 200px;">
+                    <input type="text" class="form-control" placeholder="Search..." id="search-input">
+                    <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                </div>
+                <select class="form-select ml-md-2 mt-2 mt-md-0" id="sort-select" style="max-width: 200px; height: 35px; font-size: 0.875rem;">
+                    <option value="newArrival">New Arrival</option>
+                    <option value="priceLowToHigh">Price: Low to High</option>
+                    <option value="priceHighToLow">Price: High to Low</option>
+                    <option value="nameAZ">Name [A-Z]</option>
+                    <option value="nameZA">Name [Z-A]</option>
+                </select>                  
+            </div>
+        </div>
+        
+        <!-- Filter -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="filter-section">
+                    <h6 class="text-dark fw-5">Categories</h6>
+                    <ul id="category-list">
+                        <!-- Categories will be dynamically inserted here -->
+                        <% categories.forEach(category => { %>
+                            <li>
+                                <div class="form-check">
+                                    <input class="form-check-input category-filter" type="checkbox" value="<%= category._id %>" id="category<%= category._id %>">
+                                    <label class="form-check-label" for="category<%= category._id %>">
+                                        <%= category.categoryName %>
+                                    </label>
+                                </div>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+                <div class="filter-section">
+                    <h6 class="text-dark fw-5">Price</h6>
+                    <ul>
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" value="0-500" id="price0-500">
+                                <label class="form-check-label" for="price0-500">
+                                    ₹0 - ₹500
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" value="500-1000" id="price500-1000">
+                                <label class="form-check-label" for="price500-1000">
+                                    ₹500 - ₹1000
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" value="1000-2000" id="price1000-2000">
+                                <label class="form-check-label" for="price1000-2000">
+                                    ₹1000 - ₹2000
+                                </label>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input price-filter" type="checkbox" value="2000" id="price2000">
+                                <label class="form-check-label" for="price2000">
+                                    ₹2000+
+                                </label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-				<div class="flex-w flex-l-m filter-tope-group m-tb-10">
-                    <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" data-filter="*">
-                        All Products
-                    </button>
-                    
-                    <% categories.forEach(category => { %>
-                        <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter="<%= category._id %>">
-                            <%= category.categoryName %>
-                        </button>
+            <div class="col-md-9">
+                <!-- PRODUCT -->
+                <div class="row product-grid p-t-40" id="product-list">
+                    <% products.forEach(product => { %>
+                        <div class="col-sm-6 col-md-4 col-lg-3 product-item" data-category="<%= product.category._id %>" data-price="<%= product.offerPrice || product.price %>">
+                            <div class="block2">
+                                <div class="block2-pic hov-img0">
+                                    <a href="/productDetails?productId=<%= product._id %>">
+                                        <img src="/productimages/<%= product.image[0] %>" alt="IMG-PRODUCT">
+                                    </a>
+                                </div>
+                                <div class="block2-txt flex-w flex-t p-t-14">
+                                    <div class="block2-txt-child1 flex-col-l">
+                                        <a href="/productDetails?productId=<%= product._id %>" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                                            <%= product.productName %>
+                                        </a>
+                                        <span class="stext-105 cl3">
+                                            <% if (product.offerPrice) { %>
+                                                <span style="text-decoration: line-through;">₹ <%= product.price %></span>
+                                                ₹ <%= product.offerPrice %>
+                                            <% } else { %>
+                                                ₹ <%= product.price %>
+                                            <% } %>
+                                        </span>
+                                        <span class="stext-106 cl3">
+                                            <% if (product.quantity >= 10) { %>
+                                                <span style="color: green; font-size: smaller;">in stock</span>
+                                            <% } else if (product.quantity > 0) { %>
+                                                <span style="color: peru; font-size: smaller;">only <%= product.quantity %> left in stock</span>
+                                            <% } else { %>
+                                                <span style="color: red; font-size: smaller;">out of stock</span>
+                                            <% } %>
+                                        </span><br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     <% }) %>
                 </div>
-                
-                <!-- Filter and search code starting -->
-                 <div class="flex-w flex-c-m m-tb-10">
-					<div class="flex-c-m stext-106 cl6 size-104 bor4 pointer hov-btn3 trans-04 m-r-8 m-tb-4 js-show-filter">
-						<i class="icon-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-filter-list"></i>
-						<i class="icon-close-filter cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
-						 Filter
-					</div>
 
-					<div class="flex-c-m stext-106 cl6 size-105 bor4 pointer hov-btn3 trans-04 m-tb-4 js-show-search">
-						<i class="icon-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-search"></i>
-						<i class="icon-close-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
-						Search
-					</div>
-				</div>
-				
-				<!-- Search product -->
-				<div class="dis-none panel-search w-full p-t-10 p-b-15">
-					<div class="bor8 dis-flex p-l-15">
-						<button class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
-							<i class="zmdi zmdi-search"></i>
-						</button>
+                <!-- Pagination -->
+                <div class="pagination-container mt-4">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <% if (currentPage > 1) { %>
+                            <li class="page-item">
+                                <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">
+                                    <i class="zmdi zmdi-chevron-left"></i>
+                                </a>
+                            </li>
+                        <% } %>
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
+                                <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <% if (currentPage < totalPages) { %>
+                            <li class="page-item">
+                                <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">
+                                    <i class="zmdi zmdi-chevron-right"></i>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-						<input class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search-product" placeholder="Search">
-					</div>	
-				</div>
+<!-- Back to top -->
+<div class="btn-back-to-top" id="myBtn">
+    <span class="symbol-btn-back-to-top">
+        <i class="zmdi zmdi-chevron-up"></i>
+    </span>
+</div>
 
-				<!-- Filter -->
-				<div class="dis-none panel-filter w-full p-t-10">
-					<div class="wrap-filter flex-w bg6 w-full p-lr-40 p-t-27 p-lr-15-sm">
-						<!-- Price sorting -->
-						<div class="filter-col1 p-r-15 p-b-27">
-							<div class="mtext-102 cl2 p-b-15">
-								Price
-							</div>
-							<ul>
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Default
-									</a>
-								</li>
+<%- include("../layout/footer.ejs") %>
 
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Price: Low to High
-									</a>
-								</li>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    const sortSelect = document.getElementById('sort-select');
+    const categoryFilters = document.querySelectorAll('.category-filter');
+    const priceFilters = document.querySelectorAll('.price-filter');
+    const paginationLinks = document.querySelectorAll('.page-link-custom');
 
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Price: High to Low
-									</a>
-								</li>
-							</ul>
-						</div>
+    const applyFilters = (page = 1) => {
+        const searchQuery = searchInput.value;
+        const sortOption = sortSelect.value;
+        const selectedCategories = Array.from(categoryFilters).filter(c => c.checked).map(c => c.value);
+        const selectedPrices = Array.from(priceFilters).filter(p => p.checked).map(p => p.value);
 
-						<!-- Name sorting -->
-						<div class="filter-col2 p-r-15 p-b-27">
-							<div class="mtext-102 cl2 p-b-15">
-								Name
-							</div>
-							<ul>
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Name [a - z]
-									</a>
-								</li>
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Name [z - a]
-									</a>
-								</li>
-							</ul>
-						</div>
+        const minPrice = selectedPrices.length ? Math.min(...selectedPrices.map(p => parseInt(p.split('-')[0]))) : null;
+        const maxPrice = selectedPrices.length ? Math.max(...selectedPrices.map(p => parseInt(p.split('-')[1] || p.split('-')[0]))) : null;
 
-					</div>
-				</div>
-            	<!-- Filter and search code ending -->
-			</div>
+        axios.get('/shop/sortFilterSearch', {
+            params: {
+                searchQuery,
+                sortOption,
+                selectedCategories,
+                minPrice,
+                maxPrice,
+                page
+            }
+        }).then(response => {
+            const { products, currentPage, totalPages } = response.data;
 
-            <!-- PRODUCT -->
-			<div class="row product-grid">
-                <% products.forEach(product => { %>
-                    <div class="col-sm-6 col-md-4 col-lg-3 product-item" data-category="<%= product.category._id %>">
+            // Update products
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = '';
+            products.forEach(product => {
+                productList.innerHTML += `
+                    <div class="col-sm-6 col-md-4 col-lg-3 product-item" data-category="${product.category._id}" data-price="${product.offerPrice || product.price}">
                         <div class="block2">
                             <div class="block2-pic hov-img0">
-                                <a href="/productDetails?productId=<%= product._id %>">
-                                    <img src="/productimages/<%= product.image[0] %>" alt="IMG-PRODUCT">
+                                <a href="/productDetails?productId=${product._id}">
+                                    <img src="/productimages/${product.image[0]}" alt="IMG-PRODUCT">
                                 </a>
                             </div>
                             <div class="block2-txt flex-w flex-t p-t-14">
                                 <div class="block2-txt-child1 flex-col-l">
-                                    <a href="/productDetails?productId=<%= product._id %>" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
-                                        <%= product.productName %>
+                                    <a href="/productDetails?productId=${product._id}" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                                        ${product.productName}
                                     </a>
                                     <span class="stext-105 cl3">
-                                        ₹ <%= product.price %>
+                                        ${product.offerPrice ? `<span style="text-decoration: line-through;">₹ ${product.price}</span> ₹ ${product.offerPrice}` : `₹ ${product.price}`}
                                     </span>
                                     <span class="stext-106 cl3">
-                                        <% if (product.quantity >= 10) { %>
-                                            <span style="color: green; font-size: smaller;">in stock</span>
-                                        <% } else if (product.quantity > 0) { %>
-                                            <span style="color: peru; font-size: smaller;">only <%= product.quantity %> left in stock</span>
-                                        <% } else { %>
-                                            <span style="color: red; font-size: smaller;">out of stock</span>
-                                        <% } %>
+                                        ${product.quantity >= 10 ? `<span style="color: green; font-size: smaller;">in stock</span>` : product.quantity > 0 ? `<span style="color: peru; font-size: smaller;">only ${product.quantity} left in stock</span>` : `<span style="color: red; font-size: smaller;">out of stock</span>`}
                                     </span><br>
                                 </div>
                             </div>
                         </div>
                     </div>
-                <% }) %>
-            </div>
-            
-			<!-- Load more -->
-			<!-- <div class="flex-c-m flex-w w-full p-t-45">
-				<a href="#" class="flex-c-m stext-101 cl5 size-103 bg2 bor1 hov-btn1 p-lr-15 trans-04">
-					Load More
-				</a>
-			</div> -->
+                `;
+            });
 
-		</div>
-	</div>
-
-
-	<!-- Back to top -->
-	<div class="btn-back-to-top" id="myBtn">
-		<span class="symbol-btn-back-to-top">
-			<i class="zmdi zmdi-chevron-up"></i>
-		</span>
-	</div>
-
-<%- include("../layout/footer.ejs") %>
-
-
-<!-- jQuery CDN -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        // When a category filter button is clicked
-        $('.filter-tope-group button').on('click', function() {
-            var filterValue = $(this).attr('data-filter');
-
-            // Show all products if 'All Products' button is clicked
-            if (filterValue === '*') {
-                $('.product-item').show(); // Show all products
-            } else {
-                // Hide all products
-                $('.product-item').hide();
-
-                // Show products with matching data-category attribute
-                $('.product-item[data-category="' + filterValue + '"]').show();
+            // Update pagination
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            if (currentPage > 1) {
+                pagination.innerHTML += `
+                    <li class="page-item">
+                        <a class="page-link page-link-custom" href="?page=${currentPage - 1}" style="background-color: #fff; border-color: #000000; color: #000;">
+                            <i class="zmdi zmdi-chevron-left"></i>
+                        </a>
+                    </li>
+                `;
+            }
+            for (let i = 1; i <= totalPages; i++) {
+                pagination.innerHTML += `
+                    <li class="page-item ${i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark'}" style="border-color: #000;">
+                        <a class="page-link page-link-custom ${i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark'}" href="?page=${i}" style="border-color: #000;">${i}</a>
+                    </li>
+                `;
+            }
+            if (currentPage < totalPages) {
+                pagination.innerHTML += `
+                    <li class="page-item">
+                        <a class="page-link page-link-custom" href="?page=${currentPage + 1}" style="background-color: #fff; border-color: #000; color: #000;">
+                            <i class="zmdi zmdi-chevron-right"></i>
+                        </a>
+                    </li>
+                `;
             }
 
-            // Add/remove 'how-active1' class for styling the active button
-            $('.filter-tope-group button').removeClass('how-active1');
-            $(this).addClass('how-active1');
+            // Add pagination event listeners
+            document.querySelectorAll('.page-link-custom').forEach(link => {
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    const page = parseInt(link.getAttribute('href').split('=')[1]);
+                    applyFilters(page);
+                });
+            });
+        }).catch(error => {
+            console.error(error);
+        });
+    };
+
+    searchButton.addEventListener('click', () => applyFilters());
+    sortSelect.addEventListener('change', () => applyFilters());
+    categoryFilters.forEach(filter => filter.addEventListener('change', () => applyFilters()));
+    priceFilters.forEach(filter => filter.addEventListener('change', () => applyFilters()));
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', event => {
+            event.preventDefault();
+            const page = parseInt(link.getAttribute('href').split('=')[1]);
+            applyFilters(page);
         });
     });
+});
 </script>

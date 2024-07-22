@@ -1,6 +1,7 @@
 const userModel = require('../../models/userModel');
 const addressModel = require('../../models/addressModel');
 const cartModel = require('../../models/cartModel');
+const couponModel = require('../../models/couponModel');
 const productModel = require('../../models/productModel');
 
 // Calculate total
@@ -183,12 +184,11 @@ const stockCheck = async (req, res) => {
     }
 };
 
-
-
 // Load checkout
 const loadCheckout = async (req, res) => {
     try {
         const userData = await userModel.findOne({ _id: req.session.user_id });
+        const couponData = await couponModel.find();
         const addressData = await addressModel.findOne({ userId: req.session.user_id });
         const cartData = await cartModel.findOne({ userId: req.session.user_id })
             .populate({
@@ -201,7 +201,8 @@ const loadCheckout = async (req, res) => {
 
         res.render('checkout', { 
             user: userData,  
-            cart: cartData, 
+            cart: cartData,
+            coupons: couponData,
             addresses: addressData ? addressData.address : [] 
         });
     } catch (error) {

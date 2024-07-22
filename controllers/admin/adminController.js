@@ -1,13 +1,14 @@
 const adminModel = require('../../models/adminModel');
-const bcrypt = require("bcrypt"); 
+const bcrypt = require("bcrypt");
 const orderModel = require('../../models/orderModel');
+const walletModel = require('../../models/walletModel');
 
 // Admin Login Page GET
 const adminLogin = async (req, res) => {
     try {
         res.render('login');
     } catch (error) {
-        res.send(error.message);
+        console.log(error)
     }
 };
 
@@ -26,12 +27,12 @@ const adminPostLogin = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
-        
+
         req.session.admin_id = admin._id;
         return res.status(200).json({ message: 'Login successful' });
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+        console.log(error)
     }
 };
 
@@ -50,7 +51,7 @@ const loadDashboard = async (req, res) => {
     try {
         res.render('dashboard');
     } catch (error) {
-        res.send(error.message);
+        console.log(error)
     }
 };
 
@@ -184,13 +185,218 @@ const updateOrderStatus = async (req, res) => {
 
         await order.save();
 
-        // Send back updated order details
         res.json({ success: true, status: order.status, paymentStatus: order.paymentStatus });
     } catch (error) {
         console.error('Error updating order status:', error);
-        res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// Filter intervals
+const filterInterval = async (req, res, next) => {
+    try {
+        const interval = req.query.interval;
+        let startDate;
+        let today = new Date();
+
+        switch (interval) {
+            case "daily":
+                startDate = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate() - 1
+                );
+                break;
+            case "weekly":
+                startDate = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate() - 7
+                );
+                break;
+            case "monthly":
+                startDate = new Date(
+                    today.getFullYear(),
+                    today.getMonth() - 1,
+                    today.getDate()
+                );
+                break;
+            case "yearly":
+                startDate = new Date(
+                    today.getFullYear() - 1,
+                    today.getMonth(),
+                    today.getDate()
+                );
+                break;
+            default:
+                startDate = new Date();
+                break;
+        }
+        let orderData = await orderModel.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            { $unwind: "$items" },
+            {
+                $match: {
+                    "items.itemStatus": "Delivered",
+                    date: { $gte: startDate, $lte: new Date() },
+                },
+            },
+            {
+                $sort: {
+                    date: -1,
+                },
+            },
+        ]);
+
+        let totalSales = orderData.length;
+
+        res.render("salesReport", {
+            orders: orderData,
+            totalSales: totalSales,
+        });
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+// Filter report
+const filterReport = async (req, res, next) => {
+    try {
+        const startDate = new Date(req?.query?.startDate);
+        const endDate = new Date(req?.query?.endDate);
+        let orderData = await orderModel.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            { $unwind: "$items" },
+            {
+                $match: {
+                    "items.itemStatus": "Delivered",
+                    date: { $gte: startDate, $lte: endDate },
+                },
+            },
+            {
+                $sort: {
+                    date: -1,
+                },
+            },
+        ]);
+
+        let totalSales = orderData.length;
+
+        res.render("salesReport", {
+            orders: orderData,
+            totalSales: totalSales,
+        });
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+// Sales report
+const loadSalesReport = async (req, res) => {
+    try {
+        let orderData = await orderModel.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            { $unwind: "$items" },
+            {
+                $match: {
+                    "items.itemStatus": "Delivered",
+                },
+            },
+            {
+                $sort: {
+                    date: -1,
+                },
+            },
+        ]);
+
+        let totalSales = orderData.length;
+
+        res.render("salesReport", {
+            orders: orderData,
+            totalSales: totalSales,
+        });
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+// Approve Return
+const returnApproval = async (req, res, next) => {
+    try {
+        const { orderId, itemId, status } = req.body;
+        const order = await orderModel.findById(orderId);
+        let wallet = await walletModel.findOne({ userId: req.session.user_id });
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        let completed = 1;
+        for (let item of order.items) {
+            if (item._id.toString() === itemId) {
+                if (status === "Approve") {
+                    item.itemStatus = "Returned";
+                    item.isApproved = true;
+
+                    if (!wallet) {
+                        wallet = new walletModel({
+                            userId: req.session.user_id,
+                            balance: 0,
+                            history: [],
+                        });
+                    }
+
+                    wallet.history.push({
+                        amount: item.finalPrice,
+                        transactionType: "Credit",
+                        newBalance: wallet.balance + Number(item.finalPrice * item.quantity),
+                    });
+                    wallet.balance += Number(item.finalPrice * item.quantity);
+                    await wallet.save();
+                } else {
+                    item.itemStatus = "Delivered";
+                    item.isApproved = false;
+                }
+            }
+            if (!["Delivered", "Cancelled", "Returned"].includes(item.itemStatus)) {
+                completed = 0;
+            }
+        }
+
+        if (completed === 1) {
+            order.status = "Completed";
+            order.paymentStatus = "Done";
+        } else {
+            order.status = "Ordered";
+        }
+        await order.save();
+
+        res.json({ success: true, status: order.status, paymentStatus: order.paymentStatus });
+    } catch (error) {
+        next(error);
+    }
+};
+  
 
 
 module.exports = {
@@ -200,5 +406,10 @@ module.exports = {
     loadDashboard,
     loadOrdersList,
     adminOrderDetails,
-    updateOrderStatus
+    updateOrderStatus,
+    loadSalesReport,
+    filterInterval,
+    filterReport,
+    loadSalesReport,
+    returnApproval
 };

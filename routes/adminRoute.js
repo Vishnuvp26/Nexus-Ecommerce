@@ -5,6 +5,8 @@ const categoryController = require('../controllers/admin/categoryController');
 const productController = require('../controllers/admin/productController');
 const adminUserController = require('../controllers/admin/adminUserController');
 const orderController = require('../controllers/user/orderController');
+const couponController = require('../controllers/admin/couponController');
+const offerController = require('../controllers/admin/offerController');
 const adminAuth = require('../middleware/adminAuth');
 const upload = require('../middleware/multer')
 const setNoCacheHeaders = require('../middleware/nocache');
@@ -46,5 +48,29 @@ adminRouter.post('/editProducts', adminAuth.isLogin, upload.array('images'), pro
 adminRouter.get('/orderList', adminAuth.isLogin, adminController.loadOrdersList);
 adminRouter.get('/orderDetails', adminAuth.isLogin, adminController.adminOrderDetails);
 adminRouter.post('/updateOrderStatus', adminAuth.isLogin, adminController.updateOrderStatus);
+adminRouter.post('/returnApproval', adminAuth.isLogin, adminController.returnApproval);
+
+// Coupons
+adminRouter.get('/coupons', adminAuth.isLogin, couponController.loadCoupons); 
+adminRouter.post('/coupons/add', adminAuth.isLogin, couponController.addCoupon);
+adminRouter.put('/coupons/edit', adminAuth.isLogin, couponController.editCoupon);
+adminRouter.delete('/coupons/delete', adminAuth.isLogin, couponController.deleteCoupon); 
+
+// Product offers
+adminRouter.get('/productOffers', adminAuth.isLogin, offerController.loadProductOffer);
+adminRouter.post('/addProductOffer', adminAuth.isLogin, offerController.addProductOffer);
+adminRouter.post('/editProductOffer', adminAuth.isLogin, offerController.editProductOffer);
+adminRouter.delete('/removeProductOffer', adminAuth.isLogin, offerController.removeProductOffer);
+
+// Category offers
+adminRouter.get('/categoryOffers', adminAuth.isLogin, offerController.loadCategoryOffer);
+adminRouter.post('/addCategoryOffer', adminAuth.isLogin, offerController.addCategoryOffer);
+adminRouter.post('/editCategoryOffer', adminAuth.isLogin, offerController.editCategoryOffer);
+adminRouter.delete('/removeCategoryOffer', adminAuth.isLogin, offerController.removeCategoryOffer);
+
+// Sales report
+adminRouter.get('/salesReport', adminAuth.isLogin, adminController.loadSalesReport);
+adminRouter.get('/filterInterval', adminAuth.isLogin, adminController.filterInterval);
+adminRouter.get('/filter', adminAuth.isLogin, adminController.filterReport);
 
 module.exports = adminRouter;

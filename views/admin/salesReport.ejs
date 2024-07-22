@@ -1,0 +1,211 @@
+<%- include("../layout/adminHeader") %>
+<%- include("../layout/adminSidebarHead") %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="page-header pt-5">
+            <h3 class="page-title">
+                <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                    <i class="mdi mdi-chart-line"></i>
+                </span>
+                Sales Report
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page"></li>
+                </ul>
+            </nav>
+        </div>
+  
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body table-responsive">
+                        <div class="row">
+                            <div class="col-lg-12 mb-4 d-flex justify-content-between">
+                                <form class="form-inline" onsubmit="return validateForm()">
+                                    <div class="form-group mr-3">
+                                        <label for="startDate">Start Date:</label>
+                                        <input type="date" class="form-control mx-2" id="startDate">
+                                    </div>
+                                    <div class="form-group mr-3">
+                                        <label for="endDate">End Date:</label>
+                                        <input type="date" class="form-control mx-2" id="endDate">
+                                    </div>
+                                    <button type="submit" class="btn btn-gradient-light text-black" id="filterBtn">Filter</button>
+                                </form>
+                                <div class="form-group mr-3">
+                                    <select class="form-control mx-2" id="interval" onchange="filterInterval()" style="width: 200px;">
+                                        <option value="" disabled selected>Select an interval</option>
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm mr-2" id="downloadPdfBtn">
+                            <i class="mdi mdi-file-pdf"></i> Download as PDF
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" id="downloadExcelBtn">
+                            <i class="mdi mdi-file-excel-box"></i> Download as Excel
+                        </button>                        
+                        <br><br>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 id="totalSales">Total Sales: <%= totalSales %></h5>
+                            </div>
+                        </div>                        
+                        
+                        <table class="table table-bordered border-top table-hover mt-2" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Billing Name</th>
+                                    <th>Total Price</th>
+                                    <th>Discount Price</th>
+                                    <th>Payment Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td><%= order.date.toDateString() %></td>
+                                        <td><%= order.items.productName %></td>
+                                        <td><%= order.items.quantity %></td>
+                                        <td><%= order.address.name %></td>
+                                        <td>₹<%= order.totalPrice %></td>
+                                        <td>₹<%= order.items.finalPrice %></td>
+                                        <td><%= order.paymentMethod %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include("../layout/adminSidebarFoot") %>
+<%- include("../layout/adminFooter") %>
+
+<!-- Include PDF and Excel generation scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+<!-- Script for PDF and Excel download -->
+<script>
+    document.getElementById("downloadPdfBtn").addEventListener("click", function () {
+    let doc = new window.jspdf.jsPDF();
+    let pageCenter = doc.internal.pageSize.getWidth() / 2;
+
+    doc.setFontSize(25);
+    doc.text("N E X U S", pageCenter, 10, { align: 'center' });
+    doc.setFontSize(15);
+    doc.text("Sales Report", pageCenter, 20, { align: 'center' });
+
+    // Add total sales
+    doc.setFontSize(12);
+    let totalSales = document.getElementById('totalSales').innerText;
+    doc.text(` ${totalSales}`, 14, 30);
+
+    let table = document.querySelector(".table");
+
+    doc.autoTable({ html: table, startY: 40 });
+
+    doc.save("Nexus_sales_report.pdf");
+});
+
+
+    document.getElementById("downloadExcelBtn").addEventListener("click", function () {
+        let workbook = XLSX.utils.book_new();
+
+        let table = document.querySelector(".table");
+
+        let worksheet = XLSX.utils.table_to_sheet(table);
+
+        let totalSales = document.getElementById('totalSales').innerText.replace('Total Sales: ', '');
+        let totalSalesCell = XLSX.utils.aoa_to_sheet([['Total Sales', totalSales]]);
+        XLSX.utils.sheet_add_aoa(worksheet, [['Total Sales', totalSales]], { origin: -1 });
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sales Report");
+
+        let range = XLSX.utils.decode_range(worksheet['!ref']);
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            let max_width = 0;
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                let cell_address = { c: C, r: R };
+                let cell_ref = XLSX.utils.encode_cell(cell_address);
+                if (!worksheet[cell_ref]) continue;
+                let cell_width = XLSX.SSF.format(cell_address, worksheet[cell_ref].v).length;
+                max_width = Math.max(max_width, cell_width);
+            }
+            worksheet['!cols'] = worksheet['!cols'] || [];
+            worksheet['!cols'][C] = { wch: max_width + 1 };
+        }
+
+        XLSX.writeFile(workbook, "Nexus_sales_report.xlsx", { bookSST: true, type: 'binary' });
+    });
+
+    function filterInterval() {
+        let interval = document.getElementById("interval").value;
+        window.location.href = `/admin/filterInterval?interval=${interval}`;
+    }
+
+    function filter() {
+        let startDate = document.getElementById("startDate").value;
+        let endDate = document.getElementById("endDate").value;
+        window.location.href = `/admin/filter?startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    function validateForm() {
+        event.preventDefault();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            Swal.fire('Both start date and end date are required');
+            return false;
+        }
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            Swal.fire('Start date must be less than the end date');
+            return false;
+        }
+
+        filter();
+    }
+</script>
+
+<style>
+    .swal2-title {
+    font-weight: normal !important; 
+font-size: 18px !important;
+}
+
+.swal2-content {
+    font-weight: normal !important; 
+    font-size: 16px !important;
+}
+.swal2-popup {
+    width: 300px !important;
+    font-size: 14px !important; 
+}
+.swal2-title {
+    font-size: 16px !important; 
+}
+.swal2-content {
+  font-size: 14px !important; 
+}
+.swal2-actions .swal2-styled {
+    padding: 5px 10px !important; 
+    font-size: 14px !important; 
+}
+</style>

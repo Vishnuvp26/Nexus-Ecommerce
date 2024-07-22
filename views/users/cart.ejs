@@ -2,8 +2,16 @@
 <%- include("../layout/navbar") %>
 <link rel="stylesheet" href="/css/cart.css">
 
+<style>
+    @media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+}
+</style>
+
 <!-- Breadcrumb -->
-<div class="container p-t-70">
+<div class="container p-t-70" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
             Home
@@ -14,7 +22,7 @@
 </div>
 
 <div class="container mt-2">
-    <h4 class="mt-5">SHOPPING CART</h4>
+    <h4 class="mt-5">Shopping Cart</h4>
     <% if (cart && cart.items.length > 0) { %>
         <div class="row mt-4">
             <div class="col-12 col-md-8">
@@ -38,22 +46,28 @@
                                         <!-- Product Name -->
                                         <span class="ml-3"><%= item.productId.productName %></span>
                                     </td>
-                                    <td class="align-middle">₹ <%= item.productId.price %></td>
+                                    <td class="align-middle">₹ 
+                                        <% if (item.productId.offerPrice) { %>
+                                            <%= item.productId.offerPrice %>
+                                        <% } else { %>
+                                            <%= item.productId.price %>
+                                        <% } %>
+                                    </td>
                                     <td class="align-middle">
                                         <div class="input-group quantity">
                                             <div class="input-group-prepend">
                                                 <!-- Decrease Quantity Button -->
-                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decrement('<%= item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">-</button>
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decrement('<%= item.productId.offerPrice ? item.productId.offerPrice : item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">-</button>
                                             </div>
                                             <!-- Quantity Input -->
                                             <input type="text" class="form-control text-center quantity-input" id="qty<%= i %>" value="<%= item.quantity %>" data-max="<%= Math.min(5, item.productId.quantity) %>">
                                             <div class="input-group-append">
                                                 <!-- Increase Quantity Button -->
-                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increment('<%= item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">+</button>
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increment('<%= item.productId.offerPrice ? item.productId.offerPrice : item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">+</button>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="align-middle total-price" id="subtotal<%= i %>">₹ <%= item.productId.price * item.quantity %></td>
+                                    <td class="align-middle total-price" id="subtotal<%= i %>">₹ <%= (item.productId.offerPrice ? item.productId.offerPrice : item.productId.price) * item.quantity %></td>
                                     <td class="align-middle">
                                         <!-- Delete Button -->
                                         <button class="btn btn-sm btn-dark btn-transparent btn-delete" data-id="<%= item.productId._id %>">

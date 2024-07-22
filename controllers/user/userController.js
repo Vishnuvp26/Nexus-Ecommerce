@@ -2,6 +2,8 @@ require('dotenv').config();
 const userModel = require('../../models/userModel');
 const productModel = require('../../models/productModel');
 const categoryModel = require('../../models/categoryModel');
+const productOfferModel = require('../../models/productOfferModel');
+const categoryOfferModel = require('../../models/categoryOfferModel');
 const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const nodemailer = require("nodemailer");
@@ -233,17 +235,108 @@ const loginUser = async (req, res) => {
     }
 };
 
-// Home Page   
+// Offers
+const offerPrice = async (products) => {
+    try {
+      let updatedProducts = [];
+      const productOffer = await productOfferModel.find().populate("productId");
+      const categoryOffer = await categoryOfferModel.find().populate("categoryId");
+  
+      for (let product of products) {
+        let productOfferMatch = 0;
+        let categoryOfferMatch = 0;
+        let productOfferPercentage;
+        let categoryOfferPercentage;
+  
+        for (let offer of productOffer) {
+          if (offer.productId._id.toString() === product._id.toString()) {
+            productOfferMatch = 1;
+            productOfferPercentage = offer.offerPercentage;
+            break;
+          }
+        }
+  
+        for (let offer of categoryOffer) {
+          if (offer.categoryId._id.toString() === product.category._id.toString()) {
+            categoryOfferMatch = 1;
+            categoryOfferPercentage = offer.offerPercentage;
+            break;
+          }
+        }
+  
+        if (categoryOfferMatch === 1 && productOfferMatch === 1) {
+          if (categoryOfferPercentage > productOfferPercentage) {
+            await productModel.updateOne(
+              { _id: product._id },
+              {
+                offerPrice:
+                  product.price -
+                  Math.ceil((product.price * categoryOfferPercentage) / 100),
+              }
+            );
+          } else {
+            await productModel.updateOne(
+              { _id: product._id },
+              {
+                offerPrice:
+                  product.price -
+                  Math.ceil((product.price * productOfferPercentage) / 100),
+              }
+            );
+          }
+        } else if (categoryOfferMatch === 1) {
+          await productModel.updateOne(
+            { _id: product._id },
+            {
+              offerPrice:
+                product.price -
+                Math.ceil((product.price * categoryOfferPercentage) / 100),
+            }
+          );
+        } else if (productOfferMatch === 1) {
+          await productModel.updateOne(
+            { _id: product._id },
+            {
+              offerPrice:
+                product.price -
+                Math.ceil((product.price * productOfferPercentage) / 100),
+            }
+          );
+        } else {
+          if (product.offerPrice) {
+            await productModel.updateOne(
+              { _id: product._id },
+              { $unset: { offerPrice: "" } }
+            );
+          }
+        }
+        const updatedProduct = await productModel.findOne({ _id: product._id });
+        updatedProducts.push(updatedProduct);
+      }
+  
+      return updatedProducts;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+  
+
+// Home Page    
 const userHome = async (req, res) => {
     try {   
         const userData = await userModel.findOne({ _id: req.session.user_id });
-        const activeProducts = await productModel.find({ status: "active" }).populate('category');
+        let activeProducts = await productModel.find({ status: "active" }).populate('category');
+
+        activeProducts = await offerPrice(activeProducts);
 
         res.render('home', { user: userData, products: activeProducts });
     } catch (error) {
+        console.error(error);
         res.status(500).send(error);
     }
 };
+
 
 // Logout
 const userLogout = async (req, res) => {
@@ -262,7 +355,7 @@ const productDetails = async (req, res) => {
         const productId = req.query.productId;
         
         const userData = await userModel.findOne({ _id: userId });
-        const product = await productModel.findOne({ _id: productId, status: "active" }).populate('category');
+        let product = await productModel.findOne({ _id: productId, status: "active" }).populate('category');
         
         if (product) {
             const relatedProducts = await productModel.find({
@@ -271,7 +364,12 @@ const productDetails = async (req, res) => {
                 status: "active"
             }).limit(4);
 
-            res.render('productDetails', { user: userData, product, relatedProducts });
+            product = await offerPrice([product]);
+            product = product[0];
+            
+            const updatedRelatedProducts = await offerPrice(relatedProducts);
+
+            res.render('productDetails', { user: userData, product, relatedProducts: updatedRelatedProducts });
         } else {
             res.status(404).send('Product not found');
         }
@@ -281,18 +379,35 @@ const productDetails = async (req, res) => {
     }
 };
 
+
 // Shop
 const shop = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
+        const skip = (page - 1) * limit;
+
         const userData = await userModel.findOne({ _id: req.session.user_id });
-        const activeProducts = await productModel.find({ status: "active" }).populate('category');
+        const totalProducts = await productModel.countDocuments({ status: "active" });
+        let activeProducts = await productModel.find({ status: "active" }).populate('category').skip(skip).limit(limit);
         const categories = await categoryModel.find({ status: "active" });
 
-        res.render('shop', { user: userData, products: activeProducts, categories: categories });
+        activeProducts = await offerPrice(activeProducts);
+
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        res.render('shop', {
+            user: userData,
+            products: activeProducts,
+            categories: categories,
+            currentPage: page,
+            totalPages: totalPages
+        });
     } catch (error) {
         console.log(error);
     }
 };
+
 
 
 module.exports = {
@@ -308,4 +423,5 @@ module.exports = {
     verifyOtp,
     productDetails,
     shop,
+    offerPrice
 };

@@ -41,7 +41,6 @@
                         <%= order.address.house %><br>
                         <%= order.address.district %><br>
                         <%= order.address.city %>, <%= order.address.state %> <%= order.address.pincode %><br>
-                        <!-- Add more fields as per your schema -->
                     </p>
                 </div>
                 <div class="col-md-6">
@@ -59,7 +58,6 @@
                                     <th scope="col">Category</th>
                                     <th scope="col">Image</th>
                                     <th scope="col">Quantity</th>
-                                    <th scope="col">Price</th>
                                     <th scope="col">Final Price</th>
                                     <th scope="col">Order Status</th>
                                     <th scope="col">Action</th>
@@ -72,16 +70,15 @@
                                         <td><%= item.categoryName %></td>
                                         <td><img src="/productimages/<%= item.image %>" alt="<%= item.productName %>" class="img-fluid" style="max-width: 100px;"></td>
                                         <td><%= item.quantity %></td>
-                                        <td>&#8377;<%= item.price.toFixed(2) %></td>
-                                        <td>&#8377;<%= (item.quantity * item.price).toFixed(2) %></td>
-                                        <td class="<%= item.itemStatus === 'Cancelled' ? 'text-danger' : item.itemStatus === 'Delivered' ? 'text-success' : '' %>"><%= item.itemStatus %></td>
+                                        <td>&#8377;<%= (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price)).toFixed(2) %></td>
+                                        <td class="<%= item.itemStatus === 'Cancelled' ? 'text-danger' : item.itemStatus === 'Delivered' ? 'text-success' : item.itemStatus === 'Returned' ? 'text-primary' :  item.itemStatus === 'Return Pending' ? 'text-primary' : '' %>"><%= item.itemStatus %></td>
                                         <td>
-                                            <% if (item.itemStatus !== 'Cancelled' && item.itemStatus !== 'Delivered') { %>
+                                            <% if (item.itemStatus !== 'Cancelled' && item.itemStatus !== 'Delivered' && item.itemStatus !== 'Returned' && item.itemStatus !== 'Return Pending') { %>
                                                 <button type="button" class="btn btn-sm btn-cancel" onclick="confirmCancelOrder('<%= item.productId %>', '<%= order._id %>')">
                                                     <i class="fa fa-times"></i> Cancel
                                                 </button>
                                             <% } else if (item.itemStatus === 'Delivered') { %>
-                                                <button type="button" class="btn btn-sm btn-return" onclick="confirmReturnOrder('<%= item.productId %>', '<%= order._id %>')">
+                                                <button type="button" class="btn btn-sm btn-return" onclick="showReturnModal('<%= item.productId %>', '<%= order._id %>')">
                                                     <i class="fa fa-undo"></i> Return
                                                 </button>
                                             <% } %>
@@ -89,7 +86,7 @@
                                     </tr>
                                 <% }); %>
                             </tbody>
-                        </table>
+                        </table>                        
                     </div>
                 </div>
             </div>
@@ -97,17 +94,59 @@
                 <div class="col-md-6">
                     <h6>Order Summary</h6>
                     <p class="font-weight-bold text-dark">
-                        Item(s) Subtotal : &#8377;<%= order.totalPrice.toFixed(2) %><br>
-                        <!-- Add more fields as per your schema -->
+                        Item(s) Subtotal : &#8377;<%= order.items.reduce((total, item) => {
+                            return total + (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price));
+                        }, 0).toFixed(2) %><br>
                     </p>
                 </div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+<!-- Modal HTML -->
+<div class="modal fade modal-custom" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnModalLabel">Return Product ?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm">
+                    <div class="form-group">
+                        <label for="returnReason">Reason for Return</label>
+                        <select class="form-control" id="returnReason" required>
+                            <option value="" disabled selected>Select a reason</option>
+                            <option value="Damaged product"><small>Damaged product</small></option>
+                            <option value="Wrong item received"><small>Wrong item received</small></option>
+                            <option value="Item not as described"><small>Item not as described</small></option>
+                            <option value="Duplicate Order"><small>Duplicate Order</small></option>
+                            <option value="Changed mind"><small>Changed mind</small></option>
+                            <option value="Better price available"><small>Better price available</small></option>
+                            <option value="Other"><small>Other</small></option>
+                        </select>                        
+                    </div>
+                    <input type="hidden" id="returnProductId">
+                    <input type="hidden" id="returnOrderId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-sm btnSubmitReq" form="returnForm">Submit Request</button>
             </div>
         </div>
     </div>
 </div>
 
+
 <%- include("../layout/footer.ejs") %>
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -138,7 +177,7 @@ function cancelOrder(productId, orderId) {
                     'Your order item has been cancelled.',
                     'success'
                 ).then(() => {
-                    location.reload();  // Reload the page to reflect changes
+                    location.reload();
                 });
             } else {
                 Swal.fire(
@@ -157,5 +196,61 @@ function cancelOrder(productId, orderId) {
             );
         });
 }
+
+</script>
+
+<script>
+      function showReturnModal(productId, orderId) {
+        $('#returnProductId').val(productId);
+        $('#returnOrderId').val(orderId);
+        $('#returnModal').modal('show');
+    }
+
+    function submitReturnRequest() {
+    const productId = document.getElementById('returnProductId').value;
+    const orderId = document.getElementById('returnOrderId').value;
+    const reason = document.getElementById('returnReason').value;
+
+    if (!reason) {
+        Swal.fire(
+            'Error!',
+            'Please select a reason for the return.',
+            'error'
+        );
+        return;
+    }
+
+    axios.post('/return-product', { productId, orderId, reason })
+        .then(response => {
+            if (response.data.success) {
+                Swal.fire(
+                    'Success!',
+                    response.data.message,
+                    'success'
+                ).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire(
+                    'Error!',
+                    response.data.message || 'There was an error submitting your return request.',
+                    'error'
+                );
+            }
+        })
+        .catch(error => {
+            console.error('There was an error submitting the return request:', error);
+            Swal.fire(
+                'Error!',
+                'There was an error submitting your return request.',
+                'error'
+            );
+        });
+}
+
+document.getElementById('returnForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    submitReturnRequest();
+});
 
 </script>

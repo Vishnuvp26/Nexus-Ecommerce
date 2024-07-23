@@ -209,16 +209,20 @@ const loginLoad = async (req, res) => {
 // Login
 const loginUser = async (req, res) => {
     try {
-        const email = req.body.email;
-        const password = req.body.password;
+        const { email, password } = req.body;
 
         const userData = await userModel.findOne({ email: email });
 
         if (userData) {
+            if (userData.isGoogleAuth) {
+                res.json({ success: false, message: "Account already exists with Google authentication" });
+                return;
+            }
+
             const passwordMatch = await bcrypt.compare(password, userData.password);
 
             if (passwordMatch) {
-                if (userData.is_blocked == false) {
+                if (!userData.is_blocked) {
                     req.session.user_id = userData._id;
                     res.json({ success: true, message: "Login successful" });
                 } else {
@@ -235,93 +239,93 @@ const loginUser = async (req, res) => {
     }
 };
 
+
 // Offers
 const offerPrice = async (products) => {
     try {
-      let updatedProducts = [];
-      const productOffer = await productOfferModel.find().populate("productId");
-      const categoryOffer = await categoryOfferModel.find().populate("categoryId");
+        let updatedProducts = [];
+        const productOffer = await productOfferModel.find().populate("productId");
+        const categoryOffer = await categoryOfferModel.find().populate("categoryId");
   
-      for (let product of products) {
-        let productOfferMatch = 0;
-        let categoryOfferMatch = 0;
-        let productOfferPercentage;
-        let categoryOfferPercentage;
+        for (let product of products) {
+            let productOfferMatch = 0;
+            let categoryOfferMatch = 0;
+            let productOfferPercentage;
+            let categoryOfferPercentage;
   
-        for (let offer of productOffer) {
-          if (offer.productId._id.toString() === product._id.toString()) {
-            productOfferMatch = 1;
-            productOfferPercentage = offer.offerPercentage;
-            break;
-          }
-        }
-  
-        for (let offer of categoryOffer) {
-          if (offer.categoryId._id.toString() === product.category._id.toString()) {
-            categoryOfferMatch = 1;
-            categoryOfferPercentage = offer.offerPercentage;
-            break;
-          }
-        }
-  
-        if (categoryOfferMatch === 1 && productOfferMatch === 1) {
-          if (categoryOfferPercentage > productOfferPercentage) {
-            await productModel.updateOne(
-              { _id: product._id },
-              {
-                offerPrice:
-                  product.price -
-                  Math.ceil((product.price * categoryOfferPercentage) / 100),
-              }
-            );
-          } else {
-            await productModel.updateOne(
-              { _id: product._id },
-              {
-                offerPrice:
-                  product.price -
-                  Math.ceil((product.price * productOfferPercentage) / 100),
-              }
-            );
-          }
-        } else if (categoryOfferMatch === 1) {
-          await productModel.updateOne(
-            { _id: product._id },
-            {
-              offerPrice:
-                product.price -
-                Math.ceil((product.price * categoryOfferPercentage) / 100),
+            for (let offer of productOffer) {
+                if (offer.productId._id.toString() === product._id.toString()) {
+                    productOfferMatch = 1;
+                    productOfferPercentage = offer.offerPercentage;
+                    break;
+                }
             }
-          );
-        } else if (productOfferMatch === 1) {
-          await productModel.updateOne(
-            { _id: product._id },
-            {
-              offerPrice:
-                product.price -
-                Math.ceil((product.price * productOfferPercentage) / 100),
-            }
-          );
-        } else {
-          if (product.offerPrice) {
-            await productModel.updateOne(
-              { _id: product._id },
-              { $unset: { offerPrice: "" } }
-            );
-          }
-        }
-        const updatedProduct = await productModel.findOne({ _id: product._id });
-        updatedProducts.push(updatedProduct);
-      }
   
-      return updatedProducts;
+            for (let offer of categoryOffer) {
+                if (offer.categoryId._id.toString() === product.category._id.toString()) {
+                    categoryOfferMatch = 1;
+                    categoryOfferPercentage = offer.offerPercentage;
+                    break;
+                }
+            }
+  
+            if (categoryOfferMatch === 1 && productOfferMatch === 1) {
+                if (categoryOfferPercentage > productOfferPercentage) {
+                    await productModel.updateOne(
+                        { _id: product._id },
+                        {
+                            offerPrice:
+                            product.price -
+                            Math.ceil((product.price * categoryOfferPercentage) / 100),
+                        }
+                    );
+                } else {
+                    await productModel.updateOne(
+                        { _id: product._id },
+                        {
+                            offerPrice:
+                            product.price -
+                            Math.ceil((product.price * productOfferPercentage) / 100),
+                        }
+                    );
+                }
+            } else if (categoryOfferMatch === 1) {
+                await productModel.updateOne(
+                    { _id: product._id },
+                    {
+                        offerPrice:
+                        product.price -
+                        Math.ceil((product.price * categoryOfferPercentage) / 100),
+                    }
+                );
+            } else if (productOfferMatch === 1) {
+                await productModel.updateOne(
+                    { _id: product._id },
+                    {
+                        offerPrice:
+                        product.price -
+                        Math.ceil((product.price * productOfferPercentage) / 100),
+                    }
+                );
+            } else {
+                if (product.offerPrice) {
+                    await productModel.updateOne(
+                        { _id: product._id },
+                        { $unset: { offerPrice: "" } }
+                    );
+                }
+            }
+            const updatedProduct = await productModel.findOne({ _id: product._id });
+            updatedProducts.push(updatedProduct);
+        }
+  
+        return updatedProducts;
     } catch (error) {
-      console.error(error);
-      return [];
+        console.error(error);
+        return [];
     }
-  };
+};
   
-
 // Home Page    
 const userHome = async (req, res) => {
     try {   
@@ -384,7 +388,7 @@ const productDetails = async (req, res) => {
 const shop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 8;
+        const limit = 15;
         const skip = (page - 1) * limit;
 
         const userData = await userModel.findOne({ _id: req.session.user_id });

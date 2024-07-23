@@ -170,7 +170,7 @@ const updateOrderStatus = async (req, res) => {
             if (item._id.toString() === itemId) {
                 item.itemStatus = currentStatus;
             }
-            if (item.itemStatus !== "Delivered") {
+            if (item.itemStatus !== "Delivered" && item.itemStatus !== "Cancelled" &&  item.itemStatus !== "Returned") {
                 status = false;
             }
         });
@@ -180,7 +180,6 @@ const updateOrderStatus = async (req, res) => {
             order.paymentStatus = "Success";
         } else {
             order.status = "Pending";
-            order.paymentStatus = "Pending";
         }
 
         await order.save();

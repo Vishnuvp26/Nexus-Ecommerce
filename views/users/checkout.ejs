@@ -338,6 +338,11 @@ function removeCoupon(couponId) {
                         },
                         theme: {
                             color: "#F37254"
+                        },
+                        modal : {
+                            ondismiss: function() {
+                                window.location.href = '/order-failure';
+                            }
                         }
                     };
 
@@ -354,7 +359,6 @@ function removeCoupon(couponId) {
                 }
             } else {
                 Swal.fire({
-                    icon: 'error',
                     title: 'Oops...',
                     text: response.data.message || 'Something went wrong!'
                 });
@@ -362,7 +366,6 @@ function removeCoupon(couponId) {
         } catch (error) {
             console.error('Error:', error);
             Swal.fire({
-                icon: 'error',
                 title: 'Oops...',
                 text: error.response?.data?.message || 'Something went wrong!'
             });
@@ -478,31 +481,6 @@ function removeCoupon(couponId) {
     function cancelForm() {
         document.getElementById('addAddressForm').style.display = 'none';
     }
-
-    function copyCouponCode(couponCode) {
-    navigator.clipboard.writeText(couponCode).then(function() {
-        showSnackbar('Coupon code copied to clipboard!');
-    }, function() {
-        showSnackbar('Failed to copy coupon code.');
-    });
-}
-
-function copyCouponCode(couponCode) {
-    navigator.clipboard.writeText(couponCode).then(function() {
-        showSnackbar('Coupon code copied to clipboard!', true);
-    }, function() {
-        showSnackbar('Failed to copy coupon code.', false);
-    });
-}
-
-function showSnackbar(message, success) {
-    var snackbar = document.getElementById("snackbar");
-    snackbar.innerHTML = success 
-        ? `<i class="fas fa-check-circle" style="color: #28a745;"></i> ${message}` 
-        : message;
-    snackbar.className = "show";
-    setTimeout(function() { snackbar.className = snackbar.className.replace("show", ""); }, 2000);
-}
 
 </script>
 

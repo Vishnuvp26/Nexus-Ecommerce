@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/css/orderDetails.css">
 
 <!-- Breadcrumb -->
-<div class="container p-t-75">
+<div class="container p-t-75" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
             Home
@@ -34,7 +34,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <h6 class="font-weight-bold text-dark">Shipping Address</h6>
                     <p class="mt-2">
                         <%= order.address.name %><br>
@@ -43,9 +43,18 @@
                         <%= order.address.city %>, <%= order.address.state %> <%= order.address.pincode %><br>
                     </p>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <h6 class="font-weight-bold text-dark">Payment Method</h6>
                     <p class="mt-2"><%= order.paymentMethod %></p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="font-weight-bold text-dark">Payment Status</h6>
+                    <p class="mt-2"><%= order.paymentStatus %></p>
+                    <% if (order.paymentMethod === 'razorpay' && order.paymentStatus === 'Pending') { %>
+                        <button type="button" class="btn btn-sm btn-paynow mt-3" onclick="payNow('<%= order._id %>')">
+                            <i></i> Pay Now
+                        </button>
+                    <% } %>
                 </div>
             </div>  
             <div class="row mt-4">
@@ -73,7 +82,8 @@
                                         <td>&#8377;<%= (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price)).toFixed(2) %></td>
                                         <td class="<%= item.itemStatus === 'Cancelled' ? 'text-danger' : item.itemStatus === 'Delivered' ? 'text-success' : item.itemStatus === 'Returned' ? 'text-primary' :  item.itemStatus === 'Return Pending' ? 'text-primary' : '' %>"><%= item.itemStatus %></td>
                                         <td>
-                                            <% if (item.itemStatus !== 'Cancelled' && item.itemStatus !== 'Delivered' && item.itemStatus !== 'Returned' && item.itemStatus !== 'Return Pending') { %>
+                                            <% if ((item.itemStatus !== 'Cancelled' && item.itemStatus !== 'Delivered' && item.itemStatus !== 'Returned' && item.itemStatus !== 'Return Pending') 
+                                                && !(order.paymentMethod === 'razorpay' && order.paymentStatus === 'Pending')) { %>
                                                 <button type="button" class="btn btn-sm btn-cancel" onclick="confirmCancelOrder('<%= item.productId %>', '<%= order._id %>')">
                                                     <i class="fa fa-times"></i> Cancel
                                                 </button>
@@ -83,6 +93,7 @@
                                                 </button>
                                             <% } %>
                                         </td>
+                                        
                                     </tr>
                                 <% }); %>
                             </tbody>
@@ -253,4 +264,71 @@ document.getElementById('returnForm').addEventListener('submit', function(event)
     submitReturnRequest();
 });
 
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    async function payNow(orderId) {
+        try {
+            const response = await axios.post('/payNow', { orderId });
+
+            if (response.data.success) {
+                var options = {
+                    key: response.data.key,
+                    amount: response.data.amount,
+                    currency: "INR",
+                    name: 'NEXUS',
+                    description: "Payment for order",
+                    image: "/images/icons/NEXfavicon.png",
+                    order_id: response.data.razorpayOrderId,
+                    handler: async function(response) {
+                        try {
+                            const updateResponse = await axios.post('/update-orderstatus', {
+                                orderId: orderId,
+                                paymentId: response.razorpay_payment_id,
+                                signature: response.razorpay_signature
+                            });
+
+                            if (updateResponse.data.success) {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: updateResponse.data.message || 'Failed to update order status.',
+                                    icon: 'error'
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error updating order status:', error);
+                        }
+                    },
+                    prefill: {
+                        name: response.data.name,
+                        email: response.data.email,
+                        contact: response.data.phone
+                    },
+                    notes: {
+                        address: response.data.address
+                    },
+                    theme: {
+                        color: "#F37254"
+                    },
+                };
+
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            } else {
+                Swal.fire({
+                    title: 'Oops...',
+                    text: response.data.message || 'Something went wrong!'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Oops...',
+                text: error.response?.data?.message || 'Something went wrong!'
+            });
+        }
+    }
 </script>

@@ -72,6 +72,9 @@ userRouter.get('/view-orders', userAuth.isLogin, orderController.viewOrders);
 userRouter.get('/order-details', userAuth.isLogin, orderController.orderDetails);
 userRouter.post('/cancel-order', userAuth.isLogin, orderController.cancelOrder);
 userRouter.post('/return-product', userAuth.isLogin, orderController.returnProduct);
+userRouter.get('/order-failure', userAuth.isLogin, orderController.orderFailed);
+userRouter.post('/payNow', userAuth.isLogin, orderController.payNow);
+userRouter.post('/update-orderstatus', userAuth.isLogin, orderController.updateOrderStatus);
 
 // Profile
 userRouter.get('/profile', userAuth.isLogin, profileController.profile);

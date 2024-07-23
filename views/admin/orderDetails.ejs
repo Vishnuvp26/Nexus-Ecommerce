@@ -80,20 +80,20 @@
                                                                 <p>Change Status :
                                                                     <select class="form-control mb-3"
                                                                             onchange="handleStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.itemStatus %>')"
-                                                                            <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>
+                                                                            <%= (item.itemStatus === 'Returned' || item.itemStatus === 'Cancelled' || item.itemStatus === 'Delivered') ? 'disabled' : '' %>>
                                                                         <% if (item.itemStatus === 'Return Pending') { %>
                                                                             <option value="" disabled selected>Select Action</option>
                                                                             <option value="Approve" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Approve</option>
                                                                             <option value="Decline" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Decline</option>
                                                                         <% } else { %>
-                                                                            <option value="Ordered" disabled <%= item.itemStatus === 'Ordered' ? 'selected' : '' %>>Ordered</option>
-                                                                            <option value="Shipped" <%= item.itemStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                                            <option value="Delivered" <%= item.itemStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                                            <option value="Canceled" disabled <%= item.itemStatus === 'Canceled' ? 'selected' : '' %>>Canceled</option>
-                                                                            <option value="Returned" disabled <%= item.itemStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                                            <option value="Ordered" disabled <%= item.itemStatus === 'Ordered' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Ordered</option>
+                                                                            <option value="Shipped" <%= item.itemStatus === 'Shipped' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Shipped</option>
+                                                                            <option value="Delivered" <%= item.itemStatus === 'Delivered' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Delivered</option>
+                                                                            <option value="Canceled" disabled <%= item.itemStatus === 'Canceled' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Canceled</option>
+                                                                            <option value="Returned" disabled <%= item.itemStatus === 'Returned' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Returned</option>
                                                                         <% } %>
                                                                     </select>
-                                                                </p>
+                                                                </p>                                                                
                                                             </div>                                                            
                                                         </div>
                                                     </div> 

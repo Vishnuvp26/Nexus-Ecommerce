@@ -4,7 +4,6 @@ const addressModel = require('../../models/addressModel');
 const cartModel = require('../../models/cartModel');
 const orderModel = require('../../models/orderModel');
 const productModel = require('../../models/productModel');
-const categoryModel = require('../../models/categoryModel');
 const walletModel = require('../../models/walletModel');
 const Razorpay = require('razorpay');
 
@@ -82,8 +81,8 @@ const createOrder = async (req, res) => {
         }
 
         if (orderData.paymentMethod === "cod") {
-            if (req.body.totalprice > 3000) {
-                return res.json({ success: false, message: "Cannot place order with COD for amount above 3000" });
+            if (req.body.totalprice > 1000) {
+                return res.json({ success: false, message: "Cannot place order with COD for amount above 1000" });
             }
             orderData.paymentStatus = "Pending";
 
@@ -93,7 +92,7 @@ const createOrder = async (req, res) => {
                 currency: "INR",
                 receipt: orderData.orderId,
             });
-            orderData.paymentStatus = "Pending";
+            orderData.paymentStatus = "Success";
             orderData.razorpayOrderId = razorpayOrder.id;
         } else {
             orderData.paymentStatus = "Paid";
@@ -135,6 +134,105 @@ const orderSuccess = async (req, res) => {
     }
 };
 
+// Order failure
+const orderFailed = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        if (!userId) {
+            return res.redirect('/shop');
+        }
+
+        const orderId = req.session.orderId;
+
+        const order = await orderModel.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        order.paymentStatus = "Pending";
+        order.status = "Pending";
+        for (let item of order.items) {
+            item.itemStatus = "Pending";
+        }
+
+        await order.save();
+
+        const userData = await userModel.findOne({ _id: userId });
+        res.render('orderFailure', { user: userData });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+// Pay now for razorpay
+const payNow = async (req, res) => {
+    try {
+        const orderId = req.body.orderId;
+        const order = await orderModel.findById(orderId).populate('userId');
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        const totalPrice = order.items.reduce((total, item) => {
+            return total + (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price));
+        }, 0);
+
+        const razorpayOrder = await razorpayInstance.orders.create({
+            amount: totalPrice * 100,
+            currency: "INR",
+            receipt: order.orderId,
+        });
+
+        order.razorpayOrderId = razorpayOrder.id;
+        await order.save();
+
+        res.json({
+            success: true,
+            message: "Redirecting to Razorpay...",
+            razorpayOrderId: razorpayOrder.id,
+            key: process.env.KEY_ID,
+            amount: totalPrice * 100,
+            name: order.userId.name,
+            email: order.userId.email,
+            phone: order.address.phone,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+
+// Update status after paynow
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId, paymentId, signature } = req.body;
+        const order = await orderModel.findById(orderId);
+
+        order.status = 'Pending';
+        for (let item of order.items) {
+            item.itemStatus = "Ordered";
+        }
+        order.paymentStatus = 'Success';
+        order.razorpayPaymentId = paymentId;
+        order.razorpaySignature = signature;
+        await order.save();
+
+        res.json({
+            success: true,
+            message: 'Order status updated successfully.',
+        });
+
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update order status.',
+        });
+    }
+};
+
 // View orders
 const viewOrders = async (req, res) => {
     try {
@@ -154,7 +252,7 @@ const orderDetails = async (req, res) => {
         const orderId = req.query.orderId;
 
         if (!userId || !orderId) {
-            return redirect('/')
+            return res.redirect('/')
         }
 
         const userData = await userModel.findOne({ _id: userId });
@@ -258,6 +356,8 @@ module.exports = {
     viewOrders,
     orderDetails,
     cancelOrder,
-    returnProduct
-
+    returnProduct,
+    orderFailed,
+    payNow,
+    updateOrderStatus
 };

@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="/css/viewOrders.css">
 
 <!-- Breadcrumb -->
-<div class="container p-t-75">
+<div class="container p-t-75" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
             Home
@@ -56,12 +56,18 @@
                                 <img src="/productimages/<%= item.image %>" alt="Product Image" class="img-fluid">
                             </div>
                             <!-- name -->
-                            <div class="col-md-10">
+                            <div class="col-md-8">
                                 <h5 class="viewOrdersPdtName"><%= item.productName %></h5>
                                 <p>Category: <%= item.categoryName %></p>
                                 <p>Quantity: <%= item.quantity %></p>
-                                <p>Price: &#8377;<%= item.price.toFixed(2) %></p>
-                                <!-- <p>Status: <%= item.itemStatus %></p> -->
+                                <% if (item.finalPrice) { %>
+                                    <p>Price : &#8377;<%= item.finalPrice.toFixed(2) %></p>
+                                <% } else { %>
+                                    <p>Price : &#8377;<%= item.price.toFixed(2) %></p>
+                                <% } %> 
+                            </div>
+                            <div class="col-md-2">
+                                <p>Status: <%= item.itemStatus %></p>
                             </div>
                         </div>
                     <% }); %>

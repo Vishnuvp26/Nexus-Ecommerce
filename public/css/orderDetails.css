@@ -75,6 +75,29 @@ p {
     background-color: #e0a800;
 }
 
+.btn-paynow {
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 4px;
+    border: none;
+    color: #292929;
+    background-color: #00ff6a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-paynow i {
+    margin-right: 4px;
+    font-size: 12px;
+}
+
+.btn-paynow:hover {
+    background-color: #00dc04;
+}
+
 .modal-custom {
     font-size: 0.875rem;
 }

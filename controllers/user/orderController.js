@@ -236,14 +236,27 @@ const updateOrderStatus = async (req, res) => {
 // View orders
 const viewOrders = async (req, res) => {
     try {
+        const page = Number(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
         const userData = await userModel.findOne({ _id: req.session.user_id });
-        const orderData = await orderModel.find({ userId: req.session.user_id }).sort({ date: -1 });
-    
-        res.render('viewOrders', { user: userData, order: orderData });
+        const totalOrders = await orderModel.countDocuments({ userId: req.session.user_id });
+        const orderData = await orderModel.find({ userId: req.session.user_id }).sort({ date: -1 }).skip(skip).limit(limit);
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        res.render('viewOrders', { 
+            user: userData, 
+            order: orderData, 
+            currentPage: page, 
+            totalPages 
+        });
     } catch (error) {
         console.log(error);
     }
 };
+
 
 // Order Details
 const orderDetails = async (req, res) => {

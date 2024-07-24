@@ -3,75 +3,236 @@
 
 <div class="main-panel">
     <div class="content-wrapper">
-
         <div class="page-header pt-5">
             <h3 class="page-title">
-              <span class="page-title-icon bg-info text-white mr-2">
-                <i class="mdi mdi-home"></i>
-              </span> Dashboard
+                <span class="page-title-icon bg-info text-white mr-2">
+                    <i class="mdi mdi-home"></i>
+                </span> 
+                Dashboard
             </h3>
         </div>
-          <div class="row">
+        <div class="row">
             <div class="col-md-4 stretch-card grid-margin">
-              <div class="card bg-gradient-danger card-img-holder text-white">
-                <div class="card-body">
-                  
-                  <h4 class="font-weight-normal mb-3">Weekly Sales <i class="mdi mdi-chart-line mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">$ 15,0000</h2>
-                  <h6 class="card-text">Increased by 60%</h6>
+                <div class="card bg-gradient-danger card-img-holder text-white">
+                    <div class="card-body">
+                        <img src="/images/icons/circle.svg" class="card-img-absolute" alt="circle-image" />
+                        <h4 class="font-weight-normal mb-3">
+                            Revenue 
+                            <i class="mdi mdi-chart-line mdi-24px float-right"></i>
+                        </h4>
+                        <h2 class="mb-5">₹ <%=revenue%></h2>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-4 stretch-card grid-margin">
-              <div class="card bg-gradient-info card-img-holder text-white">
-                <div class="card-body">
-                  
-                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">45,6334</h2>
-                  <h6 class="card-text">Decreased by 10%</h6>
-                </div>
-              </div>
             </div>
             <div class="col-md-4 stretch-card grid-margin">
-              <div class="card bg-gradient-success card-img-holder text-white">
-                <div class="card-body">
-              
-                  <h4 class="font-weight-normal mb-3">Visitors Online <i class="mdi mdi-diamond mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">95,5741</h2>
-                  <h6 class="card-text">Increased by 5%</h6>
+                <div class="card bg-gradient-info card-img-holder text-white">
+                    <div class="card-body">
+                        <img src="/images/icons/circle.svg" class="card-img-absolute" alt="circle-image" />
+                        <h4 class="font-weight-normal mb-3">
+                            Total Orders 
+                            <i class="mdi mdi-cart menu-icon mdi-24px float-right"></i>
+                        </h4>
+                        <h2 class="mb-5"> <%=totalOrders%></h2>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-7 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <div class="clearfix">
-                    <h4 class="card-title float-left">Visit And Sales Statistics</h4>
-                    <div id="visit-sale-chart-legend" class="rounded-legend legend-horizontal legend-top-right float-right"></div>
-                  </div>
-                  <canvas id="visit-sale-chart" class="mt-4"></canvas>
+            <div class="col-md-4 stretch-card grid-margin">
+                <div class="card bg-gradient-success card-img-holder text-white">
+                    <div class="card-body">
+                        <img src="/images/icons/circle.svg" class="card-img-absolute" alt="circle-image" />
+                        <h4 class="font-weight-normal mb-3">
+                            Total Discount 
+                            <i class="mdi mdi-sale menu-icon mdi-24px float-right"></i>
+                        </h4>
+                        <h2 class="mb-5">₹ <%=discount%></h2>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="col-md-5 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Traffic Sources</h4>
-                  <canvas id="traffic-chart"></canvas>
-                  <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Weekday Revenue</h4>
+                        <canvas id="chrt" width="400" height="400"></canvas>
+                        <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4"></div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Revenue per Interval</h4>
+                            <select class="form-control" id="intervalSelect" style="width: auto; margin-left: 1rem;" onchange="revenueInterval()">
+                                <option value="weekly">This Week</option>
+                                <option value="monthly" <%=interval=="month"?'selected':''%>>Monthly</option>
+                                <option value="yearly" <%=interval=="year"?'selected':''%>>Yearly</option>
+                            </select>
+                        </div>
+                        <canvas id="chrt2" width="400" height="400"></canvas>
+                        <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Best Selling Products</h4>
+                        <%for(let product of bestProducts){%>
+                        <div class="card mb-3 mx-auto" style="width: 18rem; border: 2px solid #ccc; margin-top: 30px;">
+                            <!-- <img src="/productimages/<%= product.image %>" class="card-img-top mx-auto" alt="Product 1" style="width: 50%; height: auto;"> -->
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><%=product.productName%></h5>
+                                <p class="card-text"><strong>Sold : </strong><%=product.totalQuantity%></p>
+                            </div>
+                        </div>
+                        <%}%>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Best Selling Categories</h4>
+                        <%for(let category of bestCategories){%>
+                        <div class="card mb-3 mx-auto" style="width: 18rem; border: 2px solid #ccc; margin-top: 30px;">
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><%=category.categoryName%></h5>
+                                <p class="card-text"><strong>Sold :</strong> <%=category.totalQuantity%></p>
+                            </div>
+                        </div>
+                        <%}%>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- content-wrapper ends -->
-  </div>
-  <!-- main-panel ends -->
+</div>
+
 <%- include("../layout/adminSidebarFoot") %>
 <%- include("../layout/adminFooter") %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let ctx = document.getElementById('chrt').getContext('2d');
+        let ctx2 = document.getElementById('chrt2').getContext('2d');
+      
+        let labels = <%- JSON.stringify(labels) %>;
+        let values = <%- JSON.stringify(values) %>;
+      
+        let labels2 = <%- JSON.stringify(labels2) %>;
+        let values2 = <%- JSON.stringify(values2) %>;
+      
+        const backgroundColors1 = [
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(231, 233, 237, 0.5)'
+        ];
+      
+        const borderColors1 = [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(231, 233, 237, 1)'
+        ];
+      
+        const backgroundColors2 = [
+            'rgba(255, 159, 64, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(231, 233, 237, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(153, 102, 255, 0.5)'
+        ];
+      
+        const borderColors2 = [
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(231, 233, 237, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)'
+        ];
+      
+        const repeatedBackgroundColors1 = Array.from({ length: labels.length }, (_, i) => backgroundColors1[i % backgroundColors1.length]);
+        const repeatedBorderColors1 = Array.from({ length: labels.length }, (_, i) => borderColors1[i % borderColors1.length]);
+      
+        const repeatedBackgroundColors2 = Array.from({ length: labels2.length }, (_, i) => backgroundColors2[i % backgroundColors2.length]);
+        const repeatedBorderColors2 = Array.from({ length: labels2.length }, (_, i) => borderColors2[i % borderColors2.length]);
+      
+        let chart1 = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue per Weekday',
+                    data: values,
+                    backgroundColor: repeatedBackgroundColors1,
+                    borderColor: repeatedBorderColors1,
+                    borderWidth: 2,
+                    hoverBackgroundColor: repeatedBackgroundColors1.map(color => color.replace('0.5', '0.75')),
+                    hoverBorderColor: repeatedBorderColors1,
+                    fill: false,
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) { return value + ' Rs'; }
+                        }
+                    }
+                }
+            }
+        });
+      
+        let chart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels2,
+                datasets: [{
+                    label: 'Revenue per Interval',
+                    data: values2,
+                    backgroundColor: repeatedBackgroundColors2,
+                    borderColor: repeatedBorderColors2,
+                    borderWidth: 2,
+                    hoverBackgroundColor: repeatedBackgroundColors2.map(color => color.replace('0.5', '0.75')),
+                    hoverBorderColor: repeatedBorderColors2,
+                    fill: false,
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) { return value + ' Rs'; }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    function revenueInterval(){
+         const interval = document.getElementById("intervalSelect").value;
+        window.location.href = "/admin/dashboard?interval="+interval;
+    }
+</script>

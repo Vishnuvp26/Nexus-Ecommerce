@@ -135,6 +135,7 @@ const loadEditProducts = async (req, res) => {
             res.status(404).send('Product not found');
         }
     } catch (error) {
+        res.render('500')
         console.log(error);
     }
 };
@@ -172,7 +173,6 @@ const editProducts = async (req, res) => {
         res.json({ success: true });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, error: error.message });
     }
 };  
 

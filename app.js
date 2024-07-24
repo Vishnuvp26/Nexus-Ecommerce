@@ -45,10 +45,6 @@ app.use('/', userRoute);
 // Admin Route
 app.use('/admin', adminRoute);
 
-// app.use((err, req, res, next) => {
-//   res.status(500).render('error');
-// });
-
 app.get('*', (req, res) => {
   res.status(404).render('404');
 });

@@ -1,8 +1,8 @@
 <%- include("../layout/header") %>
 <!-- Navbar -->
 <%- include("../layout/navbar") %>
-<!-- CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
 <link rel="stylesheet" href="/css/orderDetails.css">
 
 <!-- Breadcrumb -->
@@ -38,7 +38,8 @@
                     <h6 class="font-weight-bold text-dark">Shipping Address</h6>
                     <p class="mt-2">
                         <%= order.address.name %><br>
-                        <%= order.address.house %><br>
+                        +91 <%= order.address.phone %><br>
+                        <%= order.address.house %> (H)<br>
                         <%= order.address.district %><br>
                         <%= order.address.city %>, <%= order.address.state %> <%= order.address.pincode %><br>
                     </p>
@@ -56,6 +57,15 @@
                         </button>
                     <% } %>
                 </div>
+                <% if (order.items.every(item => item.itemStatus === 'Delivered' || item.itemStatus === 'Cancelled')) { %>
+                    <div class="row ml-0">
+                        <div class="col-md-12 text-right">
+                            <button class="btn btn-sm btn-cancel mt-3" onclick="downloadInvoice()">
+                                <i class="mdi mdi-download"></i> Download Invoice
+                            </button>
+                        </div>                        
+                    </div>
+                <% } %>
             </div>  
             <div class="row mt-4">
                 <div class="col-md-12">
@@ -152,6 +162,31 @@
     </div>
 </div>
 
+<table class="invoiceTable" style="display: none;">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% order.items.forEach(function(item) { 
+            const price = item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price;
+            const total = price * item.quantity;
+        %>
+        <tr>
+            <td><%= item.productName %></td>
+            <td>&#8377;<%= price.toFixed(2) %></td>
+            <td><%= item.quantity %></td>
+            <td><%= item.itemStatus %></td>
+            <td>&#8377;<%= total.toFixed(2) %></td>
+        </tr>
+        <% }); %>
+    </tbody>
+</table>
 
 <%- include("../layout/footer.ejs") %>
 
@@ -160,7 +195,97 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
+<!-- Invoice -->
+<script>
+    function downloadInvoice() {
+        const doc = new window.jspdf.jsPDF();
+        const pageCenter = doc.internal.pageSize.getWidth() / 2;
+
+        doc.setFontSize(25);
+        doc.setTextColor(95, 155, 159);
+        doc.text("N E X U S", pageCenter, 20, { align: 'center' });
+        doc.setFontSize(15);
+        doc.setTextColor(40, 40, 40);
+        doc.text("Invoice", pageCenter, 30, { align: 'center' });
+
+        const orderId = "<%= order.orderId %>";
+        const orderDate = "<%= new Date(order.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>";
+        const invoiceDate = new Date().toLocaleDateString();
+        const name = "<%= order.address.name %>";
+        const mobile = "<%= order.address.phone %>";
+        const house = "<%= order.address.house %> (H)";
+        const city = "<%= order.address.city %>";
+        const state = "<%= order.address.state %>";
+        const pin = "<%= order.address.pincode %>";
+        const paymentMethod = "<%= order.paymentMethod %>";
+
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Order ID: ${orderId}`, 20, 40);
+        doc.text(`Ordered Date: ${orderDate}`, 20, 45);
+        doc.text(`Invoice Date: ${invoiceDate}`, 20, 50);
+
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        const shipFromX = pageCenter;
+        doc.text("From Address:", shipFromX, 60);
+        doc.setFontSize(10);
+        doc.text("Nexus Watch Stores,\n4th Floor HiLite Mall,\nCalicut,\nKerala,\n673655", shipFromX, 65);
+
+        const shippingAddressStartX = 20;
+        doc.setFontSize(12);
+        doc.text(`Shipping Address :`, shippingAddressStartX, 60);
+        doc.setFontSize(10);
+        doc.text(`Name : ${name}`, shippingAddressStartX, 65);
+        doc.text(`Mobile : ${mobile}`, shippingAddressStartX, 70);
+        doc.text(`House no : ${house}`, shippingAddressStartX, 75);
+        doc.text(`City : ${city}`, shippingAddressStartX, 85);
+        doc.text(`State : ${state}`, shippingAddressStartX, 90);
+        doc.text(`Pin : ${pin}`, shippingAddressStartX, 95);
+        doc.text(`Payment Method : ${paymentMethod}`, shippingAddressStartX, 105);
+
+        const table = document.querySelector(".invoiceTable");
+        const tableData = Array.from(table.querySelectorAll('tbody tr'))
+            .filter(row => {
+                const statusCell = row.querySelectorAll('td')[3];
+                return statusCell && !statusCell.innerText.includes("Cancelled");
+            })
+            .map(row => {
+                return Array.from(row.querySelectorAll('td')).map(cell => cell.innerText.trim());
+            });
+
+        doc.autoTable({
+            head: [['Product Name', 'Price (Rs)', 'Quantity', 'Status', 'Total (Rs)']],
+            body: tableData,
+            startY: 120,
+            theme: 'striped',
+            headStyles: { fillColor: [40, 40, 40] },
+            styles: { halign: 'left' },
+        });
+
+        let total = 0;
+        tableData.forEach(row => {
+            const totalPrice = parseFloat(row[4].replace('₹', '').replace(',', ''));
+            if (!isNaN(totalPrice)) {
+                total += totalPrice;
+            }
+        });
+        const grandTotal = total.toFixed(2);
+
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Grand Total: Rs ${grandTotal}`, doc.internal.pageSize.getWidth() - 20, finalY + 10, { align: 'right' });
+
+        doc.save("order_invoice.pdf");
+    }
+</script>
+
+<!-- Cancel order -->
 <script>
     function confirmCancelOrder(productId, orderId) {
     Swal.fire({
@@ -210,6 +335,7 @@ function cancelOrder(productId, orderId) {
 
 </script>
 
+<!-- Return Product -->
 <script>
       function showReturnModal(productId, orderId) {
         $('#returnProductId').val(productId);
@@ -266,6 +392,7 @@ document.getElementById('returnForm').addEventListener('submit', function(event)
 
 </script>
 
+<!-- Pay Now -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     async function payNow(orderId) {
@@ -332,3 +459,11 @@ document.getElementById('returnForm').addEventListener('submit', function(event)
         }
     }
 </script>
+
+<style>
+    @media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+}
+</style>

@@ -378,8 +378,8 @@ const productDetails = async (req, res) => {
             res.status(404).send('Product not found');
         }
     } catch (error) {
+        res.render('500')
         console.log(error);
-        res.status(500).send('Internal Server Error');
     }
 };
 

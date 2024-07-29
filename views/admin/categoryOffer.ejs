@@ -172,8 +172,10 @@
             document.getElementById('addCategoryNameError').textContent = 'Category name is required.';
             return;
         }
-        if (offerPercentage < 0) {
-            document.getElementById('addOfferPercentageError').textContent = 'Offer percentage cannot be negative.';
+        if (isNaN(offerPercentage) || offerPercentage < 1 || offerPercentage > 100) {
+                Swal.fire({
+                    text: 'Offer percentage must be a number between 1 and 100.'
+            });
             return;
         }
 
@@ -221,12 +223,13 @@
             const offerPercentage = formData.get('offerPercentage');
             const expiryDate = formData.get('expiryDate');
 
-            if (isNaN(offerPercentage) || offerPercentage < 0) {
+            if (isNaN(offerPercentage) || offerPercentage < 1 || offerPercentage > 100) {
                 Swal.fire({
-                    text: 'Offer percentage must be a positive number.'
+                    text: 'Offer percentage must be a number between 1 and 100.'
                 });
                 return;
             }
+
 
             const today = new Date().setHours(0, 0, 0, 0);
             const expiry = new Date(expiryDate).setHours(0, 0, 0, 0);

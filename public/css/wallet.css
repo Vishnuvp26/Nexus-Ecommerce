@@ -48,7 +48,7 @@
 @media (max-width: 768px) {
     .wallet-card {
         width: 300px;
-        height: 250px;
+        height: 300px;
     }
 
     .wallet-card .card-header h5 {
@@ -63,7 +63,7 @@
 @media (max-width: 576px) {
     .wallet-card {
         width: 250px;
-        height: 200px;
+        height:300px;
     }
 
     .wallet-card .card-header h5 {
@@ -72,5 +72,11 @@
 
     .wallet-card .card-body h4 {
         font-size: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
     }
 }

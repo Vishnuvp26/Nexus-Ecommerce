@@ -78,6 +78,10 @@
                             icon: 'success',
                             title: 'Success!',
                             text: response.data.message
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/admin/category';
+                            }
                         });
                         form.reset();
                     }

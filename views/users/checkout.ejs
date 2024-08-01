@@ -14,7 +14,7 @@
             Home
             <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
         </a>
-        <a href="/checkout" class="stext-109 cl8 hov-cl1 trans-04">
+        <a href="/load-cart" class="stext-109 cl8 hov-cl1 trans-04">
             Cart
             <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
         </a>
@@ -179,20 +179,23 @@
                     <div class="form-group">
                         <label>Payment Method</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked>
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" <% if (totalPrice > 1000) { %> disabled <% } else { %> checked <% } %>>
                             <label class="form-check-label" for="cod">Cash on delivery</label>
                         </div>
-                        <div class="form-check">
+                        <!-- <div class="form-check">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="wallet">
                             <label class="form-check-label" for="wallet">Wallet</label>
-                        </div>
+                        </div> -->
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
                             <label class="form-check-label" for="razorpay">RazorPay</label>
                         </div>
+                        <% if (totalPrice > 1000) { %>
+                            <small id="codMessage" style="color: tomato;">COD is not available for orders above ₹ 1000.</small>
+                        <% } %>
                     </div>
                     <button id="placeOrderBtn" class="btn btn-primary btn-block" data-totalprice="<%= totalPrice.toFixed(2) %>">PLACE ORDER</button>
-                    <button class="btn btn-outline-secondary btn-block">CONTINUE SHOPPING</button>
+                    <button class="btn btn-outline-secondary btn-block" onclick="window.location.href='/shop'">CONTINUE SHOPPING</button>
                 </div>
             </div>
         </div>        
@@ -318,36 +321,52 @@ function removeCoupon(couponId) {
             if (response.data.success) {
                 if (selectedPaymentMethod === 'razorpay') {
                     var options = {
-                        key: response.data.key,
-                        amount: response.data.amount,
-                        currency: "INR",
-                        name: 'NEXUS',
-                        description: "Payment for order",
-                        image: "/images/icons/NEXfavicon.png",
-                        order_id: response.data.razorpayOrderId,
-                        handler: function(response) {
-                            window.location.href = '/order-success';
-                        },
-                        prefill: {
-                            name: response.data.name,
-                            email: response.data.email,
-                            contact: response.data.phone
-                        },
-                        notes: {
-                            address: selectedAddress.dataset.description
-                        },
-                        theme: {
-                            color: "#F37254"
-                        },
-                        modal : {
-                            ondismiss: function() {
-                                window.location.href = '/order-failure';
-                            }
+                    key: response.data.key,
+                    amount: response.data.amount,
+                    currency: "INR",
+                    name: 'NEXUS',
+                    description: "Payment for order",
+                    image: "/images/icons/NEXfavicon.png",
+                    order_id: response.data.razorpayOrderId,
+                    handler: function(response) {
+                        if (response.razorpay_payment_id) {
+                            console.log("Payment Successful: ", response);
+                            window.location.href = "/order-success";
+                        } else {
+                            window.location.href = "/order-failure";
                         }
-                    };
+                    },
+                    prefill: {
+                        name: response.data.name,
+                        email: response.data.email,
+                        contact: response.data.phone
+                    },
+                    notes: {
+                        address: selectedAddress.dataset.description
+                    },
+                    theme: {
+                        color: "#F37254"
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            setTimeout(() => {
+                                rzp1.close();
+                                window.location.href = '/order-failure';
+                            }, 3000);
+                        }
+                    }
+                };
 
-                    var rzp1 = new Razorpay(options);
-                    rzp1.open();
+                let rzp1 = new Razorpay(options);
+                rzp1.open();
+
+                rzp1.on('payment.failed', (response) => {
+                    setTimeout(() => {
+                        rzp1.close();
+                        window.location.href = "/order-failure";
+                    }, 3000);
+                });
+
                 } else {
                     Swal.fire({
                         title: 'Processing your order...!',

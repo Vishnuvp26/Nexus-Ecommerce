@@ -101,3 +101,11 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
+
+.bg-gradient-custom {
+    background: linear-gradient(45deg, #cdcdcd, #ffffff);
+}
+  
+.page-item.active .page-link{
+    border-color: rgb(155, 155, 155);
+}

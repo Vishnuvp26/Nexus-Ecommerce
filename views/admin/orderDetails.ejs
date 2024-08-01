@@ -32,9 +32,10 @@
                                         <h2 class="card-title">Order Details</h2>
                                         <p class="card-text">
                                             <span class="fw-bold">Order ID : </span><span id="orderID"><%= order.orderId %></span><br>
-                                            <span class="fw-bold">Order Date : </span><span id="orderDate"><%= order.date.toLocaleDateString() %></span><br>
-                                            <span class="fw-bold">Payment Method : </span><span id="paymentMethod"><%= order.paymentMethod %></span><br>
-                                            <span class="fw-bold">Customer Name : </span><span id="customerName"><%= order.userId.name %></span>
+                                            <span class="fw-bold mt-2">Order Date : </span><span id="orderDate"><%= order.date.toLocaleDateString() %></span><br>
+                                            <span class="fw-bold mt-2">Total Amount : </span><span id="orderDate"> ₹ <%= order.totalPrice %></span><br>
+                                            <span class="fw-bold mt-2">Payment Method : </span><span id="paymentMethod"><%= order.paymentMethod %></span><br>
+                                            <span class="fw-bold mt-2">Customer Name : </span><span id="customerName"><%= order.userId.name %></span>
                                         </p>
                                     </div>
                                 </div>
@@ -69,8 +70,9 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <p>Quantity : <%= item.quantity %></p>  
-                                                                <p>Price : &#8377;<%= item.price.toFixed(2) %></p>
-                                                                <p>Total : &#8377;<%= item.finalPrice.toFixed(2) %></p>
+                                                                <p>Price : &#8377;<%= (item.price * item.quantity).toFixed(2) %></p>
+                                                                <p>Final Price : &#8377;<%= (item.finalPrice * item.quantity).toFixed(2) %></p>
+
                                                                 <p id="status-item-<%= item._id %>">
                                                                     <span>Status : </span><span class="status-<%= item.itemStatus.toLowerCase() %>"><%= item.itemStatus %></span>
                                                                 </p>
@@ -80,11 +82,10 @@
                                                                 <p>Change Status :
                                                                     <select class="form-control mb-3"
                                                                             onchange="handleStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.itemStatus %>')"
-                                                                            <%= (item.itemStatus === 'Returned' || item.itemStatus === 'Cancelled' || item.itemStatus === 'Delivered') ? 'disabled' : '' %>>
+                                                                            <%= (item.itemStatus === 'Returned' || item.itemStatus === 'Cancelled' || item.itemStatus === 'Delivered' || item.itemStatus === 'Pending') ? 'disabled' : '' %>>
                                                                         <% if (item.itemStatus === 'Return Pending') { %>
                                                                             <option value="" disabled selected>Select Action</option>
                                                                             <option value="Approve" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Approve</option>
-                                                                            <option value="Decline" <%= item.itemStatus === 'Returned' ? 'disabled' : '' %>>Decline</option>
                                                                         <% } else { %>
                                                                             <option value="Ordered" disabled <%= item.itemStatus === 'Ordered' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Ordered</option>
                                                                             <option value="Shipped" <%= item.itemStatus === 'Shipped' ? 'selected' : '' %> <%= item.itemStatus === 'Delivered' ? 'disabled' : '' %>>Shipped</option>

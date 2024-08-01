@@ -89,7 +89,7 @@
                                         <td><%= item.categoryName %></td>
                                         <td><img src="/productimages/<%= item.image %>" alt="<%= item.productName %>" class="img-fluid" style="max-width: 100px;"></td>
                                         <td><%= item.quantity %></td>
-                                        <td>&#8377;<%= (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price)).toFixed(2) %></td>
+                                        <td><%= (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price)).toFixed(2) %></td>
                                         <td class="<%= item.itemStatus === 'Cancelled' ? 'text-danger' : item.itemStatus === 'Delivered' ? 'text-success' : item.itemStatus === 'Returned' ? 'text-primary' :  item.itemStatus === 'Return Pending' ? 'text-primary' : '' %>"><%= item.itemStatus %></td>
                                         <td>
                                             <% if ((item.itemStatus !== 'Cancelled' && item.itemStatus !== 'Delivered' && item.itemStatus !== 'Returned' && item.itemStatus !== 'Return Pending') 
@@ -113,11 +113,9 @@
             </div>
             <div class="row mt-2">
                 <div class="col-md-6">
-                    <h6>Order Summary</h6>
+                    <h6>Order Summary After Discount</h6>
                     <p class="font-weight-bold text-dark">
-                        Item(s) Subtotal : &#8377;<%= order.items.reduce((total, item) => {
-                            return total + (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price));
-                        }, 0).toFixed(2) %><br>
+                        Item(s) Subtotal : <%= order.totalPrice %><br>
                     </p>
                 </div>
             </div>            
@@ -179,10 +177,10 @@
         %>
         <tr>
             <td><%= item.productName %></td>
-            <td>&#8377;<%= price.toFixed(2) %></td>
+            <td><%= price.toFixed(2) %></td>
             <td><%= item.quantity %></td>
             <td><%= item.itemStatus %></td>
-            <td>&#8377;<%= total.toFixed(2) %></td>
+            <td><%= total.toFixed(2) %></td>
         </tr>
         <% }); %>
     </tbody>
@@ -268,7 +266,7 @@
 
         let total = 0;
         tableData.forEach(row => {
-            const totalPrice = parseFloat(row[4].replace('₹', '').replace(',', ''));
+            const totalPrice = parseFloat(row[4].replace('Rs', '').replace(',', ''));
             if (!isNaN(totalPrice)) {
                 total += totalPrice;
             }

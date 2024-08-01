@@ -42,7 +42,7 @@ userRouter.post('/otp', userController.verifyOtp);
 // Products
 userRouter.get('/productDetails', userController.productDetails);
 userRouter.get('/shop', userController.shop);
-// userRouter.get('/shop/sortFilterSearch', userController.sortFilterSearch);
+// userRouter.get('/sortFilterSearch', userController.sortFilterSearch);
 
 // Wishlist
 userRouter.get('/wishlist', userAuth.isLogin, wishlistController.wishlist);
@@ -97,5 +97,9 @@ userRouter.post('/reset-password', profileController.handleResetPassword);
 
 // Wallet
 userRouter.get('/wallet', userAuth.isLogin, walletController.loadWallet);
+userRouter.post('/wallet/add-money', userAuth.isLogin, walletController.loadWallet);
+
+// Others
+userRouter.get('/about', userController.aboutPage);
 
 module.exports = userRouter;

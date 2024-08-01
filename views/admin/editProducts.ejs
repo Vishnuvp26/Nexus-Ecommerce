@@ -195,12 +195,11 @@ font-size: 18px !important;
 <%- include("../layout/adminFooter") %>
 
 <!-- Cropper.js library -->
-<!-- Cropper.js library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
 
 <script>
-    function validateForm() {
+    async function validateForm() {
         let productName = document.getElementById('productName').value.trim();
         let quantity = document.getElementById('quantity').value.trim();
         let price = document.getElementById('price').value.trim();
@@ -217,6 +216,19 @@ font-size: 18px !important;
         document.getElementById('priceError').innerText = '';
         document.getElementById('productDescriptionError').innerText = '';
         document.getElementById('imageError').innerText = '';
+
+        try {
+              // Check if product name already exists
+              const response = await axios.get(`/admin/checkAlready?productName=${encodeURIComponent(productName)}`);
+              if (response.data.exists) {
+                  document.getElementById('productNameError').innerText = 'Product Name already exists';
+                  isValid = false;
+              }
+          } catch (error) {
+              console.error('Error checking product name:', error);
+              document.getElementById('productNameError').innerText = 'Error checking product name';
+              isValid = false;
+          }
 
         if (!nameRegex.test(productName)) {
             document.getElementById('productNameError').innerText = 'Product Name must be of only letters and numbers';
@@ -257,115 +269,148 @@ font-size: 18px !important;
 
     let deletedIndices = [];
 
-    // Function to remove an image from the preview and mark for deletion
-    function removeImage(buttonElement, index) {
-        const imageWrapper = buttonElement.closest('.image-wrapper');
-        imageWrapper.remove();
-        deletedIndices.push(index);
-    }
+// Function to remove an image from the preview and mark for deletion
+function removeImage(buttonElement, index) {
+    const imageWrapper = buttonElement.closest('.image-wrapper');
+    imageWrapper.remove();
+    deletedIndices.push(index); // Mark the image index for deletion
+}
 
-    function handleFileSelect(event) {
-        const preview = document.getElementById('imagePreview');
-        preview.innerHTML = '';
+// Handle file selection and preview
+function handleFileSelect(event) {
+    const preview = document.getElementById('imagePreview');
+    const files = event.target.files;
+    const filesAmount = files.length;
 
-        const files = event.target.files;
-        const filesAmount = files.length;
+    // Preserve existing images in the preview
+    const existingImages = document.querySelectorAll('.image-wrapper img');
+    const existingFiles = Array.from(existingImages).map(img => img.src);
 
-        document.getElementById('fileCount').value = filesAmount + ' files selected';
+    preview.innerHTML = ''; // Clear existing previews to update with both existing and new images
 
-        for (let i = 0; i < filesAmount; i++) {
-            const reader = new FileReader();
+    // Add existing images to the preview
+    existingFiles.forEach((src, index) => {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.className = 'image-wrapper';
+        imageWrapper.style.position = 'relative';
+        imageWrapper.style.display = 'inline-block';
+        imageWrapper.style.marginRight = '10px';
 
-            reader.onload = function(event) {
-                const imageWrapper = document.createElement('div');
-                imageWrapper.className = 'image-wrapper';
-                imageWrapper.style.position = 'relative';
-                imageWrapper.style.display = 'inline-block';
-                imageWrapper.style.marginRight = '10px';
+        const imageElement = document.createElement('img');
+        imageElement.src = src;
+        imageElement.style.width = '100px';
+        imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
 
-                const imageElement = document.createElement('img');
-                imageElement.src = event.target.result;
-                imageElement.style.width = '100px';
-                imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+        const removeButton = document.createElement('button');
+        removeButton.innerText = 'x';
+        removeButton.className = 'close-button';
+        removeButton.style.position = 'absolute';
+        removeButton.style.top = '0';
+        removeButton.style.right = '0';
+        removeButton.style.color = 'rgb(255, 255, 255)';
+        removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
+        removeButton.style.border = 'none';
+        removeButton.style.borderRadius = '50%';
+        removeButton.style.cursor = 'pointer';
+        removeButton.onclick = function() {
+            removeImage(removeButton, index); // Mark image index for deletion
+        };
 
-                const removeButton = document.createElement('button');
-                removeButton.innerText = 'x';
-                removeButton.className = 'close-button';
-                removeButton.style.position = 'absolute';
-                removeButton.style.top = '0';
-                removeButton.style.right = '0';
-                removeButton.style.color = 'rgb(255, 255, 255)';
-                removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
-                removeButton.style.border = 'none';
-                removeButton.style.borderRadius = '50%';
-                removeButton.style.cursor = 'pointer';
-                removeButton.onclick = function() {
-                    const newFiles = Array.from(files).filter((file, index) => index !== i);
-                    const fileList = new DataTransfer();
+        imageWrapper.appendChild(imageElement);
+        imageWrapper.appendChild(removeButton);
+        preview.appendChild(imageWrapper);
+    });
 
-                    newFiles.forEach(file => {
-                        fileList.items.add(file);
-                    });
+    // Add newly selected images to the preview
+    for (let i = 0; i < filesAmount; i++) {
+        const reader = new FileReader();
 
-                    document.getElementById('imageInput').files = fileList.files;
-                    handleFileSelect({ target: document.getElementById('imageInput') });
+        reader.onload = function(event) {
+            const imageWrapper = document.createElement('div');
+            imageWrapper.className = 'image-wrapper';
+            imageWrapper.style.position = 'relative';
+            imageWrapper.style.display = 'inline-block';
+            imageWrapper.style.marginRight = '10px';
 
-                    document.getElementById('imageInput').value = '';
-                };
+            const imageElement = document.createElement('img');
+            imageElement.src = event.target.result;
+            imageElement.style.width = '100px';
+            imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
 
-                imageElement.addEventListener('click', function() {
-                    const cropperModal = new bootstrap.Modal(document.getElementById('cropModal'));
-                    const cropperImage = document.getElementById('cropperImage');
-                    cropperImage.src = event.target.result;
+            const removeButton = document.createElement('button');
+            removeButton.innerText = 'x';
+            removeButton.className = 'close-button';
+            removeButton.style.position = 'absolute';
+            removeButton.style.top = '0';
+            removeButton.style.right = '0';
+            removeButton.style.color = 'rgb(255, 255, 255)';
+            removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
+            removeButton.style.border = 'none';
+            removeButton.style.borderRadius = '50%';
+            removeButton.style.cursor = 'pointer';
+            removeButton.onclick = function() {
+                // Remove image from preview and update file list
+                const newFiles = Array.from(files).filter((file, index) => index !== i);
+                const fileList = new DataTransfer();
 
-                    cropperModal.show();
-
-                    const cropper = new Cropper(cropperImage, {
-                        aspectRatio: 1,
-                        viewMode: 1,    
-                        autoCropArea: 1,
-                    });
-
-                    // Handle crop button click
-                    document.getElementById('cropButton').addEventListener('click', function() {
-                        const canvas = cropper.getCroppedCanvas({
-                            width: 600,
-                            height: 600,
-                            fillColor: '#fff',
-                        });
-
-                        // Replace the original image with the cropped image
-                        imageElement.src = canvas.toDataURL();
-
-                        // Update the File object with the cropped image data
-                        canvas.toBlob(function(blob) {
-                            const newFile = new File([blob], files[i].name, { type: 'image/jpeg', lastModified: Date.now() });
-
-                            const dataTransfer = new DataTransfer();
-                            for (let j = 0; j < files.length; j++) {
-                                if (j !== i) {
-                                    dataTransfer.items.add(files[j]);
-                                } else {
-                                    dataTransfer.items.add(newFile);
-                                }
-                            }
-                            document.getElementById('imageInput').files = dataTransfer.files;
-
-                            cropperModal.hide();
-                            cropper.destroy();
-                        });
-                    });
+                newFiles.forEach(file => {
+                    fileList.items.add(file);
                 });
 
-                imageWrapper.appendChild(imageElement);
-                imageWrapper.appendChild(removeButton);
-                preview.appendChild(imageWrapper);
+                document.getElementById('imageInput').files = fileList.files;
+                handleFileSelect({ target: document.getElementById('imageInput') });
             };
 
-            reader.readAsDataURL(files[i]);
-        }
-    }
+            imageElement.addEventListener('click', function() {
+                const cropperModal = new bootstrap.Modal(document.getElementById('cropModal'));
+                const cropperImage = document.getElementById('cropperImage');
+                cropperImage.src = event.target.result;
 
+                cropperModal.show();
+
+                const cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,    
+                    autoCropArea: 1,
+                });
+
+                // Handle crop button click
+                document.getElementById('cropButton').addEventListener('click', function() {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 600,
+                        height: 600,
+                        fillColor: '#fff',
+                    });
+
+                    imageElement.src = canvas.toDataURL();
+
+                    canvas.toBlob(function(blob) {
+                        const newFile = new File([blob], files[i].name, { type: 'image/jpeg', lastModified: Date.now() });
+
+                        const dataTransfer = new DataTransfer();
+                        for (let j = 0; j < files.length; j++) {
+                            if (j !== i) {
+                                dataTransfer.items.add(files[j]);
+                            } else {
+                                dataTransfer.items.add(newFile);
+                            }
+                        }
+                        document.getElementById('imageInput').files = dataTransfer.files;
+
+                        cropperModal.hide();
+                        cropper.destroy();
+                    });
+                });
+            });
+
+            imageWrapper.appendChild(imageElement);
+            imageWrapper.appendChild(removeButton);
+            preview.appendChild(imageWrapper);
+        };
+
+        reader.readAsDataURL(files[i]);
+    }
+}   
     document.querySelector('.forms-sample').addEventListener('submit', (event) => {
         event.preventDefault();
         if (validateForm()) {

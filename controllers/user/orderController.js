@@ -174,9 +174,7 @@ const payNow = async (req, res) => {
             return res.status(404).json({ success: false, message: "Order not found" });
         }
 
-        const totalPrice = order.items.reduce((total, item) => {
-            return total + (item.quantity * (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price));
-        }, 0);
+        const totalPrice = order.totalPrice;
 
         const razorpayOrder = await razorpayInstance.orders.create({
             amount: totalPrice * 100,
@@ -201,7 +199,7 @@ const payNow = async (req, res) => {
         console.log(error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-};
+};  
 
 
 // Update status after paynow
@@ -273,6 +271,7 @@ const orderDetails = async (req, res) => {
 
         res.render('orderDetails', { user: userData, order: orderData });
     } catch (error) {
+        res.render('500');
         console.log(error);
     }
 };
@@ -289,7 +288,11 @@ const cancelOrder = async (req, res) => {
         for (let item of orderData.items) {
             if (item.productId == productId) {
                 item.itemStatus = "Cancelled";
-                refundAmount = item.price * item.quantity;
+                
+                const product = await productModel.findById(item.productId);
+                const itemPrice = product.offerPrice ? product.offerPrice : product.price;
+                
+                refundAmount = itemPrice * item.quantity;
 
                 await productModel.findByIdAndUpdate(
                     item.productId,
@@ -335,6 +338,7 @@ const cancelOrder = async (req, res) => {
         res.json({ success: false, message: "Error cancelling order." });
     }
 };
+
 
 // Return request
 const returnProduct = async (req, res) => {

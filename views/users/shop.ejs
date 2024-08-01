@@ -1,9 +1,8 @@
 <%- include("../layout/header") %>
-<!-- Navbar -->
 <%- include("../layout/navbar") %>
 <link rel="stylesheet" href="/css/shop.css">
+<link rel="stylesheet" href="https://cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css">
 
-<!-- breadcrumb -->
 <div class="container p-t-75" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
@@ -16,37 +15,44 @@
     </div>
 </div>
 
-<!-- Product -->
 <div class="bg0 m-t-23 p-b-140 p-t-10">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
             <h4 class="ml-2 mt-2">Shop</h4>
             <div class="d-flex flex-column flex-md-row align-items-center">
                 <div class="input-group mb-2 mb-md-0" style="width: 200px;">
-                    <input type="text" class="form-control" placeholder="Search..." id="search-input">
-                    <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+                    <input type="text" class="form-control" placeholder="Search..." id="search-input" value="<%= search %>">
+                    <button class="btn btn-outline-secondary" type="button" id="search-button">
+                        <i class="mdi mdi-magnify"></i>
+                    </button>
                 </div>
                 <select class="form-select ml-md-2 mt-2 mt-md-0" id="sort-select" style="max-width: 200px; height: 35px; font-size: 0.875rem;">
-                    <option value="newArrival">New Arrival</option>
-                    <option value="priceLowToHigh">Price: Low to High</option>
-                    <option value="priceHighToLow">Price: High to Low</option>
-                    <option value="nameAZ">Name [A-Z]</option>
-                    <option value="nameZA">Name [Z-A]</option>
-                </select>                  
+                    <option value="newArrival" <%= sortOption === 'newArrival' ? 'selected' : '' %>>New Arrival</option>
+                    <option value="priceLowToHigh" <%= sortOption === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
+                    <option value="priceHighToLow" <%= sortOption === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
+                    <option value="nameAZ" <%= sortOption === 'nameAZ' ? 'selected' : '' %>>Name [A-Z]</option>
+                    <option value="nameZA" <%= sortOption === 'nameZA' ? 'selected' : '' %>>Name [Z-A]</option>
+                </select>
             </div>
         </div>
         
-        <!-- Filter -->
         <div class="row">
             <div class="col-md-3">
                 <div class="filter-section">
                     <h6 class="text-dark fw-5">Categories</h6>
                     <ul id="category-list">
-                        <!-- Categories will be dynamically inserted here -->
+                        <li>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="all-products" onclick="window.location='/shop'">
+                                <label class="form-check-label" for="all-products">
+                                    All products
+                                </label>
+                            </div>
+                        </li>
                         <% categories.forEach(category => { %>
                             <li>
                                 <div class="form-check">
-                                    <input class="form-check-input category-filter" type="checkbox" value="<%= category._id %>" id="category<%= category._id %>">
+                                    <input class="form-check-input category-filter" type="checkbox" value="<%= category._id %>" id="category<%= category._id %>" <%= selectedCategories.includes(category._id.toString()) ? 'checked' : '' %>>
                                     <label class="form-check-label" for="category<%= category._id %>">
                                         <%= category.categoryName %>
                                     </label>
@@ -58,44 +64,26 @@
                 <div class="filter-section">
                     <h6 class="text-dark fw-5">Price</h6>
                     <ul>
-                        <li>
-                            <div class="form-check">
-                                <input class="form-check-input price-filter" type="checkbox" value="0-500" id="price0-500">
-                                <label class="form-check-label" for="price0-500">
-                                    ₹0 - ₹500
-                                </label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="form-check">
-                                <input class="form-check-input price-filter" type="checkbox" value="500-1000" id="price500-1000">
-                                <label class="form-check-label" for="price500-1000">
-                                    ₹500 - ₹1000
-                                </label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="form-check">
-                                <input class="form-check-input price-filter" type="checkbox" value="1000-2000" id="price1000-2000">
-                                <label class="form-check-label" for="price1000-2000">
-                                    ₹1000 - ₹2000
-                                </label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="form-check">
-                                <input class="form-check-input price-filter" type="checkbox" value="2000" id="price2000">
-                                <label class="form-check-label" for="price2000">
-                                    ₹2000+
-                                </label>
-                            </div>
-                        </li>
+                        <% ["0-500", "500-1000", "1000-2000", "2000"].forEach(range => { %>
+                            <li>
+                                <div class="form-check">
+                                    <input class="form-check-input price-filter" type="checkbox" value="<%= range %>" id="price<%= range.replace('-', '') %>" <%= (minPrice === parseInt(range.split('-')[0]) && maxPrice === (range.split('-')[1] || Number.MAX_VALUE)) ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="price<%= range.replace('-', '') %>">
+                                        <%= range.replace('-', ' - ') %>
+                                    </label>
+                                </div>
+                            </li>
+                        <% }) %>
                     </ul>
                 </div>
             </div>
 
             <div class="col-md-9">
-                <!-- PRODUCT -->
+                <% if (noProductsFound) { %>
+                    <div class="no-products-found">
+                        <p class="text-center mt-lg-5">No products found</p>
+                    </div>
+                <% } else { %> 
                 <div class="row product-grid p-t-40" id="product-list">
                     <% products.forEach(product => { %>
                         <div class="col-sm-6 col-md-4 col-lg-3 product-item" data-category="<%= product.category._id %>" data-price="<%= product.offerPrice || product.price %>">
@@ -118,173 +106,97 @@
                                                 ₹ <%= product.price %>
                                             <% } %>
                                         </span>
-                                        <span class="stext-106 cl3">
-                                            <% if (product.quantity >= 10) { %>
-                                                <span style="color: green; font-size: smaller;">in stock</span>
-                                            <% } else if (product.quantity > 0) { %>
-                                                <span style="color: peru; font-size: smaller;">only <%= product.quantity %> left in stock</span>
-                                            <% } else { %>
-                                                <span style="color: red; font-size: smaller;">out of stock</span>
-                                            <% } %>
-                                        </span><br>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     <% }) %>
                 </div>
-
-                <!-- Pagination -->
-                <div class="pagination-container mt-4">
-                    <ul class="pagination justify-content-center" id="pagination">
-                        <% if (currentPage > 1) { %>
-                            <li class="page-item">
-                                <a class="page-link page-link-custom" href="?page=<%= currentPage - 1 %>" style="background-color: #fff; border-color: #000000; color: #000;">
-                                    <i class="zmdi zmdi-chevron-left"></i>
-                                </a>
-                            </li>
-                        <% } %>
-                        <% for(let i = 1; i <= totalPages; i++) { %>
-                            <li class="page-item <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" style="border-color: #000;">
-                                <a class="page-link page-link-custom <%= i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark' %>" href="?page=<%= i %>" style="border-color: #000;"><%= i %></a>
-                            </li>
-                        <% } %>
-                        <% if (currentPage < totalPages) { %>
-                            <li class="page-item">
-                                <a class="page-link page-link-custom" href="?page=<%= currentPage + 1 %>" style="background-color: #fff; border-color: #000; color: #000;">
-                                    <i class="zmdi zmdi-chevron-right"></i>
-                                </a>
-                            </li>
-                        <% } %>
-                    </ul>
-                </div>
+                <div class="pagination-container" style="display: flex; justify-content: center; margin-top: 20px;">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination" style="color: black;">
+                            <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>&sortOption=<%= sortOption %>&searchQuery=<%= search %>&selectedCategories=<%= selectedCategories %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>" aria-label="Previous" style="color: black;">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                    <a class="page-link bg-gradient-custom" href="?page=<%= i %>&sortOption=<%= sortOption %>&searchQuery=<%= search %>&selectedCategories=<%= selectedCategories %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>" style="color: black;">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&sortOption=<%= sortOption %>&searchQuery=<%= search %>&selectedCategories=<%= selectedCategories %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>" aria-label="Next" style="color: black;">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                </div>                
+                <% } %>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Back to top -->
-<div class="btn-back-to-top" id="myBtn">
-    <span class="symbol-btn-back-to-top">
-        <i class="zmdi zmdi-chevron-up"></i>
-    </span>
-</div>
+<%- include("../layout/footer") %>
 
-<%- include("../layout/footer.ejs") %>
-
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/jquery-3.6.0.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search-input');
-    const searchButton = document.getElementById('search-button');
-    const sortSelect = document.getElementById('sort-select');
-    const categoryFilters = document.querySelectorAll('.category-filter');
-    const priceFilters = document.querySelectorAll('.price-filter');
-    const paginationLinks = document.querySelectorAll('.page-link-custom');
+    // Update URL parameters
+    function updateURLParams() {
+        const searchQuery = document.getElementById('search-input').value;
+        const sortOption = document.getElementById('sort-select').value;
 
-    const applyFilters = (page = 1) => {
-        const searchQuery = searchInput.value;
-        const sortOption = sortSelect.value;
-        const selectedCategories = Array.from(categoryFilters).filter(c => c.checked).map(c => c.value);
-        const selectedPrices = Array.from(priceFilters).filter(p => p.checked).map(p => p.value);
+        const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked'))
+            .map(cb => cb.value).join(',');
 
-        const minPrice = selectedPrices.length ? Math.min(...selectedPrices.map(p => parseInt(p.split('-')[0]))) : null;
-        const maxPrice = selectedPrices.length ? Math.max(...selectedPrices.map(p => parseInt(p.split('-')[1] || p.split('-')[0]))) : null;
+        const selectedPrices = Array.from(document.querySelectorAll('.price-filter:checked'))
+            .map(cb => cb.value);
+        const minPrice = selectedPrices.length > 0 ? selectedPrices[0].split('-')[0] : 0;
+        const maxPrice = selectedPrices.length > 0 ? (selectedPrices[0].split('-')[1] || Number.MAX_VALUE) : Number.MAX_VALUE;
 
-        axios.get('/shop/sortFilterSearch', {
-            params: {
-                searchQuery,
-                sortOption,
-                selectedCategories,
-                minPrice,
-                maxPrice,
-                page
-            }
-        }).then(response => {
-            const { products, currentPage, totalPages } = response.data;
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('searchQuery', searchQuery);
+        urlParams.set('sortOption', sortOption);
+        urlParams.set('selectedCategories', selectedCategories);
+        urlParams.set('minPrice', minPrice);
+        urlParams.set('maxPrice', maxPrice);
+        
+        window.history.replaceState(null, '', '?' + urlParams.toString());
+    }
 
-            // Update products
-            const productList = document.getElementById('product-list');
-            productList.innerHTML = '';
-            products.forEach(product => {
-                productList.innerHTML += `
-                    <div class="col-sm-6 col-md-4 col-lg-3 product-item" data-category="${product.category._id}" data-price="${product.offerPrice || product.price}">
-                        <div class="block2">
-                            <div class="block2-pic hov-img0">
-                                <a href="/productDetails?productId=${product._id}">
-                                    <img src="/productimages/${product.image[0]}" alt="IMG-PRODUCT">
-                                </a>
-                            </div>
-                            <div class="block2-txt flex-w flex-t p-t-14">
-                                <div class="block2-txt-child1 flex-col-l">
-                                    <a href="/productDetails?productId=${product._id}" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
-                                        ${product.productName}
-                                    </a>
-                                    <span class="stext-105 cl3">
-                                        ${product.offerPrice ? `<span style="text-decoration: line-through;">₹ ${product.price}</span> ₹ ${product.offerPrice}` : `₹ ${product.price}`}
-                                    </span>
-                                    <span class="stext-106 cl3">
-                                        ${product.quantity >= 10 ? `<span style="color: green; font-size: smaller;">in stock</span>` : product.quantity > 0 ? `<span style="color: peru; font-size: smaller;">only ${product.quantity} left in stock</span>` : `<span style="color: red; font-size: smaller;">out of stock</span>`}
-                                    </span><br>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+    // Event listeners
+    document.getElementById('search-button').addEventListener('click', () => {
+        updateURLParams();
+        location.reload();
+    });
 
-            // Update pagination
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
-            if (currentPage > 1) {
-                pagination.innerHTML += `
-                    <li class="page-item">
-                        <a class="page-link page-link-custom" href="?page=${currentPage - 1}" style="background-color: #fff; border-color: #000000; color: #000;">
-                            <i class="zmdi zmdi-chevron-left"></i>
-                        </a>
-                    </li>
-                `;
-            }
-            for (let i = 1; i <= totalPages; i++) {
-                pagination.innerHTML += `
-                    <li class="page-item ${i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark'}" style="border-color: #000;">
-                        <a class="page-link page-link-custom ${i === currentPage ? 'bg-dark text-light' : 'btn-light text-dark'}" href="?page=${i}" style="border-color: #000;">${i}</a>
-                    </li>
-                `;
-            }
-            if (currentPage < totalPages) {
-                pagination.innerHTML += `
-                    <li class="page-item">
-                        <a class="page-link page-link-custom" href="?page=${currentPage + 1}" style="background-color: #fff; border-color: #000; color: #000;">
-                            <i class="zmdi zmdi-chevron-right"></i>
-                        </a>
-                    </li>
-                `;
-            }
+    document.getElementById('sort-select').addEventListener('change', () => {
+        updateURLParams();
+        location.reload();
+    });
 
-            // Add pagination event listeners
-            document.querySelectorAll('.page-link-custom').forEach(link => {
-                link.addEventListener('click', event => {
-                    event.preventDefault();
-                    const page = parseInt(link.getAttribute('href').split('=')[1]);
-                    applyFilters(page);
-                });
-            });
-        }).catch(error => {
-            console.error(error);
-        });
-    };
-
-    searchButton.addEventListener('click', () => applyFilters());
-    sortSelect.addEventListener('change', () => applyFilters());
-    categoryFilters.forEach(filter => filter.addEventListener('change', () => applyFilters()));
-    priceFilters.forEach(filter => filter.addEventListener('change', () => applyFilters()));
-    paginationLinks.forEach(link => {
-        link.addEventListener('click', event => {
-            event.preventDefault();
-            const page = parseInt(link.getAttribute('href').split('=')[1]);
-            applyFilters(page);
+    document.querySelectorAll('.category-filter').forEach(cb => {
+        cb.addEventListener('change', () => {
+            updateURLParams();
+            location.reload();
         });
     });
-});
+
+    document.querySelectorAll('.price-filter').forEach(cb => {
+        cb.addEventListener('change', () => {
+            updateURLParams();
+            location.reload();
+        });
+    });
 </script>

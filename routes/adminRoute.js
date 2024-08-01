@@ -37,7 +37,7 @@ adminRouter.get('/unblockUser', adminAuth.isLogin, adminUserController.unblockUs
 // products
 adminRouter.get('/products', adminAuth.isLogin, productController.loadProduct);
 adminRouter.get('/addProducts', adminAuth.isLogin, productController.loadAddProducts);
-adminRouter.post('/addProducts', adminAuth.isLogin, upload.array('images'), productController.addProducts);
+adminRouter.post('/addProducts', adminAuth.isLogin, upload.any(), productController.addProducts);
 adminRouter.post('/listProducts', adminAuth.isLogin, productController.listProducts);
 adminRouter.post('/unlistProducts', adminAuth.isLogin, productController.unlistProducts);
 adminRouter.get('/editProducts', adminAuth.isLogin, productController.loadEditProducts);

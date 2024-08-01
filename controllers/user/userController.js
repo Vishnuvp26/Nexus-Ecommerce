@@ -175,7 +175,7 @@ const googleSuccess = async (req, res) => {
 
         if (userData.is_blocked) {
             // return res.status(403).send('You are blocked from accessing this website');
-            return res.redirect(`/login?error=blocked`);
+            return res.redirect('/login');
         }
         
         req.session.user_id = userData._id;
@@ -238,7 +238,6 @@ const loginUser = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
-
 
 // Offers
 const offerPrice = async (products) => {
@@ -341,7 +340,6 @@ const userHome = async (req, res) => {
     }
 };
 
-
 // Logout
 const userLogout = async (req, res) => {
     try {
@@ -388,24 +386,73 @@ const productDetails = async (req, res) => {
 const shop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 15;
+        const limit = 8;
         const skip = (page - 1) * limit;
 
-        const userData = await userModel.findOne({ _id: req.session.user_id });
-        const totalProducts = await productModel.countDocuments({ status: "active" });
-        let activeProducts = await productModel.find({ status: "active" }).populate('category').skip(skip).limit(limit);
-        const categories = await categoryModel.find({ status: "active" });
+        const { sortOption, searchQuery = "", selectedCategories = "", minPrice = 0, maxPrice = Number.MAX_VALUE } = req.query;
 
-        activeProducts = await offerPrice(activeProducts);
+        const query = { status: "active" };
 
+        if (searchQuery) {
+            query.productName = { $regex: searchQuery, $options: 'i' };
+        }
+
+        const selectedCategoryArray = selectedCategories.length > 0 ? selectedCategories.split(",") : [];
+        if (selectedCategoryArray.length > 0) {
+            query.category = { $in: selectedCategoryArray };
+        }
+
+        const minPriceInt = Number(minPrice);
+        const maxPriceInt = Number(maxPrice);
+
+        if (!isNaN(minPriceInt) && minPriceInt > 0) {
+            query.price = { $gte: minPriceInt };
+        }
+        if (!isNaN(maxPriceInt) && maxPriceInt < Number.MAX_VALUE) {
+            query.price = { ...query.price, $lte: maxPriceInt };
+        }
+
+        let productsQuery = productModel.find(query).populate('category').skip(skip).limit(limit);
+
+        switch (sortOption) {
+            case "newArrival":
+                productsQuery = productsQuery.sort({ addedDate: -1 });
+                break;
+            case "priceLowToHigh":
+                productsQuery = productsQuery.sort({ price: 1 });
+                break;
+            case "priceHighToLow":
+                productsQuery = productsQuery.sort({ price: -1 });
+                break;
+            case "nameAZ":
+                productsQuery = productsQuery.sort({ productName: 1 });
+                break;
+            case "nameZA":
+                productsQuery = productsQuery.sort({ productName: -1 });
+                break;
+            default:
+                break;
+        }
+
+        const totalProducts = await productModel.countDocuments(query);
+        const activeProducts = await productsQuery.exec();
         const totalPages = Math.ceil(totalProducts / limit);
+
+        const userData = await userModel.findOne({ _id: req.session.user_id });
+        const categories = await categoryModel.find({ status: "active" });
 
         res.render('shop', {
             user: userData,
             products: activeProducts,
             categories: categories,
             currentPage: page,
-            totalPages: totalPages
+            totalPages: totalPages,
+            search: searchQuery,
+            selectedCategories: selectedCategoryArray,
+            sortOption: sortOption || "",
+            minPrice: minPriceInt || 0,
+            maxPrice: maxPriceInt || Number.MAX_VALUE,
+            noProductsFound: activeProducts.length === 0
         });
     } catch (error) {
         console.log(error);
@@ -413,6 +460,15 @@ const shop = async (req, res) => {
 };
 
 
+// About page
+const aboutPage = async (req, res) => {
+    try {
+        const userData = await userModel.findOne({ _id: req.session.user_id });
+        res.render('about', { user: userData });
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 module.exports = {
     userHome,
@@ -427,5 +483,6 @@ module.exports = {
     verifyOtp,
     productDetails,
     shop,
-    offerPrice
+    offerPrice,
+    aboutPage
 };

@@ -4,14 +4,6 @@
 <!-- css -->
 <link rel="stylesheet" href="/css/address.css">
 
-<style>
-    @media (max-width: 767.98px) {
-    #breadcrumb-container {
-        padding-top: 0 !important;
-    }
-}
-</style>
-
 <!-- breadcrumb -->
 <div class="container p-t-75" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
@@ -146,7 +138,7 @@
     // Form validation
     document.addEventListener("DOMContentLoaded", function() {
         const validationPatterns = {
-            name: /^[A-Za-z]+(?: [A-Za-z]+)*$/,
+            name: /^[a-zA-Z\s]{3,}$/,
             phone: /^[1-9]\d{9}$/,
             district: /^[A-Za-z]{3,}$/,
             city: /^[A-Za-z]+(?: [A-Za-z]+)*$/,

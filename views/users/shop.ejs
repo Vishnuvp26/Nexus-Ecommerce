@@ -18,15 +18,19 @@
 <div class="bg0 m-t-23 p-b-140 p-t-10">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-            <h4 class="ml-2 mt-2">Shop</h4>
-            <div class="d-flex flex-column flex-md-row align-items-center">
-                <div class="input-group mb-2 mb-md-0" style="width: 200px;">
+            <!-- Left side: Search -->
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search..." id="search-input" value="<%= search %>">
                     <button class="btn btn-outline-secondary" type="button" id="search-button">
                         <i class="mdi mdi-magnify"></i>
                     </button>
                 </div>
-                <select class="form-select ml-md-2 mt-2 mt-md-0" id="sort-select" style="max-width: 200px; height: 35px; font-size: 0.875rem;">
+            </div>
+        
+            <!-- Right side: Sort -->
+            <div class="d-flex align-items-center mt-2 mt-md-0">
+                <select class="form-select" id="sort-select" style="max-width: 200px; height: 35px; font-size: 0.875rem;">
                     <option value="newArrival" <%= sortOption === 'newArrival' ? 'selected' : '' %>>New Arrival</option>
                     <option value="priceLowToHigh" <%= sortOption === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
                     <option value="priceHighToLow" <%= sortOption === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
@@ -34,7 +38,7 @@
                     <option value="nameZA" <%= sortOption === 'nameZA' ? 'selected' : '' %>>Name [Z-A]</option>
                 </select>
             </div>
-        </div>
+        </div>        
         
         <div class="row">
             <div class="col-md-3">
@@ -64,7 +68,7 @@
                 <div class="filter-section">
                     <h6 class="text-dark fw-5">Price</h6>
                     <ul>
-                        <% ["0-500", "500-1000", "1000-2000", "2000"].forEach(range => { %>
+                        <% ["500-1000", "1000-2000", "2000"].forEach(range => { %>
                             <li>
                                 <div class="form-check">
                                     <input class="form-check-input price-filter" type="checkbox" value="<%= range %>" id="price<%= range.replace('-', '') %>" <%= (minPrice === parseInt(range.split('-')[0]) && maxPrice === (range.split('-')[1] || Number.MAX_VALUE)) ? 'checked' : '' %>>
@@ -81,7 +85,7 @@
             <div class="col-md-9">
                 <% if (noProductsFound) { %>
                     <div class="no-products-found">
-                        <p class="text-center mt-lg-5">No products found</p>
+                        <p class="text-center mt-lg-5">No such products found</p>
                     </div>
                 <% } else { %> 
                 <div class="row product-grid p-t-40" id="product-list">
@@ -152,6 +156,32 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/main.js"></script>
 <script>
+    // Function to set checkbox states based on URL parameters
+    function setCheckboxStates() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Set category filters
+        const selectedCategories = urlParams.get('selectedCategories')?.split(',') || [];
+        selectedCategories.forEach(category => {
+            const checkbox = document.querySelector(`.category-filter[value="${category}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+
+        // Set price filters
+        const minPrice = urlParams.get('minPrice');
+        const maxPrice = urlParams.get('maxPrice');
+
+        document.querySelectorAll('.price-filter').forEach(cb => {
+            const [priceMin, priceMax] = cb.value.split('-');
+            if (priceMin == minPrice && priceMax == maxPrice) {
+                cb.checked = true;
+            }
+        });
+    }
+
+    // Call this function when the page loads
+    window.onload = setCheckboxStates;
+
     // Update URL parameters
     function updateURLParams() {
         const searchQuery = document.getElementById('search-input').value;
@@ -200,3 +230,4 @@
         });
     });
 </script>
+

@@ -20,7 +20,7 @@ form {
 }
 
 .formContainer {
-  background-color:rgba(255, 255, 255, 0);
+  background-color: rgba(255, 255, 255, 0);
   padding: 2em;
   border-radius: 10px;
 }
@@ -45,10 +45,6 @@ input::placeholder {
   background-color: #00bdc4bb; 
 }
 
-#submitBtn:hover {
-  background-color: #000000bb; 
-}
-
 #signupButton {
   background-color: #008B8B; 
   color: white;
@@ -59,10 +55,6 @@ input::placeholder {
   background-color: #00bdc4bb; 
 }
 
-#signupButton:hover {
-  background-color: #ffffffbb; 
-}
-
 #submitOTPBtn {
   background-color: #008B8B; 
   color: white;
@@ -71,10 +63,6 @@ input::placeholder {
 
 #submitOTPBtn:hover {
   background-color: #00bdc4bb; 
-}
-
-#submitOTPBtn:hover {
-  background-color: #000000bb; 
 }
 
 .signin {
@@ -177,17 +165,26 @@ button svg {
   padding-bottom: 50px;
 }
 
-#nothaveaccount{
+#nothaveaccount {
   font-size: 14px;
 }
 
-#orContinue{
+#orContinue {
   font-size: 15px;
   font-weight: 500;
 }
 
+/* Media queries for form input fields on mobile view */
 @media (max-width: 767px) {
   .formContainer {
       margin-bottom: 50px;
+  }
+  .input {
+      width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  form {
+    padding: 0;
   }
 }

@@ -8,8 +8,21 @@ body {
 
 .accordion .card-header {
     padding: 0;
-    background-color: rgba(0, 0, 0, .03);
+    background-color: #e8f0f2;
     height: 90px;
+}
+
+#headersoftitle{
+    background-color: #e8f0f2;
+}
+
+.card{
+    border-radius: 0%;
+}
+
+#carttotalsinside{
+    background-color: #e8f0f2;
+    border-radius: 0%;
 }
 
 .accordion .btn-link {
@@ -26,7 +39,7 @@ body {
 }
 
 .accordion .card-body {
-    background-color: rgba(0, 0, 0, .03);
+    background-color: rgba(99, 99, 99, 0);
 }
 
 .quantity-controls .btn {
@@ -131,35 +144,6 @@ body {
     padding: 12px 15px;
 }
 
-#snackbar {
-    visibility: hidden; /* Hidden by default. Visible on action */
-    min-width: 250px; /* Minimum width */
-    margin-left: -125px; /* Center the snackbar */
-    background-color: #333; /* Black background color */
-    color: #fff; /* White text color */
-    text-align: center; /* Centered text */
-    border-radius: 2px; /* Rounded borders */
-    padding: 16px; /* Padding */
-    position: fixed; /* Sit on top of the screen */
-    z-index: 1; /* Add a z-index if needed */
-    left: 50%; /* Center the snackbar */
-    bottom: 30px; /* 30px from the bottom */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#snackbar i {
-    margin-right: 8px; /* Space between icon and text */
-}
-
-/* Show the snackbar */
-#snackbar.show {
-    visibility: visible; /* Show the snackbar */
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; /* Fade in and out */
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
 /* Add fade-in and fade-out effects */
 @-webkit-keyframes fadein {
     from {bottom: 0; opacity: 0;} 
@@ -191,5 +175,15 @@ body {
     }
     .media-body p {
         font-size: 14px;
+    }
+}
+@media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+}
+@media (max-width: 767.98px) {
+    .col-md-4 {
+        margin-top: 20px;
     }
 }

@@ -5,14 +5,14 @@
 
 <style>
     @media (max-width: 767.98px) {
-    #breadcrumb-container {
-        padding-top: 0 !important;
+        #breadcrumb-container {
+            padding-top: 0 !important;
+        }
     }
-}
 </style>
 
 <!-- breadcrumb -->
-<div class="container p-t-75"  id="breadcrumb-container">
+<div class="container p-t-75" id="breadcrumb-container">
     <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="/" class="stext-109 cl8 hov-cl1 trans-04">
             Home
@@ -46,70 +46,76 @@
     <a href="#" id="showTransactionsLink" class="show-transactions-link">Show Transactions</a>
 </div>
 
-<!-- Transaction Table -->
+<!-- Transaction Table or No Transactions Message -->
 <div class="container mt-5" id="transactionTableContainer" style="display: none;">
-    <div class="table-responsive">
-        <table class="table table-hover transaction-table">
-            <thead>
-                <tr>
-                    <th scope="col">DATE</th>
-                    <th scope="col">AMOUNT</th>
-                    <th scope="col">TYPE</th>
-                    <th scope="col">BALANCE</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% history.forEach(transaction => { %>
+    <% if (history.length === 0) { %>
+        <div class="text-center">
+            <p>No Transactions Yet</p>
+        </div>
+    <% } else { %>
+        <div class="table-responsive">
+            <table class="table table-hover transaction-table">
+                <thead>
                     <tr>
-                        <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                        <td>₹<%= transaction.amount %></td>
-                        <td class="<%= transaction.transactionType === 'debit' ? 'text-danger' : 'text-success' %>">
-                            <%= transaction.transactionType %>
-                        </td>
-                        <td>₹<%= transaction.newBalance %></td>
+                        <th scope="col">DATE</th>
+                        <th scope="col">AMOUNT</th>
+                        <th scope="col">TYPE</th>
+                        <th scope="col">BALANCE</th>
                     </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    <% history.forEach(transaction => { %>
+                        <tr>
+                            <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                            <td>₹<%= transaction.amount %></td>
+                            <td class="<%= transaction.transactionType === 'debit' ? 'text-danger' : 'text-success' %>">
+                                <%= transaction.transactionType %>
+                            </td>
+                            <td>₹<%= transaction.newBalance %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Pagination Controls -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center mt-4">
-            <!-- Previous Page -->
-            <% if (currentPage > 1) { %>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            <% } else { %>
-                <li class="page-item disabled">
-                    <span class="page-link" aria-hidden="true">&laquo;</span>
-                </li>
-            <% } %>
+        <!-- Pagination Controls -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                <!-- Previous Page -->
+                <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                <% } %>
 
-            <!-- Page Numbers -->
-            <% for (let i = 1; i <= totalPages; i++) { %>
-                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                </li>
-            <% } %>
+                <!-- Page Numbers -->
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
 
-            <!-- Next Page -->
-            <% if (currentPage < totalPages) { %>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            <% } else { %>
-                <li class="page-item disabled">
-                    <span class="page-link" aria-hidden="true">&raquo;</span>
-                </li>
-            <% } %>
-        </ul>
-    </nav>
+                <!-- Next Page -->
+                <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    <% } %>
 </div>
 
 <%- include("../layout/footer.ejs") %>

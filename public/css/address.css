@@ -143,7 +143,6 @@ label {
     color: #999;    
 }
 input::placeholder {
-    /* Resetting placeholder styles */
     font-size: inherit; /* Ensure placeholder inherits font size */
     color: inherit; /* Ensure placeholder inherits text color */
     opacity: 1; /* Ensure placeholder is fully visible */
@@ -165,5 +164,25 @@ input::placeholder {
 
     .form-control {
         height: 42px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+
+    #addAddressForm,
+    #actualAddAddressForm {
+        width: 100% !important;
+        padding: 0 15px;
+    }
+
+    .form-group {
+        width: 100% !important;
+    }
+
+    .form-control {
+        width: 100% !important;
     }
 }

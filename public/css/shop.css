@@ -11,17 +11,23 @@
         margin-bottom: 10px;
     }
     .input-group {
-        flex-direction: column;
+        flex-direction: row;
         width: 100%;
+        justify-content: center;
     }
     .input-group input, .input-group button, .form-select {
-        width: 100%;
+        width: auto;
         margin-bottom: 5px;
     }
-    #search-input{
-        width: 200px;
-        margin: 10px;
+    #search-input {
+        width: auto;
+        margin: 10px 0;
         border-radius: 4px;
+        flex-grow: 1;
+    }
+    #search-button {
+        margin: 10px 0;
+        flex-grow: 0;
     }
 }
 
@@ -105,7 +111,7 @@
 .bg-gradient-custom {
     background: linear-gradient(45deg, #cdcdcd, #ffffff);
 }
-  
-.page-item.active .page-link{
+
+.page-item.active .page-link {
     border-color: rgb(155, 155, 155);
 }

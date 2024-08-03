@@ -118,7 +118,7 @@
 
             <% if (user) { %>
                 <li>
-                    <a href="/profile">Account</a>
+                    <a href="/profile"><%= user.name %> <i class="zmdi zmdi-account"></i></a>
                 </li>
             <% } else { %>
                 <li>

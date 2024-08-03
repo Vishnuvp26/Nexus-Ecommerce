@@ -40,6 +40,8 @@
     margin-bottom: 20px;
 }
 
+
+
 @media (max-width: 768px) {
     .container {
         width: 90%;
@@ -48,7 +50,7 @@
 
 #customerProfileCard {
     border-radius: 10px;
-    border-color: rgba(47, 79, 79, 0.223);
+    border-color: rgba(0, 255, 255, 0.223);
 }
 
 /* UserLogout sweetalert styles */
@@ -127,3 +129,35 @@
     padding: 8px;
     opacity: 1;
 }
+
+/* userProfile.css */
+
+@media (max-width: 767.98px) {
+    #breadcrumb-container {
+        padding-top: 0 !important;
+    }
+    .container {
+        width: 90% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .container.pb-lg-5 {
+        padding-bottom: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 100%;
+        margin: 10px auto;
+    }
+
+    .modal-content {
+        padding: 15px;
+    }
+    
+    .modal-content .form-control {
+        height: 40px;
+    }
+}
+

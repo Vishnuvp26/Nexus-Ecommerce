@@ -217,19 +217,6 @@ font-size: 18px !important;
         document.getElementById('productDescriptionError').innerText = '';
         document.getElementById('imageError').innerText = '';
 
-        try {
-              // Check if product name already exists
-              const response = await axios.get(`/admin/checkAlready?productName=${encodeURIComponent(productName)}`);
-              if (response.data.exists) {
-                  document.getElementById('productNameError').innerText = 'Product Name already exists';
-                  isValid = false;
-              }
-          } catch (error) {
-              console.error('Error checking product name:', error);
-              document.getElementById('productNameError').innerText = 'Error checking product name';
-              isValid = false;
-          }
-
         if (!nameRegex.test(productName)) {
             document.getElementById('productNameError').innerText = 'Product Name must be of only letters and numbers';
             isValid = false;

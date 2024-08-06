@@ -113,12 +113,13 @@
             </div>
             <div class="row mt-2">
                 <div class="col-md-6">
-                    <h6>Order Summary After Discount</h6>
-                    <p class="font-weight-bold text-dark">
-                        Item(s) Subtotal : <%= order.totalPrice %><br>
+                    <h6 class="font-weight-bold text-dark">Order Summary After Discount</h6>
+                    <p class="font-weight-bolder text-dark">
+                        Item(s) Subtotal : <%= order.items.reduce((acc, item) => acc + (item.finalPrice && item.finalPrice !== item.price ? item.finalPrice : item.price) * item.quantity, 0).toFixed(2) %><br>
+                        Discount Price : <%= order.totalPrice.toFixed(2) %><br>
                     </p>
                 </div>
-            </div>            
+            </div>                        
         </div>
     </div>
 </div>
@@ -274,10 +275,13 @@
         const grandTotal = total.toFixed(2);
 
         const finalY = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(14);
+        doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
         doc.setFont('helvetica', 'bold');
         doc.text(`Grand Total: Rs ${grandTotal}`, doc.internal.pageSize.getWidth() - 20, finalY + 10, { align: 'right' });
+
+        const discountPrice = "<%= order.totalPrice %>";
+        doc.text(`Discount Price: Rs ${discountPrice}`, doc.internal.pageSize.getWidth() - 20, finalY + 20, { align: 'right' });
 
         doc.save("order_invoice.pdf");
     }

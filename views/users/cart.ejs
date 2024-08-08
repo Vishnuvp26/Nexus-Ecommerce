@@ -60,7 +60,7 @@
                                                 <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decrement('<%= item.productId.offerPrice ? item.productId.offerPrice : item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">-</button>
                                             </div>
                                             <!-- Quantity Input -->
-                                            <input type="text" class="form-control text-center quantity-input" id="qty<%= i %>" value="<%= item.quantity %>" data-max="<%= Math.min(5, item.productId.quantity) %>">
+                                            <input type="text" class="form-control text-center quantity-input" id="qty<%= i %>" value="<%= item.quantity %>" data-max="<%= Math.min(5, item.productId.quantity) %>" disabled>
                                             <div class="input-group-append">
                                                 <!-- Increase Quantity Button -->
                                                 <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increment('<%= item.productId.offerPrice ? item.productId.offerPrice : item.productId.price %>', '<%= item.productId.quantity %>', '<%= i %>', '<%= item.productId._id %>')">+</button>

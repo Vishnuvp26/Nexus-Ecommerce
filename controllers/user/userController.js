@@ -101,9 +101,8 @@ const handleOTP = async (req, res) => {
 
         const recipientEmail = req.session.newUser.email;
         const otp = generateOTP();
-        console.log('GENERATED OTP......'); // debugging
-        console.log(otp); // debugging
         req.session.otp = otp;
+        req.session.otpExpires = Date.now() + 60000;
 
         sendOTP(recipientEmail, otp);
         res.render('otp', { user: userData, products: activeProducts, email: recipientEmail });
@@ -116,8 +115,13 @@ const handleOTP = async (req, res) => {
 // Register user to db after otp
 const verifyOtp = async (req, res) => {
     try {
+        const currentTime = Date.now();
+
+        if (currentTime > req.session.otpExpires) {
+            return res.json({ success: false, message: 'OTP has expired' });
+        }
+
         if (req.body.otp == req.session.otp) {
- 
             const user = new userModel({
                 name: req.session.newUser.name,
                 phone: req.session.newUser.phone,
@@ -140,6 +144,7 @@ const verifyOtp = async (req, res) => {
         return res.json({ success: false, message: 'An error occurred' });
     }
 };
+
 
 //------Google Authentication Starting------//
 passport.use(new GoogleStrategy({
@@ -391,7 +396,7 @@ const shop = async (req, res) => {
 
         const { sortOption, searchQuery = "", selectedCategories = "", minPrice = 0, maxPrice = Number.MAX_VALUE } = req.query;
 
-        const query = { status: "active" };
+        const query = { status: "active", quantity: { $gt: 0 } };
 
         if (searchQuery) {
             query.productName = { $regex: searchQuery, $options: 'i' };

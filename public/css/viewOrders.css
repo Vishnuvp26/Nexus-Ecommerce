@@ -52,3 +52,19 @@
         margin-bottom: 0;
     }
 }
+
+.empty-cart-img {
+    max-width: 200px;
+}
+
+@media (max-width: 768px) {
+    .empty-cart-img {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 576px) {
+    .empty-cart-img {
+        max-width: 120px;
+    }
+}

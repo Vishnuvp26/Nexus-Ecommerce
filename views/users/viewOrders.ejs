@@ -16,13 +16,12 @@
             <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
         </a>
         <span class="stext-109 cl4">
-            View Orders
+            Orders
         </span>
     </div>
 </div>
 
 <div class="container mt-5">
-    <h4 class="">Your Orders</h4>
 
     <% if (order && order.length > 0) { %>
         <% order.forEach(order => { %>
@@ -75,7 +74,16 @@
             </div>
         <% }); %>
     <% } else { %>
-        <p>No orders found.</p>
+        <div class="row mt-4 text-center">
+            <div class="col-12">
+                <h5 class="text-dark">No orders found!</h5>
+                <p class="mt-3" style="font-size: 13px;">Explore the shop and find something you like</p>
+                <div>
+                    <img src="/images/icons/od3.png" alt="Empty orders" class="empty-cart-img">
+                </div>
+                <a href="/shop" class="text-info">Shop Now</a>
+            </div>
+        </div>
     <% } %>
 </div>
 

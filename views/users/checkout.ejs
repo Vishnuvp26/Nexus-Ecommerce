@@ -354,14 +354,14 @@ function removeCoupon(couponId) {
                     theme: {
                         color: "#F37254"
                     },
-                    modal: {
-                        ondismiss: function() {
-                            setTimeout(() => {
-                                rzp1.close();
-                                window.location.href = '/order-failure';
-                            }, 3000);
-                        }
-                    }
+                    // modal: {
+                    //     ondismiss: function() {
+                    //         setTimeout(() => {
+                    //             rzp1.close();
+                    //             window.location.href = '/order-failure';
+                    //         }, 3000);
+                    //     }
+                    // }
                 };
 
                 let rzp1 = new Razorpay(options);

@@ -25,7 +25,7 @@
                     
                     <!-- Timer -->
                     <div class="mb-3" id="timerSection" style="display: none;">
-                        <span id="timer"></span> seconds remaining
+                        <span id="timer"></span> seconds remaining for resend OTP
                     </div>
 
                     <a href="/otp">
@@ -99,6 +99,11 @@
                                 window.location.href = '/login';
                             }
                         });
+                    } else if (response.data.message === 'OTP has expired') {
+                        otpError.textContent = 'The OTP has expired. Please request a new one.';
+                        resendButton.style.display = 'block';
+                        timerSection.style.display = 'none';
+                        clearInterval(timerInterval);
                     } else {
                         otpError.textContent = 'The OTP you entered is incorrect. Please try again.';
                     }
@@ -111,4 +116,5 @@
             otpError.textContent = 'Please enter a valid OTP.';
         }
     }
+
 </script>

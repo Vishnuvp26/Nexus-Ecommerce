@@ -80,7 +80,6 @@ const addToCart = async (req, res) => {
         }
     } catch (error) {
         console.error('Error adding to cart:', error);
-        return res.status(500).send('Internal server error');
     }
 };
 
@@ -180,7 +179,6 @@ const stockCheck = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, message: "Server error" });
     }
 };
 
@@ -198,6 +196,11 @@ const loadCheckout = async (req, res) => {
                     model: 'Category'
                 }
             });
+        
+
+        if (!cartData || !cartData.items || cartData.items.length === 0) {
+            return res.redirect('/shop');
+        }
 
         res.render('checkout', { 
             user: userData,  
@@ -242,7 +245,6 @@ const addNewAddress = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 

@@ -39,12 +39,12 @@ const loadProduct = async (req, res) => {
 };
 
 // Load add products
-const loadAddProducts = async (req, res, next) => {
+const loadAddProducts = async (req, res) => {
     try {
         const category = await Category.find();
         res.render('addProducts', { category: category });
     } catch (error) {
-        next(error);
+        console.log(error)
     }
 };
 
@@ -79,7 +79,6 @@ const addProducts = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Failed to add product', error: error.message });
     }
 };
 
@@ -95,13 +94,13 @@ const listProducts = async (req, res, next) => {
 };
 
 // Unlist Products
-const unlistProducts = async (req, res, next) => {
+const unlistProducts = async (req, res) => {
     try {
         const id = req.query.id;
         await Product.updateOne({ _id: id }, { $set: { status: "inactive" } });
         res.json({ success: true });
     } catch (error) {
-        next(error);
+        console.log(error)
     }
 };
 
@@ -117,8 +116,7 @@ const checkAlready = async (req, res) => {
             res.json({ exists: false });
         }
     } catch (error) {
-        console.error('Error checking product name:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        console.log(error)
     }
 }
 

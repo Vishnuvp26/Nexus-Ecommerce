@@ -36,7 +36,6 @@ const addToWishlist = async (req, res) => {
         }
     } catch (error) {
         console.error('Error adding product to wishlist:', error);
-        res.status(500).json({ success: false, message: 'Failed to add product to wishlist' });
     }
 };
 
@@ -52,7 +51,6 @@ const wishlist = async (req, res) => {
         res.render('wishlist', { user: userData, wishlist: wishlist });
     } catch (error) {
         console.log(error);
-        res.status(500).send('Error fetching wishlist');
     }
 };
 
@@ -76,7 +74,6 @@ const removeFromWishlist = async (req, res) => {
             return res.json({ success: false, message: 'Wishlist not found' });
         }
     } catch (error) {
-        console.error('Error removing product from wishlist:', error);
     }
 };
 

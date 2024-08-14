@@ -43,7 +43,6 @@ const addCoupon = async (req, res) => {
         }
     } catch (error) {
         console.error('Error adding coupon:', error);
-        return res.status(500).json({ message: 'Failed to add coupon' });
     }
 };
 
@@ -102,7 +101,6 @@ const checkCoupon = async (req, res) => {
         }
     } catch (error) {
         console.error('Error checking coupon:', error.message);
-        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
 

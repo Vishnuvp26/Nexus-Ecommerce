@@ -60,7 +60,6 @@ const addNewCategory = async (req, res) => {
         return res.status(200).json({ message: 'Category added successfully' });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
@@ -80,7 +79,6 @@ const updateCategory = async (req, res) => {
             res.status(400).render('category', { categoryData, error: 'Category name already exists' });
         } else {
             console.error(error);
-            res.status(500).render('category', { categoryData, error: 'An error occurred while updating the category.' });
         }
     }
 };
@@ -97,7 +95,6 @@ const listCategory = async (req, res) => {
         
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'An error occurred while updating the category status.' });
     }
 };
 
@@ -113,7 +110,6 @@ const unlistCategory = async (req, res) => {
         
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'An error occurred while updating the category status.' });
     }
 };
 

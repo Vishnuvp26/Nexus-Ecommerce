@@ -79,12 +79,12 @@ const addToCart = async (req, res) => {
             }
         }
     } catch (error) {
-        console.error('Error adding to cart:', error);
+        console.log(error)
     }
 };
 
 // Reduce cart quanity
-const decrementCart = async (req, res, next) => {
+const decrementCart = async (req, res) => {
     try {
         const { index } = req.body;
         const item = await cartModel.findOne({ userId: req.session.user_id });
@@ -97,12 +97,12 @@ const decrementCart = async (req, res, next) => {
             res.json({ success: false, message: 'Quantity cannot be less than 1' });
         }
     } catch (error) {
-        next(error);
+        console.log(error)
     }
 };
 
 // Increase cart quantity
-const incrementCart = async (req, res, next) => {
+const incrementCart = async (req, res) => {
     try {
         const { index } = req.body;
         const item = await cartModel.findOne({ userId: req.session.user_id });
@@ -115,12 +115,12 @@ const incrementCart = async (req, res, next) => {
             res.json({ success: false, message: "You can't buy more than 5 quantityssss" });
         }
     } catch (error) {
-        next(error);
+        console.log(error);
     }
 };
 
 // Remove cart
-const removeFromCart = async (req, res, next) => {
+const removeFromCart = async (req, res) => {
     try {
         const { productId } = req.body;
         const cart = await cartModel.findOne({ userId: req.session.user_id });
@@ -142,7 +142,7 @@ const removeFromCart = async (req, res, next) => {
             res.json({ success: false, message: 'Cart not found' });
         }
     } catch (error) {
-        next(error);
+        console.log(error)
     }
 };
 

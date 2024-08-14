@@ -68,7 +68,6 @@ const registerLoad = async (req, res) => {
         res.render('register',{user: userData});
     } catch (error) {
         console.log(error);
-        res.status(500).send('Internal Server Error');
     }
 };
 
@@ -89,7 +88,6 @@ const insertUser = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
 
@@ -141,7 +139,6 @@ const verifyOtp = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.json({ success: false, message: 'An error occurred' });
     }
 };
 
@@ -179,8 +176,7 @@ const googleSuccess = async (req, res) => {
         }
 
         if (userData.is_blocked) {
-            // return res.status(403).send('You are blocked from accessing this website');
-            return res.redirect('/login');
+            return res.status(403).send('You are blocked from accessing this website');
         }
         
         req.session.user_id = userData._id;
@@ -195,7 +191,6 @@ const googleSuccess = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).send('An error occurred');
     }
 };
 //------Google Authentication Ending------//
@@ -207,7 +202,6 @@ const loginLoad = async (req, res) => {
         res.render('login',{user: userData});
     } catch (error) {
         console.log(error);
-        res.status(500).send('Internal Server Error');
     }
 };
 
@@ -240,7 +234,7 @@ const loginUser = async (req, res) => {
             res.json({ success: false, message: "No user found" });
         }
     } catch (error) {
-        res.json({ success: false, message: error.message });
+        console.log(error)
     }
 };
 
@@ -341,7 +335,6 @@ const userHome = async (req, res) => {
         res.render('home', { user: userData, products: activeProducts });
     } catch (error) {
         console.error(error);
-        res.status(500).send(error);
     }
 };
 

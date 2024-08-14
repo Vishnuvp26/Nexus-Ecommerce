@@ -119,8 +119,7 @@ const createOrder = async (req, res) => {
             return res.json({ success: true, message: "Order placed successfully" });
         }
     } catch (error) {
-        console.error('Error creating order:', error);
-        res.json({ success: false, message: "Error creating order" });
+        console.log(error)
     }
 };
 
@@ -197,7 +196,6 @@ const payNow = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };  
 
@@ -223,11 +221,7 @@ const updateOrderStatus = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to update order status.',
-        });
+        console.log(error)
     }
 };
 
@@ -334,8 +328,7 @@ const cancelOrder = async (req, res) => {
 
         res.json({ success: true, message: "Order item cancelled successfully." });
     } catch (error) {
-        console.log('Error cancelling order:', error);
-        res.json({ success: false, message: "Error cancelling order." });
+        console.log(error)
     }
 };
 
@@ -361,7 +354,7 @@ const returnProduct = async (req, res) => {
 
         res.json({ success: true, message: "Return request submitted successfully" });
     } catch (error) {
-        console.error('Error processing return request:', error);
+        console.log(error)
     }
 };
 

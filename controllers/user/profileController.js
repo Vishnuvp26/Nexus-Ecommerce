@@ -24,7 +24,6 @@ const loadAddress = async (req, res) => {
         res.render('address', { user: userData, addresses: addressData ? addressData.address : [] });
     } catch (error) {
         console.log(error);
-        res.status(500).send('Internal Server Error');
     }
 };
 
@@ -57,12 +56,11 @@ const addAddress = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
 // Load Edit Address
-const loadEditAddress = async (req, res, next) => {
+const loadEditAddress = async (req, res) => {
     try {
         const userData = await userModel.findOne({ _id: req.session.user_id });
         const addressId = req.query.addressId;
@@ -73,12 +71,12 @@ const loadEditAddress = async (req, res, next) => {
             address: address.address.find(a => a._id.toString() === addressId)
         });
     } catch (error) {
-        next(error);
+        console.log(error)
     }
 };
 
 // Edit address
-const editAddress = async (req, res, next) => {
+const editAddress = async (req, res) => {
     try {
         const addressId = req.body.addressId;
 
@@ -101,7 +99,7 @@ const editAddress = async (req, res, next) => {
         await address.save();
         res.status(200).json({ msg: 'Address updated successfully', address: address.address[index] });
     } catch (error) {
-        next(error);
+        console.log(error)
     }
 };
 
@@ -139,8 +137,7 @@ const editProfile = async (req, res) => {
 
         return res.redirect('/profile');
     } catch (error) {
-        console.error('Error updating profile:', error);
-        res.status(500).json({ error: 'Server error' });
+        console.log(error)
     }
 };
 
@@ -160,7 +157,7 @@ const loadEditPassword = async (req, res) => {
         const userData = await userModel.findOne({ _id: req.session.user_id });
         res.render('editPassword', { user: userData });
     } catch (error) {
-        console.log('error');
+        console.log(error);
     }
 };
 
@@ -183,7 +180,6 @@ const changePassword = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: "Internal server error." });
     }
 };
 
@@ -250,7 +246,6 @@ const sendPasswordLink = async (req, res) => {
         }
     } catch (err) {
         console.log(err.message);
-        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -268,7 +263,6 @@ const renderResetPasswordForm = async (req, res) => {
         res.render('resetPasswordForm', { token, user: userData });
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error');
     }
 };
 
@@ -294,7 +288,6 @@ const handleResetPassword = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.status(500).send('Server error');
     }
 };
 

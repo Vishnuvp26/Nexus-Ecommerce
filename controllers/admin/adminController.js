@@ -476,7 +476,7 @@ const updateOrderStatus = async (req, res) => {
 
         res.json({ success: true, status: order.status, paymentStatus: order.paymentStatus });
     } catch (error) {
-        console.error('Error updating order status:', error);
+        console.error(error);
     }
 };
 
@@ -682,7 +682,7 @@ const returnApproval = async (req, res, next) => {
 
         res.json({ success: true, status: order.status, paymentStatus: order.paymentStatus });
     } catch (error) {
-        next(error);
+        console.log(error);
     }
 };
   

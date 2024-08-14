@@ -74,6 +74,7 @@ const removeFromWishlist = async (req, res) => {
             return res.json({ success: false, message: 'Wishlist not found' });
         }
     } catch (error) {
+        console.log(error)
     }
 };
 

@@ -1,14 +1,9 @@
 <%- include("../layout/header") %>
 	<!-- Navbar -->
 	<%- include("../layout/navbar") %>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/css/productDetails.css">
 
-	<style>
-		@media (max-width: 767.98px) {
-		#breadcrumb-container {
-			padding-top: 0 !important;
-		}
-	}
-	</style>
 
 	<!-- breadcrumb -->
 	<div class="container p-t-75 " id="breadcrumb-container">
@@ -138,14 +133,6 @@
 						<li class="nav-item p-b-10">
 							<a class="nav-link active" data-toggle="tab" href="#description" role="tab">Description</a>
 						</li>
-
-						<!-- <li class="nav-item p-b-10">
-							<a class="nav-link" data-toggle="tab" href="#information" role="tab">Additional information</a>
-						</li> -->
-
-						<!-- <li class="nav-item p-b-10">
-							<a class="nav-link" data-toggle="tab" href="#reviews" role="tab">Reviews (1)</a>
-						</li> -->
 					</ul>
 
 					<!-- Tab panes -->
@@ -158,65 +145,6 @@
 								</p>
 							</div>
 						</div>
-
-						<!-- Product information -->
-						<!-- <div class="tab-pane fade" id="information" role="tabpanel">
-							<div class="row">
-								<div class="col-sm-10 col-md-8 col-lg-6 m-lr-auto">
-									<ul class="p-lr-28 p-lr-15-sm">
-										<li class="flex-w flex-t p-b-7">
-											<span class="stext-102 cl3 size-205">
-												Weight
-											</span>
-
-											<span class="stext-102 cl6 size-206">
-												0.79 kg
-											</span>
-										</li>
-
-										<li class="flex-w flex-t p-b-7">
-											<span class="stext-102 cl3 size-205">
-												Dimensions
-											</span>
-
-											<span class="stext-102 cl6 size-206">
-												110 x 33 x 100 cm
-											</span>
-										</li>
-
-										<li class="flex-w flex-t p-b-7">
-											<span class="stext-102 cl3 size-205">
-												Materials
-											</span>
-
-											<span class="stext-102 cl6 size-206">
-												60% cotton
-											</span>
-										</li>
-
-										<li class="flex-w flex-t p-b-7">
-											<span class="stext-102 cl3 size-205">
-												Color
-											</span>
-
-											<span class="stext-102 cl6 size-206">
-												Black, Blue, Grey, Green, Red, White
-											</span>
-										</li>
-
-										<li class="flex-w flex-t p-b-7">
-											<span class="stext-102 cl3 size-205">
-												Size
-											</span>
-
-											<span class="stext-102 cl6 size-206">
-												XL, L, M, S
-											</span>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div> -->
 
 						<!-- - -->
 						<div class="tab-pane fade" id="reviews" role="tabpanel">
@@ -357,6 +285,8 @@
 		</div>
 	</section>	
 
+	<div id="snackbar"></div>
+
 <%- include("../layout/footer.ejs") %>
 
 <style>
@@ -390,75 +320,39 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<!-- <script>
-    function addToCart(productId) {
-        axios.post('/add-to-cart', { productId: productId })
-            .then(function (response) {
-                console.log(response.data);
-                alert('Product added to cart successfully!');
-            })
-            .catch(function (error) {
-                console.error('Error adding to cart:', error);
-                alert('Failed to add product to cart');
-            });
-    }
-</script> -->
 
 <!-- Add to cart -->
 <script>
-    function addToCart(productId) {
-        axios.post('/add-to-cart', { productId: productId })
-            .then(function (response) {
-                console.log(response.data);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Product added to cart successfully!',
-					customClass: {
-                        icon: 'swal2-icon-custom',
-                        content: 'swal2-content-custom',
-                    }
-                });
-            })
-            .catch(function (error) {
-                console.error('Error adding to cart:', error);
-                Swal.fire({
-                    text: 'Product already exists in cart',
-                });
-            });
-    }
-</script>
-<style>
-    .swal2-icon-custom {
-        font-size: 8px !important;	
-    }
-    .swal2-content-custom {
-        font-size: 5px !important;
-		font-family:'Poppins-Regular';
-    }
-</style>
-
-<!-- Wishlist -->
-<script>	
-const addToWishlist = async (productId) => {
-    try {
-        const response = await axios.post(`/wishlist/add?productId=${productId}`);
-        if (response.data.success) {
-            Swal.fire({
-                icon: 'success',
-                text: 'Product added to wishlist!',
-            });
-        } else {
-            Swal.fire({
-                text: 'Product already in wishlist!',
-            });
-        }
-    } catch (error) {	
-        console.error('Error adding product to wishlist:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to add product to wishlist.',
-        });
-    }
-};
+	function showSnackbar(message) {
+		var x = document.getElementById("snackbar");
+		x.textContent = message;
+		x.className = "show";
+		setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1000);
+	}
+	
+	function addToCart(productId) {
+		axios.post('/add-to-cart', { productId: productId })
+			.then(function (response) {
+				console.log(response.data);
+				showSnackbar('Product added to cart successfully!');
+			})
+			.catch(function (error) {
+				console.error('Error adding to cart:', error);
+				showSnackbar('Product already exists in cart');
+			});
+	}
+	
+	async function addToWishlist(productId) {
+		try {
+			const response = await axios.post(`/wishlist/add?productId=${productId}`);
+			if (response.data.success) {
+				showSnackbar('Product added to wishlist!');
+			} else {
+				showSnackbar('Product already in wishlist!');
+			}
+		} catch (error) {
+			console.error('Error adding product to wishlist:', error);
+			showSnackbar('Failed to add product to wishlist.');
+		}
+	}
 </script>

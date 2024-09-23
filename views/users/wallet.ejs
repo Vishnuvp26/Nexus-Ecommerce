@@ -1,6 +1,8 @@
 <%- include("../layout/header") %>
 <!-- Navbar -->
 <%- include("../layout/navbar") %>
+<!-- <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"> -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/wallet.css">
 
 <style>
@@ -30,13 +32,16 @@
 
 <!-- Wallet Design -->
 <div class="container mt-5">
-    <h4 class="ml-4">Wallet</h4>
     <div class="card mt-4 wallet-card" id="walletcontainer">
         <div class="card-header text-center">
             <h5 class="walletText">NEXUS WALLET</h5>
         </div>
         <div class="card-body text-center">
-            <h4 class="walletText">Available Balance: <b>₹ <span id="balance"><%= balance %></span></b></h4>
+            <h4 class="walletText">Balance: <b>₹ <span id="balance"><%= balance %></span></b></h4>
+        </div>
+        <!-- wallet name -->
+        <div class="card-holder-name">
+            <h6> <%= user.name %></h6>
         </div>
     </div>
 </div>

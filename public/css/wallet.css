@@ -1,4 +1,4 @@
-/* Wallet card styling */
+/* Wallet card styling with professional ATM card design in teal */
 .wallet-card {
     width: 500px;
     height: 300px;
@@ -6,32 +6,88 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: linear-gradient(135deg, #008b8b 0%, #2f9f9f 50%, #4a4a4a 100%);
+    border-radius: 15px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Digital7', 'Orbitron', sans-serif; /* Digital font */
 }
 
+/* Circular designs */
+.wallet-card::before, .wallet-card::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.card-header {
+    font-family: 'Digital7', 'Orbitron', sans-serif; /* Digital font */
+    border: none;
+}
+
+/* First large circle */
+.wallet-card::before {
+    width: 350px;
+    height: 350px;
+    top: -100px;
+    right: -100px;
+}
+
+/* Second medium circle */
+.wallet-card::after {
+    width: 200px;
+    height: 200px;
+    bottom: -50px;
+    left: -50px;
+}
+
+/* Card text styling */
 .wallet-card .card-header h5 {
     margin: 0;
     padding: 9px 0;
     font-size: 1.25rem;
-
+    color: white;
+    text-align: center;
 }
 
 .wallet-card .card-body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: center;
 }
 
 .wallet-card .card-body h4 {
     margin: 0;
+    font-size: 1.5rem;
 }
 
-#showTransactionsLink{
+/* Cardholder name styling */
+.card-holder-name {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 1.25rem;
+    color: white;
+    font-family: 'Digital7', 'Orbitron', sans-serif; /* Digital font */
+}
+
+.card-holder-name h5 {
+    margin: 0;
+}
+
+/* Transaction link */
+#showTransactionsLink {
     text-decoration: none;
-    color:#008B8B;
+    color: #008b8b; /* Changed to teal */
 }
 
-#showTransactionsLink:hover{
-    color:#006060;
+#showTransactionsLink:hover {
+    color: #4a4a4a; /* Slightly lighter shade for hover effect */
 }
 
 .table-responsive {
@@ -41,14 +97,15 @@
     margin-right: auto;
 }
 
-.transaction-table {    
+.transaction-table {
     width: 100%;
 }
 
+/* Media Queries for Mobile View */
 @media (max-width: 768px) {
     .wallet-card {
         width: 300px;
-        height: 300px;
+        height: 200px;
     }
 
     .wallet-card .card-header h5 {
@@ -58,12 +115,28 @@
     .wallet-card .card-body h4 {
         font-size: 1.25rem;
     }
+
+    .card-holder-name {
+        bottom: 15px;
+        left: 15px;
+        font-size: 1rem;
+    }
+
+    .card-holder-name {
+        bottom: 10px;
+        left: 10px;
+        font-size: 0.875rem;
+    }
+
+    .card-holder-name h6 {
+        font-size: 0.75rem;
+    }
 }
 
 @media (max-width: 576px) {
     .wallet-card {
         width: 250px;
-        height:300px;
+        height: 180px;
     }
 
     .wallet-card .card-header h5 {
@@ -72,6 +145,12 @@
 
     .wallet-card .card-body h4 {
         font-size: 1rem;
+    }
+
+    .card-holder-name {
+        bottom: 10px;
+        left: 10px;
+        font-size: 0.875rem;
     }
 }
 

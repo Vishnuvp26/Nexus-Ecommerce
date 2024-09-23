@@ -261,7 +261,11 @@ const orderDetails = async (req, res) => {
         }
 
         const userData = await userModel.findOne({ _id: userId });
-        const orderData = await orderModel.findOne({ _id: orderId });
+        const orderData = await orderModel.findOne({ _id: orderId, userId: userId });
+
+        if (!orderData) {
+            return res.render('500');
+        }
 
         res.render('orderDetails', { user: userData, order: orderData });
     } catch (error) {

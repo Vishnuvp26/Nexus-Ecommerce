@@ -2,6 +2,7 @@
 <%- include("../layout/navbar") %>
 <link rel="stylesheet" href="/css/wishlist.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
     @media (max-width: 767.98px) {
@@ -77,34 +78,33 @@
         </div>
     <% } %>
 </div>
+<div id="snackbar"></div>
 
 <%- include("../layout/footer.ejs") %>
 
 <script>
+function showSnackbar(message) {
+    var x = document.getElementById("snackbar");
+    x.textContent = message; // Set the message
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1600);
+}
+
 // Remove from wishlist
 const removeFromWishlist = async (productId) => {
     try {
         const response = await axios.delete(`/wishlist/remove?productId=${productId}`);
         if (response.data.success) {
-            Swal.fire({
-                text: 'Product removed from wishlist!',
-            }).then(()=>{
+            showSnackbar('Product removed from wishlist!');
+            setTimeout(() => {
                 window.location.reload();
-            })
+            }, 1600); // Delayed reload to allow Snackbar to disappear
         } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Info',
-                text: response.data.message,
-            });
+            showSnackbar(response.data.message || 'Info: Action could not be completed.');
         }
     } catch (error) {
         console.error('Error removing product from wishlist:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to remove product from wishlist.',
-        });
+        showSnackbar('Failed to remove product from wishlist.');
     }
 };
 
@@ -113,20 +113,11 @@ function addToCart(productId) {
     axios.post('/add-to-cart', { productId: productId })
         .then(function (response) {
             console.log(response.data);
-            Swal.fire({
-                icon: 'success',
-                title: 'Product added to cart successfully!',
-                customClass: {
-                    icon: 'swal2-icon-custom',
-                    content: 'swal2-content-custom',
-                }
-            });
+            showSnackbar('Product added to cart successfully!');
         })
         .catch(function (error) {
             console.error('Error adding to cart:', error);
-            Swal.fire({
-                text: 'Product already exists in cart',
-            });
+            showSnackbar('Product already exists in cart');
         });
 }
 </script>

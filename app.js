@@ -40,6 +40,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // User Route
 app.use('/', userRoute);
 
+//health checkup
+app.get('/health', (req, res) => {
+  res.status(200).send('Healthy')
+})
+
 // Admin Route
 app.use('/admin', adminRoute);
 

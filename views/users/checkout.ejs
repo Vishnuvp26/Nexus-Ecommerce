@@ -354,60 +354,57 @@ function removeCoupon(couponId) {
                         console.error("Payment verification error:", error);
                         window.location.href = "/order-failure";
                     }
-                },
-                prefill: {
-                    name: response.data.name,
-                    email: response.data.email,
-                    contact: response.data.phone
-                },
-                notes: {
-                    address: selectedAddress.dataset.description
-                },
-                theme: {
-                    color: "#F37254"
-                },
-                modal: {
-                    ondismiss: function() {
-                        // Stay on same page when modal is closed - user can try again
-                        console.log("Payment modal closed by user");
-                        // Do nothing - stay on checkout page
+                    },
+                    prefill: {
+                        name: response.data.name,
+                        email: response.data.email,
+                        contact: response.data.phone
+                    },
+                    notes: {
+                        address: selectedAddress.dataset.description
+                    },
+                    theme: {
+                        color: "#F37254"
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log("Payment modal closed by user");
+                        }
                     }
-                }
-            };
+                };
 
-            let rzp1 = new Razorpay(options);
-            rzp1.open();
+                let rzp1 = new Razorpay(options);
+                rzp1.open();
 
-            rzp1.on('payment.failed', (response) => {
-                console.log("Payment failed:", response.error);
-                setTimeout(() => {
-                    window.location.href = "/order-failure";
-                }, 2000);
-            });
+                rzp1.on('payment.failed', (response) => {
+                    console.log("Payment failed:", response.error);
+                    setTimeout(() => {
+                        window.location.href = "/order-failure";
+                    }, 2000);
+                });
 
+            } else {
+                Swal.fire({
+                    title: 'Processing your order...!',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    window.location.href = '/order-success';
+                });
+            }
         } else {
-            // COD flow remains the same
             Swal.fire({
-                title: 'Processing your order...!',
-                showConfirmButton: false,
-                timer: 2000
-            }).then(() => {
-                window.location.href = '/order-success';
+                title: 'Oops...',
+                text: response.data.message || 'Something went wrong!'
             });
         }
-    } else {
-        Swal.fire({
-            title: 'Oops...',
-            text: response.data.message || 'Something went wrong!'
-        });
-    }
-} catch (error) {
-    console.error('Error:', error);
-    Swal.fire({
-        title: 'Oops...',
-        text: error.response?.data?.message || 'Something went wrong!'
-    });
-}
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Oops...',
+                text: error.response?.data?.message || 'Something went wrong!'
+            });
+        }
     });
 
     document.addEventListener("DOMContentLoaded", function() {

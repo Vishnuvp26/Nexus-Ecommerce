@@ -71,7 +71,7 @@
                 <tbody>
                     <% history.forEach(transaction => { %>
                         <tr>
-                            <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                            <td><%= new Date(transaction.date).toLocaleDateString('en-GB') %></td>
                             <td>₹<%= transaction.amount %></td>
                             <td class="<%= transaction.transactionType === 'debit' ? 'text-danger' : 'text-success' %>">
                                 <%= transaction.transactionType %>

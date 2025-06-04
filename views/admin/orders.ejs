@@ -40,7 +40,7 @@
                             <% orders.forEach(order => { %>
                             <tr>
                                 <td><%= order.orderId %></td>
-                                <td><%= order.date.toLocaleDateString() %></td>
+                                <td><%= order.date.toLocaleDateString('en-GB') %></td>
                                 <td><%= order.user.name %></td>
                                 <td>₹ <%= order.totalPrice.toFixed(2) %></td>
                                 <td><%= order.items.length %></td>

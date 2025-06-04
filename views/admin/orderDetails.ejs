@@ -32,7 +32,7 @@
                                         <h2 class="card-title">Order Details</h2>
                                         <p class="card-text">
                                             <span class="fw-bold">Order ID : </span><span id="orderID"><%= order.orderId %></span><br>
-                                            <span class="fw-bold mt-2">Order Date : </span><span id="orderDate"><%= order.date.toLocaleDateString() %></span><br>
+                                            <span class="fw-bold mt-2">Order Date : </span><span id="orderDate"><%= order.date.toLocaleDateString('en-GB') %></span><br>
                                             <span class="fw-bold mt-2">Total Amount : </span><span id="orderDate"> ₹ <%= order.totalPrice %></span><br>
                                             <span class="fw-bold mt-2">Payment Method : </span><span id="paymentMethod"><%= order.paymentMethod %></span><br>
                                             <span class="fw-bold mt-2">Customer Name : </span><span id="customerName"><%= order.userId.name %></span>

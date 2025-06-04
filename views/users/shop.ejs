@@ -31,6 +31,7 @@
             <!-- Right side: Sort -->
             <div class="d-flex align-items-center mt-2 mt-md-0">
                 <select class="form-select" id="sort-select" style="max-width: 200px; height: 35px; font-size: 0.875rem;">
+                    <option disabled selected value="">Sort by</option>
                     <option value="newArrival" <%= sortOption === 'newArrival' ? 'selected' : '' %>>New Arrival</option>
                     <option value="priceLowToHigh" <%= sortOption === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
                     <option value="priceHighToLow" <%= sortOption === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
@@ -165,7 +166,6 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/main.js"></script>
 <script>
-    // Function to set checkbox states based on URL parameters
     function setCheckboxStates() {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -188,10 +188,8 @@
         });
     }
 
-    // Call this function when the page loads
     window.onload = setCheckboxStates;
 
-    // Update URL parameters
     function updateURLParams() {
         const searchQuery = document.getElementById('search-input').value;
         const sortOption = document.getElementById('sort-select').value;
@@ -214,7 +212,6 @@
         window.history.replaceState(null, '', '?' + urlParams.toString());
     }
 
-    // Event listeners
     document.getElementById('search-button').addEventListener('click', () => {
         updateURLParams();
         location.reload();

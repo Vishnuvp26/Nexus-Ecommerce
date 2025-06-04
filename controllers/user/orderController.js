@@ -123,7 +123,6 @@ const razorpayInstance = new Razorpay({
 //     }
 // };
 
-// CONTROLLER - Fixed Version
 const createOrder = async (req, res) => {
     try {
         const userId = req.session.user_id;
@@ -152,7 +151,6 @@ const createOrder = async (req, res) => {
         const address = addressArray[0].address;
         const orderId = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // For COD - Create order immediately
         if (req.body.paymentMethod === "cod") {
             if (req.body.totalprice > 1000) {
                 return res.json({ success: false, message: "Cannot place order with COD for amount above 1000" });
@@ -178,7 +176,6 @@ const createOrder = async (req, res) => {
                 date: Date.now(),
             });
 
-            // Add items and reduce stock for COD
             for (const item of cartData.items) {
                 let finalPrice = item.productId.price;
                 if (item.productId.offerPrice) {
@@ -207,7 +204,6 @@ const createOrder = async (req, res) => {
             return res.json({ success: true, message: "Order placed successfully" });
         }
 
-        // For Razorpay - Only create Razorpay order, don't save to DB yet
         else if (req.body.paymentMethod === "razorpay") {
             console.log('1')
             const razorpayOrder = await razorpayInstance.orders.create({
@@ -217,14 +213,13 @@ const createOrder = async (req, res) => {
             });
             console.log('2')
 
-            // Store order data in session for later use after payment verification
             req.session.pendingOrder = {
                 orderId,
                 userId,
                 paymentMethod: req.body.paymentMethod,
                 totalPrice: req.body.totalprice,
                 address,
-                cartData: cartData.toObject() // Convert to plain object
+                cartData: cartData.toObject()
             };
             console.log('3')
 
@@ -247,14 +242,12 @@ const createOrder = async (req, res) => {
     }
 };
 
-// NEW CONTROLLER - Payment Verification
 const verifyPayment = async (req, res) => {
     try {
         console.log('4')
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
         console.log('5')
         
-        // Verify signature
         const crypto = require('crypto');
         const expectedSignature = crypto
             .createHmac('sha256', process.env.SECRET_KEY)
@@ -267,7 +260,6 @@ const verifyPayment = async (req, res) => {
         }
 
         console.log('7')
-        // Get pending order data from session
         const pendingOrder = req.session.pendingOrder;
         if (!pendingOrder) {
             return res.json({ success: false, message: "Order session expired" });
@@ -275,7 +267,6 @@ const verifyPayment = async (req, res) => {
 
         console.log('8')
 
-        // Now create the actual order in database
         const orderData = new orderModel({
             orderId: pendingOrder.orderId,
             userId: pendingOrder.userId,
@@ -292,7 +283,6 @@ const verifyPayment = async (req, res) => {
 
         console.log('9')
 
-        // Add items and reduce stock only after successful payment
         for (const item of pendingOrder.cartData.items) {
             let finalPrice = item.productId.price;
             if (item.productId.offerPrice) {
@@ -319,7 +309,6 @@ const verifyPayment = async (req, res) => {
         const savedOrder = await orderData.save();
         await cartModel.findOneAndUpdate({ userId: pendingOrder.userId }, { $set: { items: [] } });
         
-        // Clear session data
         req.session.orderId = savedOrder._id;
         delete req.session.pendingOrder;
 
@@ -330,8 +319,6 @@ const verifyPayment = async (req, res) => {
         return res.status(500).json({ success: false, message: "Payment verification failed" });
     }
 };
-
-// No handlePaymentFailure controller needed - session will automatically expire
 
 // Order success
 const orderSuccess = async (req, res) => {

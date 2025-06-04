@@ -66,7 +66,6 @@
                                 
             </div>
             <div class="accordion" id="accordionExample">
-                
                 <!-- Address Section -->
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center" id="headingTwo">
@@ -319,83 +318,96 @@ function removeCoupon(couponId) {
         }
 
         try {
-            const response = await axios.post('/checkout/place-order', {
-                selectedAddress: selectedAddress.value,
-                paymentMethod: selectedPaymentMethod,
-                totalprice: finalTotalPrice  
-            });
+    const response = await axios.post('/checkout/place-order', {
+        selectedAddress: selectedAddress.value,
+        paymentMethod: selectedPaymentMethod,
+        totalprice: finalTotalPrice  
+    });
 
-            if (response.data.success) {
-                if (selectedPaymentMethod === 'razorpay') {
-                    var options = {
-                    key: response.data.key,
-                    amount: response.data.amount,
-                    currency: "INR",
-                    name: 'NEXUS',
-                    description: "Payment for order",
-                    image: "/images/icons/NEXfavicon.png",
-                    order_id: response.data.razorpayOrderId,
-                    handler: function(response) {
-                        if (response.razorpay_payment_id) {
-                            console.log("Payment Successful: ", response);
+    if (response.data.success) {
+        if (selectedPaymentMethod === 'razorpay') {
+            var options = {
+                key: response.data.key,
+                amount: response.data.amount,
+                currency: "INR",
+                name: 'NEXUS',
+                description: "Payment for order",
+                image: "/images/icons/NEXfavicon.png",
+                order_id: response.data.razorpayOrderId,
+                handler: async function(response) {
+                    try {
+                        // Verify payment on server
+                        const verifyResponse = await axios.post('/verify-payment', {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+
+                        if (verifyResponse.data.success) {
+                            console.log("Payment Successful and Verified");
                             window.location.href = "/order-success";
                         } else {
+                            console.log("Payment verification failed");
                             window.location.href = "/order-failure";
                         }
-                    },
-                    prefill: {
-                        name: response.data.name,
-                        email: response.data.email,
-                        contact: response.data.phone
-                    },
-                    notes: {
-                        address: selectedAddress.dataset.description
-                    },
-                    theme: {
-                        color: "#F37254"
-                    },
-                    // modal: {
-                    //     ondismiss: function() {
-                    //         setTimeout(() => {
-                    //             rzp1.close();
-                    //             window.location.href = '/order-failure';
-                    //         }, 3000);
-                    //     }
-                    // }
-                };
-
-                let rzp1 = new Razorpay(options);
-                rzp1.open();
-
-                rzp1.on('payment.failed', (response) => {
-                    setTimeout(() => {
-                        rzp1.close();
+                    } catch (error) {
+                        console.error("Payment verification error:", error);
                         window.location.href = "/order-failure";
-                    }, 3000);
-                });
-
-                } else {
-                    Swal.fire({
-                        title: 'Processing your order...!',
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        window.location.href = '/order-success';
-                    });
+                    }
+                },
+                prefill: {
+                    name: response.data.name,
+                    email: response.data.email,
+                    contact: response.data.phone
+                },
+                notes: {
+                    address: selectedAddress.dataset.description
+                },
+                theme: {
+                    color: "#F37254"
+                },
+                modal: {
+                    ondismiss: function() {
+                        // Stay on same page when modal is closed - user can try again
+                        console.log("Payment modal closed by user");
+                        // Do nothing - stay on checkout page
+                    }
                 }
-            } else {
-                Swal.fire({
-                    title: 'Oops...',
-                    text: response.data.message || 'Something went wrong!'
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
+            };
+
+            let rzp1 = new Razorpay(options);
+            rzp1.open();
+
+            rzp1.on('payment.failed', (response) => {
+                console.log("Payment failed:", response.error);
+                setTimeout(() => {
+                    window.location.href = "/order-failure";
+                }, 2000);
+            });
+
+        } else {
+            // COD flow remains the same
             Swal.fire({
-                title: 'Oops...',
-                text: error.response?.data?.message || 'Something went wrong!'
+                title: 'Processing your order...!',
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => {
+                window.location.href = '/order-success';
             });
         }
+    } else {
+        Swal.fire({
+            title: 'Oops...',
+            text: response.data.message || 'Something went wrong!'
+        });
+    }
+} catch (error) {
+    console.error('Error:', error);
+    Swal.fire({
+        title: 'Oops...',
+        text: error.response?.data?.message || 'Something went wrong!'
+    });
+}
     });
 
     document.addEventListener("DOMContentLoaded", function() {

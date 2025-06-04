@@ -67,6 +67,7 @@ userRouter.get('/check-coupon', userAuth.isLogin, couponController.checkCoupon);
 
 // Orders
 userRouter.post('/checkout/place-order', userAuth.isLogin, orderController.createOrder);
+userRouter.post('/verify-payment', userAuth.isLogin, orderController.verifyPayment);
 userRouter.get('/order-success', userAuth.isLogin, orderController.orderSuccess);
 userRouter.get('/view-orders', userAuth.isLogin, orderController.viewOrders);
 userRouter.get('/order-details', userAuth.isLogin, orderController.orderDetails);

@@ -93,11 +93,17 @@
                                     data-name="<%= products[i].productName %>">
                                     Edit
                                 </a>
-                                <% if (products[i].status === "active") { %>
-                                    <button class="btn-sm btn-gradient-danger status-btn" data-id="<%= products[i]._id %>" onclick="unlistProduct('<%= products[i]._id %>')">Inactive</button>
-                                <% } else { %>
-                                    <button class="btn-sm btn-gradient-success status-btn" data-id="<%= products[i]._id %>" onclick="listProduct('<%= products[i]._id %>')">Active</button>
-                                <% } %>
+                                <td id="product-btn-<%= products[i]._id %>">
+                                    <% if (products[i].status === "active") { %>
+                                        <button class="btn-sm btn-gradient-danger" onclick="toggleProductStatus('<%= products[i]._id %>', true)">
+                                        Inactive
+                                        </button>
+                                    <% } else { %>
+                                        <button class="btn-sm btn-gradient-success" onclick="toggleProductStatus('<%= products[i]._id %>', false)">
+                                        Active
+                                        </button>
+                                    <% } %>
+                                </td>
                             </td>                                                
                         </tr>
                         <% } } else { %>
@@ -136,8 +142,6 @@
             </div>
       </div>
   </div>
-    
-
 </div>
     <!-- content-wrapper ends -->
 </div>
@@ -147,85 +151,45 @@
 <%- include("../layout/adminFooter") %>
 
 <script>
-    // list product
-    function listProduct(productId) {
-        Swal.fire({
-            title: 'Do you want to make this product active?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, make active',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.post(`/admin/listProducts?id=${productId}`)
-                    .then((response) => {
-                        if (response.data.success) {
-                            Swal.fire({
-                            icon: 'success',
-                            text: 'Product marked as active successfully.',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                        } else {
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Failed to mark product as active. Please try again.',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error(error);
-                    Swal.fire({
-                        icon: 'error',
-                        text: 'An error occurred while trying to mark product as active. Please try again.',
-                        confirmButtonText: 'OK'
-                    });
-                });
-            }
-        });
-    }
+function toggleProductStatus(productId, isActive) {
+    const action = isActive ? 'unlist' : 'list';
+    const statusText = isActive ? 'inactive' : 'active';
+    const url = `/admin/${action}Products?id=${productId}`;
 
-    //unlist product
-    function unlistProduct(productId) {
-        Swal.fire({
-            title: 'Do you want to make this product inactive?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, make inactive',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.post(`/admin/unlistProducts?id=${productId}`)
+    Swal.fire({
+        title: `Do you want to make this product ${statusText}?`,
+        icon: isActive ? 'warning' : 'question',
+        showCancelButton: true,
+        confirmButtonText: `Yes, make ${statusText}`,
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.post(url)
                 .then((response) => {
-                    if (response.data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            text: 'Product marked as inactive successfully.',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Failed to mark product as inactive. Please try again.',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                    })
-                .catch((error) => {
-                    console.error(error);
+                if (response.data.success) {
                     Swal.fire({
-                        icon: 'error',
-                        text: 'An error occurred while trying to mark product as inactive. Please try again.',
+                        icon: 'success',
+                        text: `Product marked as ${statusText} successfully.`,
                         confirmButtonText: 'OK'
                     });
-                });
-            }
-        });
-    }
+
+                    const container = document.getElementById(`product-btn-${productId}`);
+                    container.innerHTML = `
+                    <button class="btn-sm btn-gradient-${isActive ? 'success' : 'danger'}"
+                            onclick="toggleProductStatus('${productId}', ${!isActive})">
+                        ${isActive ? 'Active' : 'Inactive'}
+                    </button>
+                    `;
+                } else {
+                    Swal.fire('Error!', 'Failed to update product status.', 'error');
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                Swal.fire('Error!', 'An error occurred. Please try again.', 'error');
+            });
+        }
+    });
+}
 </script>

@@ -4,11 +4,12 @@ const adminController = require('../controllers/admin/adminController');
 const categoryController = require('../controllers/admin/categoryController');
 const productController = require('../controllers/admin/productController');
 const adminUserController = require('../controllers/admin/adminUserController');
-const orderController = require('../controllers/user/orderController');
 const couponController = require('../controllers/admin/couponController');
 const offerController = require('../controllers/admin/offerController');
 const adminAuth = require('../middleware/adminAuth');
-const upload = require('../middleware/multer')
+const upload = require('../middleware/multer');
+const adminOrderController = require('../controllers/admin/adminOrderController');
+const authController = require('../controllers/admin/adminAuthController');
 const setNoCacheHeaders = require('../middleware/nocache');
 
 // views
@@ -16,10 +17,12 @@ adminRouter.set("view engine", "ejs");
 adminRouter.set("views", "./views/admin");
 
 // login logout
-adminRouter.get('/', adminAuth.isLogout, adminController.adminLogin);
-adminRouter.post('/', adminController.adminPostLogin);
-adminRouter.get("/dashboard", adminAuth.isLogin, adminController.loadDashboard);  
-adminRouter.get("/logout", adminAuth.isLogin, adminController.adminLogout);
+adminRouter.get('/', adminAuth.isLogout, authController.adminLogin);
+adminRouter.post('/', authController.adminPostLogin);
+adminRouter.get("/logout", adminAuth.isLogin, authController.adminLogout);
+
+// dashboard
+adminRouter.get("/dashboard", adminAuth.isLogin, adminController.loadDashboard);
 
 // category
 adminRouter.get('/category', adminAuth.isLogin, categoryController.loadCategory);
@@ -45,10 +48,10 @@ adminRouter.get('/checkAlready', adminAuth.isLogin, productController.checkAlrea
 adminRouter.post('/editProducts', adminAuth.isLogin, upload.array('images'), productController.editProducts);
 
 // Orders
-adminRouter.get('/orderList', adminAuth.isLogin, adminController.loadOrdersList);
-adminRouter.get('/orderDetails', adminAuth.isLogin, adminController.adminOrderDetails);
-adminRouter.post('/updateOrderStatus', adminAuth.isLogin, adminController.updateOrderStatus);
-adminRouter.post('/returnApproval', adminAuth.isLogin, adminController.returnApproval);
+adminRouter.get('/orderList', adminAuth.isLogin, adminOrderController.loadOrdersList);
+adminRouter.get('/orderDetails', adminAuth.isLogin, adminOrderController.adminOrderDetails);
+adminRouter.post('/updateOrderStatus', adminAuth.isLogin, adminOrderController.updateOrderStatus);
+adminRouter.post('/returnApproval', adminAuth.isLogin, adminOrderController.returnApproval);
 
 // Coupons
 adminRouter.get('/coupons', adminAuth.isLogin, couponController.loadCoupons); 
